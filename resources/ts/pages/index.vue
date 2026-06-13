@@ -2,6 +2,13 @@
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
 
+definePage({
+  meta: {
+    layout: 'blank',
+    public: true,
+  },
+})
+
 const categories = ref<any[]>([])
 const loading = ref(true)
 

@@ -3,6 +3,13 @@ import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import axios from 'axios'
 
+definePage({
+  meta: {
+    layout: 'blank',
+    public: true,
+  },
+})
+
 const route = useRoute()
 const router = useRouter()
 const category = ref<any>(null)

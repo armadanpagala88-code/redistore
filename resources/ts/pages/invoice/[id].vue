@@ -3,6 +3,13 @@ import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import axios from 'axios'
 
+definePage({
+  meta: {
+    layout: 'blank',
+    public: true,
+  },
+})
+
 const route = useRoute()
 const invoice = ref<any>(null)
 const loading = ref(true)

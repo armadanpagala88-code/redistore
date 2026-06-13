@@ -26,6 +26,13 @@ Route::post('/login', [App\Http\Controllers\Api\AuthController::class, 'login'])
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [App\Http\Controllers\Api\AuthController::class, 'logout']);
     
+    // Transaksi
     Route::get('/admin/transaksi', [App\Http\Controllers\Api\Admin\TransaksiController::class, 'index']);
     Route::put('/admin/transaksi/{id}/status', [App\Http\Controllers\Api\Admin\TransaksiController::class, 'updateStatus']);
+    
+    // Kategori Game
+    Route::apiResource('/admin/kategori', App\Http\Controllers\Api\Admin\KategoriGameController::class);
+    
+    // Produk Voucher
+    Route::apiResource('/admin/produk', App\Http\Controllers\Api\Admin\ProdukVoucherController::class);
 });
