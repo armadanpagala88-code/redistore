@@ -26,7 +26,7 @@ watch([isFallbackStateActive, refLoadingIndicator], () => {
       <VContainer class="d-flex align-center w-100 h-100" style="max-width: 1200px; padding: 0 16px;">
         <RouterLink to="/" class="d-flex align-center gap-x-3 text-decoration-none">
           <VNodeRenderer :nodes="themeConfig.app.logo" />
-          <span class="text-h5 font-weight-bold text-white text-uppercase tracking-wider">
+          <span class="text-h5 font-weight-black text-primary text-uppercase tracking-wider" style="color: #1e293b !important;">
             {{ themeConfig.app.title }}
           </span>
         </RouterLink>
