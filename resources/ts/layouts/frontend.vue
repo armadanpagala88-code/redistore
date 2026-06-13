@@ -84,14 +84,14 @@ watch([isFallbackStateActive, refLoadingIndicator], () => {
 
 <style lang="scss">
 .premium-layout {
-  background-color: #0b0f19 !important; /* Deep dark blue */
-  color: #f1f5f9;
+  background-color: #f8fafc !important; /* Light slate background */
+  color: #0f172a;
 }
 
-/* Override default typography colors for dark theme */
+/* Override default typography colors for light theme */
 .premium-layout .text-high-emphasis,
 .premium-layout .text-medium-emphasis {
-  color: rgba(255, 255, 255, 0.9) !important;
+  color: #334155 !important;
 }
 
 .main-content-area {
@@ -99,43 +99,23 @@ watch([isFallbackStateActive, refLoadingIndicator], () => {
   overflow: hidden;
 }
 
-/* Glassmorphism Navbar */
+/* Glassmorphism Navbar (Light) */
 .glass-navbar {
-  background: rgba(11, 15, 25, 0.85) !important;
+  background: rgba(255, 255, 255, 0.9) !important;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
 }
 
-/* Glowing Orbs Background */
-.bg-glow {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(120px);
-  z-index: 0;
-  opacity: 0.5;
-}
-
-.bg-glow-1 {
-  top: -10%;
-  left: -10%;
-  width: 600px;
-  height: 600px;
-  background: radial-gradient(circle, rgba(98,54,255,0.7) 0%, rgba(0,0,0,0) 70%);
-}
-
-.bg-glow-2 {
-  bottom: 10%;
-  right: -5%;
-  width: 500px;
-  height: 500px;
-  background: radial-gradient(circle, rgba(255,54,129,0.5) 0%, rgba(0,0,0,0) 70%);
-}
-
-/* Premium Footer */
+/* Premium Footer (Light) */
 .premium-footer {
-  background-color: #080b13 !important;
-  border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+  background-color: #ffffff !important;
+  border-top: 1px solid rgba(0, 0, 0, 0.05) !important;
+  color: #475569 !important;
+}
+
+.premium-footer .text-white {
+  color: #0f172a !important; /* Make footer title dark */
 }
 
 .max-w-600 {
@@ -147,10 +127,11 @@ watch([isFallbackStateActive, refLoadingIndicator], () => {
 }
 
 .nav-btn {
-  opacity: 0.9;
+  color: #334155 !important;
+  font-weight: 600 !important;
   transition: all 0.3s ease;
   &:hover {
-    opacity: 1;
+    color: rgb(var(--v-theme-primary)) !important;
     transform: translateY(-2px);
   }
 }
@@ -159,8 +140,13 @@ watch([isFallbackStateActive, refLoadingIndicator], () => {
   transition: all 0.3s ease;
   color: white !important;
   &:hover {
-    box-shadow: 0 0 20px rgba(var(--v-theme-primary), 0.6);
+    box-shadow: 0 0 20px rgba(var(--v-theme-primary), 0.4);
     transform: translateY(-2px);
   }
+}
+
+/* Remove dark glows */
+.bg-glow {
+  display: none;
 }
 </style>

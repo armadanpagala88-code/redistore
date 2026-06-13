@@ -29,8 +29,7 @@ onMounted(async () => {
 })
 
 const getImageUrl = (path: string) => {
-  // Gunakan placeholder kotak (square) ala UniPin
-  if (!path) return 'https://placehold.co/400x400/1e293b/ffffff.png?text=Icon'
+  if (!path) return 'https://placehold.co/400x400/f1f5f9/94a3b8.png?text=Icon'
   return path.startsWith('http') ? path : `/images/${path}`
 }
 </script>
@@ -82,20 +81,20 @@ const getImageUrl = (path: string) => {
       <div v-else class="mb-12 rounded-lg d-flex align-center justify-center empty-banner-box">
         <div class="text-center pa-8">
           <VIcon icon="ri-image-add-line" size="48" color="primary" class="mb-3 opacity-50" />
-          <h3 class="text-h6 font-weight-bold text-white mb-1">Space Iklan Tersedia</h3>
-          <p class="text-caption text-grey-lighten-1">Login sebagai admin untuk mengupload banner promo di sini.</p>
+          <h3 class="text-h6 font-weight-bold text-primary mb-1">Space Iklan Tersedia</h3>
+          <p class="text-caption text-medium-emphasis">Login sebagai admin untuk mengupload banner promo di sini.</p>
         </div>
       </div>
 
       <!-- Section Title ala UniPin -->
       <div class="d-flex align-center mb-6">
-        <h2 class="text-h5 font-weight-bold text-white d-flex align-center gap-2">
+        <h2 class="text-h5 font-weight-bold text-high-emphasis d-flex align-center gap-2">
           <VIcon icon="ri-gamepad-fill" color="primary" size="28" />
           Populer
         </h2>
       </div>
 
-      <!-- Game Grid ala UniPin (Kecil, Rapat, Banyak Kolom) -->
+      <!-- Game Grid ala UniPin -->
       <VRow dense class="match-unipin-grid">
         <VCol
           v-for="cat in categories"
@@ -116,8 +115,8 @@ const getImageUrl = (path: string) => {
             </div>
             
             <VCardItem class="pa-3 text-center card-content flex-grow-1 d-flex flex-column justify-center">
-              <VCardTitle class="text-subtitle-2 font-weight-bold text-white mb-0 line-clamp-1" style="font-size: 0.9rem !important;">{{ cat.nama_game }}</VCardTitle>
-              <VCardSubtitle class="text-caption text-grey-lighten-1 mt-1 line-clamp-1">{{ cat.deskripsi }}</VCardSubtitle>
+              <VCardTitle class="text-subtitle-2 font-weight-bold text-high-emphasis mb-0 line-clamp-1" style="font-size: 0.9rem !important;">{{ cat.nama_game }}</VCardTitle>
+              <VCardSubtitle class="text-caption text-medium-emphasis mt-1 line-clamp-1">{{ cat.deskripsi }}</VCardSubtitle>
             </VCardItem>
           </VCard>
         </VCol>
@@ -130,7 +129,7 @@ const getImageUrl = (path: string) => {
 /* UniPin Style Tweaks */
 .unipin-carousel {
   border-radius: 12px !important;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1) !important;
 }
 
 .carousel-bg {
@@ -143,12 +142,12 @@ const getImageUrl = (path: string) => {
 .carousel-overlay {
   width: 100%;
   height: 100%;
-  background: linear-gradient(to top, rgba(11, 15, 25, 0.9) 0%, rgba(11, 15, 25, 0.2) 60%, rgba(0,0,0,0) 100%);
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.2) 60%, rgba(0,0,0,0) 100%);
 }
 
 .empty-banner-box {
-  background: rgba(30, 41, 59, 0.5);
-  border: 1px dashed rgba(255, 255, 255, 0.2);
+  background: rgba(var(--v-theme-primary), 0.05);
+  border: 1px dashed rgba(var(--v-theme-primary), 0.3);
   min-height: 200px;
 }
 
@@ -173,8 +172,8 @@ const getImageUrl = (path: string) => {
 }
 
 .unipin-card {
-  background: #1e293b !important; /* Latar warna navy/abu-abu gelap ala UniPin */
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: #ffffff !important; /* Latar warna putih */
+  border: 1px solid rgba(0, 0, 0, 0.05);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   cursor: pointer;
   overflow: hidden;
@@ -182,7 +181,7 @@ const getImageUrl = (path: string) => {
 
 .unipin-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4) !important;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
   border-color: rgba(var(--v-theme-primary), 0.5);
 }
 
@@ -201,7 +200,7 @@ const getImageUrl = (path: string) => {
 }
 
 .card-content {
-  background: #1e293b;
+  background: #ffffff;
 }
 
 .line-clamp-1 {

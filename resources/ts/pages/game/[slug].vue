@@ -404,36 +404,52 @@ const checkout = async () => {
   filter: blur(2px);
 }
 
+/* Hero Section */
+.hero-section {
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
 .hero-overlay {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(to bottom, rgba(11, 15, 25, 0.4) 0%, rgba(11, 15, 25, 0.9) 70%, rgba(11, 15, 25, 1) 100%);
+  background: linear-gradient(to bottom, rgba(248, 250, 252, 0.4) 0%, rgba(248, 250, 252, 0.9) 70%, rgba(248, 250, 252, 1) 100%);
+}
+/* Layout */
+.game-detail-container {
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
-.hero-content {
-  position: relative;
-  z-index: 2;
-}
-
+/* Background & Typography */
 .text-shadow {
-  text-shadow: 0 4px 12px rgba(0,0,0,0.9);
+  text-shadow: none;
 }
 
-.text-shadow-sm {
-  text-shadow: 0 2px 6px rgba(0,0,0,0.9);
+.text-high-emphasis {
+  color: #1e293b !important;
 }
 
-/* Glass Cards */
+.text-medium-emphasis {
+  color: #475569 !important;
+}
+
+/* Cards */
 .glass-card {
-  background: rgba(30, 41, 59, 0.7) !important;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: #ffffff !important;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05) !important;
   border-radius: 16px !important;
   overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.glass-card:hover {
+  box-shadow: 0 8px 25px rgba(0,0,0,0.08) !important;
 }
 
 .border-primary-top {
@@ -451,23 +467,24 @@ const checkout = async () => {
 
 /* Nominal Cards */
 .nominal-card {
-  border: 2px solid rgba(255, 255, 255, 0.1) !important;
+  border: 2px solid transparent !important;
   border-radius: 12px !important;
-  background: rgba(255, 255, 255, 0.02) !important;
+  background: #f8fafc !important;
   position: relative;
   overflow: hidden;
+  transition: all 0.3s ease;
 }
 
 .nominal-card:hover {
-  border-color: rgba(var(--v-theme-primary), 0.5) !important;
-  background: rgba(var(--v-theme-primary), 0.05) !important;
+  border-color: rgba(var(--v-theme-primary), 0.3) !important;
+  background: #ffffff !important;
   transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05) !important;
 }
 
 .selected-card {
   border-color: rgb(var(--v-theme-primary)) !important;
-  background: rgba(var(--v-theme-primary), 0.1) !important;
-  box-shadow: 0 0 15px rgba(var(--v-theme-primary), 0.3) !important;
+  background: rgba(var(--v-theme-primary), 0.05) !important;
 }
 
 .selected-badge {
@@ -485,12 +502,11 @@ const checkout = async () => {
 
 /* Inputs & Boxes */
 .custom-input {
-  background: rgba(15, 23, 42, 0.6);
-  border-radius: 8px;
+  --v-input-control-bg: #f1f5f9;
 }
 
 .promo-box {
-  background: rgba(15, 23, 42, 0.8);
+  background: #f8fafc;
   border: 1px dashed rgba(var(--v-theme-warning), 0.5);
 }
 
@@ -500,7 +516,7 @@ const checkout = async () => {
 
 .summary-box {
   background: rgba(var(--v-theme-primary), 0.05);
-  border-color: rgba(var(--v-theme-primary), 0.2) !important;
+  border: 1px solid rgba(var(--v-theme-primary), 0.2) !important;
 }
 
 .z-1 {
