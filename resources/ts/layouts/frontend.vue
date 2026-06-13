@@ -16,6 +16,8 @@ const webSettings = ref({
   wa_number: '08123456789'
 })
 
+const userData = ref<any>(null)
+
 onMounted(async () => {
   try {
     const res = await axios.get('/api/settings')
@@ -24,10 +26,29 @@ onMounted(async () => {
       if (res.data.data.app_description) webSettings.value.app_description = res.data.data.app_description
       if (res.data.data.wa_number) webSettings.value.wa_number = res.data.data.wa_number
     }
+    
+    // Check user data
+    const user = localStorage.getItem('user_data')
+    if (user) {
+      userData.value = JSON.parse(user)
+    }
   } catch (e) {
     console.error('Failed to load settings', e)
   }
 })
+
+const handleLogout = async () => {
+  try {
+    await axios.post('/api/logout')
+  } catch (e) {
+    console.error(e)
+  } finally {
+    localStorage.removeItem('admin_token')
+    localStorage.removeItem('user_data')
+    userData.value = null
+    window.location.href = '/'
+  }
+}
 
 watch([isFallbackStateActive, refLoadingIndicator], () => {
   if (isFallbackStateActive.value && refLoadingIndicator.value)
@@ -59,9 +80,23 @@ watch([isFallbackStateActive, refLoadingIndicator], () => {
           <VBtn variant="text" to="/" prepend-icon="ri-gamepad-line" class="text-white font-weight-medium nav-btn">
             Semua Game
           </VBtn>
-          <VBtn variant="flat" color="primary" to="/login" prepend-icon="ri-user-settings-line" class="font-weight-bold rounded-pill px-6 login-btn">
-            Login Admin
-          </VBtn>
+          
+          <template v-if="userData">
+            <VBtn variant="text" to="/member/dashboard" prepend-icon="ri-dashboard-line" class="text-white font-weight-medium nav-btn">
+              Dashboard Saya
+            </VBtn>
+            <VBtn variant="flat" color="error" @click="handleLogout" prepend-icon="ri-logout-box-r-line" class="font-weight-bold rounded-pill px-6 login-btn">
+              Logout
+            </VBtn>
+          </template>
+          <template v-else>
+            <VBtn variant="text" to="/register" prepend-icon="ri-user-add-line" class="text-white font-weight-medium nav-btn">
+              Daftar
+            </VBtn>
+            <VBtn variant="flat" color="primary" to="/login" prepend-icon="ri-user-settings-line" class="font-weight-bold rounded-pill px-6 login-btn">
+              Login
+            </VBtn>
+          </template>
         </div>
         
         <!-- Mobile Menu Icon -->

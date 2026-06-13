@@ -29,6 +29,7 @@ declare module 'vue-router/auto-routes' {
     'game-slug': RouteRecordInfo<'game-slug', '/game/:slug', { slug: ParamValue<true> }, { slug: ParamValue<false> }>,
     'invoice-id': RouteRecordInfo<'invoice-id', '/invoice/:id', { id: ParamValue<true> }, { id: ParamValue<false> }>,
     'login': RouteRecordInfo<'login', '/login', Record<never, never>, Record<never, never>>,
+    'member-dashboard': RouteRecordInfo<'member-dashboard', '/member/dashboard', Record<never, never>, Record<never, never>>,
     'register': RouteRecordInfo<'register', '/register', Record<never, never>, Record<never, never>>,
     'second-page': RouteRecordInfo<'second-page', '/second-page', Record<never, never>, Record<never, never>>,
   }

@@ -24,14 +24,20 @@ Route::post('/promo/check', [App\Http\Controllers\Api\CheckoutController::class,
 // Midtrans Webhook
 Route::post('/midtrans/webhook', [App\Http\Controllers\Api\MidtransWebhookController::class, 'handle']);
 
+// Digiflazz Webhook
+Route::post('/digiflazz/webhook', [App\Http\Controllers\Api\DigiflazzWebhookController::class, 'handle']);
+
 // Autentikasi
 Route::post('/login', [App\Http\Controllers\Api\AuthController::class, 'login']);
 Route::post('/register', [App\Http\Controllers\Api\AuthController::class, 'register']);
 Route::get('/me', [App\Http\Controllers\Api\AuthController::class, 'me'])->middleware('auth:sanctum');
 
-// Rute Admin (Terlindungi)
+// Rute Admin & Member (Terlindungi)
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [App\Http\Controllers\Api\AuthController::class, 'logout']);
+    
+    // Member Routes
+    Route::get('/member/dashboard', [App\Http\Controllers\Api\MemberController::class, 'dashboard']);
     
     // Dasbor & Laporan
     Route::get('/admin/dashboard-stats', [App\Http\Controllers\Api\Admin\DashboardController::class, 'stats']);

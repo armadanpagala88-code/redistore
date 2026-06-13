@@ -51,9 +51,9 @@ class MidtransWebhookController extends Controller
             $transaksi->save();
 
             if ($success) {
-                // TODO: Panggil API Digiflazz untuk memproses top up secara otomatis
-                // $digiflazz = new \App\Services\DigiflazzService();
-                // $digiflazz->createTransaction($transaksi);
+                // Panggil API Digiflazz untuk memproses top up secara otomatis
+                $digiflazz = new \App\Services\DigiflazzService();
+                $digiflazz->createTransaction($transaksi);
 
                 $msg = "Hore! Pembayaran untuk pesanan *$orderId* telah BERHASIL kami terima.\n\nSistem sedang memproses pesanan Anda secara otomatis. Terima kasih telah berbelanja di Redistore!";
                 FonnteService::sendMessage($transaksi->no_whatsapp, $msg);
