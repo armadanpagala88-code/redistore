@@ -85,13 +85,13 @@ watch([isFallbackStateActive, refLoadingIndicator], () => {
 <style lang="scss">
 .premium-layout {
   background-color: #0b0f19 !important; /* Deep dark blue */
-  color: #ffffff;
+  color: #f1f5f9;
 }
 
 /* Override default typography colors for dark theme */
 .premium-layout .text-high-emphasis,
 .premium-layout .text-medium-emphasis {
-  color: rgba(255, 255, 255, 0.85) !important;
+  color: rgba(255, 255, 255, 0.9) !important;
 }
 
 .main-content-area {
@@ -101,10 +101,10 @@ watch([isFallbackStateActive, refLoadingIndicator], () => {
 
 /* Glassmorphism Navbar */
 .glass-navbar {
-  background: rgba(11, 15, 25, 0.7) !important;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-bottom-color: rgba(255, 255, 255, 0.05) !important;
+  background: rgba(11, 15, 25, 0.85) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
 
 /* Glowing Orbs Background */
@@ -113,7 +113,7 @@ watch([isFallbackStateActive, refLoadingIndicator], () => {
   border-radius: 50%;
   filter: blur(120px);
   z-index: 0;
-  opacity: 0.4;
+  opacity: 0.5;
 }
 
 .bg-glow-1 {
@@ -121,7 +121,7 @@ watch([isFallbackStateActive, refLoadingIndicator], () => {
   left: -10%;
   width: 600px;
   height: 600px;
-  background: radial-gradient(circle, rgba(98,54,255,0.6) 0%, rgba(0,0,0,0) 70%);
+  background: radial-gradient(circle, rgba(98,54,255,0.7) 0%, rgba(0,0,0,0) 70%);
 }
 
 .bg-glow-2 {
@@ -129,13 +129,13 @@ watch([isFallbackStateActive, refLoadingIndicator], () => {
   right: -5%;
   width: 500px;
   height: 500px;
-  background: radial-gradient(circle, rgba(255,54,129,0.4) 0%, rgba(0,0,0,0) 70%);
+  background: radial-gradient(circle, rgba(255,54,129,0.5) 0%, rgba(0,0,0,0) 70%);
 }
 
 /* Premium Footer */
 .premium-footer {
   background-color: #080b13 !important;
-  border-top-color: rgba(255, 255, 255, 0.05) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
 
 .max-w-600 {
@@ -147,7 +147,7 @@ watch([isFallbackStateActive, refLoadingIndicator], () => {
 }
 
 .nav-btn {
-  opacity: 0.8;
+  opacity: 0.9;
   transition: all 0.3s ease;
   &:hover {
     opacity: 1;
@@ -157,8 +157,9 @@ watch([isFallbackStateActive, refLoadingIndicator], () => {
 
 .login-btn {
   transition: all 0.3s ease;
+  color: white !important;
   &:hover {
-    box-shadow: 0 0 15px rgba(var(--v-theme-primary), 0.5);
+    box-shadow: 0 0 20px rgba(var(--v-theme-primary), 0.6);
     transform: translateY(-2px);
   }
 }
