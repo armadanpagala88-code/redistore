@@ -38,6 +38,8 @@ Route::middleware('auth:sanctum')->group(function () {
     
     // Member Routes
     Route::get('/member/dashboard', [App\Http\Controllers\Api\MemberController::class, 'dashboard']);
+    Route::post('/member/redeem-points', [App\Http\Controllers\Api\MemberController::class, 'redeemPoints']);
+    Route::post('/member/update-photo', [App\Http\Controllers\Api\MemberController::class, 'updatePhoto']);
     
     // Dasbor & Laporan
     Route::get('/admin/dashboard-stats', [App\Http\Controllers\Api\Admin\DashboardController::class, 'stats']);
@@ -52,9 +54,14 @@ Route::middleware('auth:sanctum')->group(function () {
     
     // Produk Voucher
     Route::apiResource('/admin/produk', App\Http\Controllers\Api\Admin\ProdukVoucherController::class);
+    Route::post('/admin/digiflazz/sync', [App\Http\Controllers\Api\Admin\DigiflazzSyncController::class, 'sync']);
     
     // Banner / Iklan
     Route::apiResource('/admin/banner', App\Http\Controllers\Api\Admin\BannerController::class);
+    
+    // Artikel
+    Route::apiResource('admin/artikel', \App\Http\Controllers\Api\Admin\ArtikelController::class);
+    Route::get('admin/pengguna', [\App\Http\Controllers\Api\Admin\PenggunaController::class, 'index']);
     
     // Settings
     Route::post('/admin/settings', [App\Http\Controllers\SettingController::class, 'update']);
@@ -62,3 +69,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
 // Settings (Public)
 Route::get('/settings', [App\Http\Controllers\SettingController::class, 'index']);
+
+// Artikel (Public)
+Route::get('/artikels', [App\Http\Controllers\Api\ArtikelController::class, 'index']);
+Route::get('/artikels/{slug}', [App\Http\Controllers\Api\ArtikelController::class, 'show']);

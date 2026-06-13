@@ -69,6 +69,11 @@ class KategoriGameController extends Controller
             $file = $request->file('gambar_logo');
             $filename = time() . '_' . $file->getClientOriginalName();
             $file->move(public_path('images'), $filename);
+
+            if ($kategori->gambar_logo && file_exists(public_path('images/' . $kategori->gambar_logo))) {
+                unlink(public_path('images/' . $kategori->gambar_logo));
+            }
+
             $data['gambar_logo'] = $filename;
         }
 
@@ -85,6 +90,11 @@ class KategoriGameController extends Controller
     {
         try {
             $kategori = KategoriGame::findOrFail($id);
+
+            if ($kategori->gambar_logo && file_exists(public_path('images/' . $kategori->gambar_logo))) {
+                unlink(public_path('images/' . $kategori->gambar_logo));
+            }
+
             $kategori->delete();
 
             return response()->json([

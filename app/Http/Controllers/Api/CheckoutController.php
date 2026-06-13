@@ -70,6 +70,7 @@ class CheckoutController extends Controller
             'user_id_game' => 'required|string',
             'produk_voucher_id' => 'required|exists:produk_vouchers,id',
             'no_whatsapp' => 'required|string',
+            'email_pembeli' => 'nullable|email',
             'zone_id' => 'nullable|string',
             'kode_voucher' => 'nullable|string'
         ]);
@@ -114,6 +115,7 @@ class CheckoutController extends Controller
             'user_id_game' => $request->user_id_game,
             'zone_id' => $request->zone_id,
             'no_whatsapp' => $request->no_whatsapp,
+            'email_pembeli' => $request->email_pembeli,
             'total_bayar' => $totalBayar,
             'diskon_voucher_id' => $diskonVoucherId,
             'nominal_diskon' => $nominalDiskon,

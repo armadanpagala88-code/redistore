@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: redistore-app
+    ports:
+      - "8000:80"
+    environment:
+      - APP_ENV=production
+      - APP_DEBUG=false
+      - APP_URL=http://localhost:8000
+      - DB_CONNECTION=mysql
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_DATABASE=redistore
+      - DB_USERNAME=redistore
+      - DB_PASSWORD=secret
+      - REDIS_HOST=redis
+    depends_on:
+      - db
+    networks:
+      - redistore-network
+
+  db:
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_DATABASE=redistore
+      - MYSQL_USER=redistore
+      - MYSQL_PASSWORD=secret
+      - MYSQL_ROOT_PASSWORD=secret
+    volumes:
+      - dbdata:/var/lib/mysql
+    networks:
+      - redistore-network
+
+networks:
+  redistore-network:
+    driver: bridge
+
+volumes:
+  dbdata:

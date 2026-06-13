@@ -26,6 +26,34 @@ class DigiflazzService
     }
 
     /**
+     * Mendapatkan daftar harga lengkap (Prepaid)
+     */
+    public function getPriceList()
+    {
+        $cmd = "prepaid"; // atau "pasca" untuk PPOB
+        $sign = $this->generateSign($cmd);
+
+        $payload = [
+            'cmd' => $cmd,
+            'username' => $this->username,
+            'sign' => $sign,
+        ];
+
+        try {
+            $response = Http::post($this->baseUrl . '/price-list', $payload);
+            $result = $response->json();
+            
+            if (isset($result['data'])) {
+                return $result['data'];
+            }
+            return [];
+        } catch (\Exception $e) {
+            \Log::error('Digiflazz Price List Error: ' . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
      * Membeli produk via API Digiflazz
      */
     public function createTransaction(Transaksi $transaksi)

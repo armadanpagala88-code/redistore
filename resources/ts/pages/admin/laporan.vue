@@ -50,14 +50,19 @@ const printLaporan = () => {
 <template>
   <div class="pa-4">
     <!-- Header: Hide when printing -->
-    <div class="d-print-none mb-6">
-      <h2 class="text-h4 font-weight-bold">Laporan Penjualan</h2>
-      <p class="text-body-1 text-medium-emphasis">Filter dan cetak laporan transaksi sukses.</p>
+    <div class="d-flex flex-column flex-md-row justify-space-between align-md-center mb-6 gap-4 d-print-none">
+      <div>
+        <h2 class="text-h4 font-weight-bold d-flex align-center gap-2">
+          <VIcon icon="ri-bar-chart-box-line" color="primary" />
+          Laporan Penjualan
+        </h2>
+        <p class="text-body-2 text-medium-emphasis mb-0 mt-1">Filter dan cetak laporan transaksi sukses berdasarkan periode tanggal.</p>
+      </div>
     </div>
 
     <!-- Filter Card: Hide when printing -->
-    <VCard class="mb-6 d-print-none" elevation="3">
-      <VCardText>
+    <VCard elevation="10" class="mb-6 d-print-none rounded-lg border-t-primary">
+      <VCardText class="pa-6">
         <VForm @submit.prevent="fetchLaporan">
           <VRow align="center">
             <VCol cols="12" md="4">
@@ -65,6 +70,9 @@ const printLaporan = () => {
                 v-model="filter.start_date"
                 label="Tanggal Awal"
                 type="date"
+                variant="outlined"
+                density="comfortable"
+                prepend-inner-icon="ri-calendar-line"
                 hide-details
               />
             </VCol>
@@ -73,14 +81,17 @@ const printLaporan = () => {
                 v-model="filter.end_date"
                 label="Tanggal Akhir"
                 type="date"
+                variant="outlined"
+                density="comfortable"
+                prepend-inner-icon="ri-calendar-check-line"
                 hide-details
               />
             </VCol>
-            <VCol cols="12" md="4" class="d-flex gap-4">
-              <VBtn color="primary" type="submit" :loading="loading">
+            <VCol cols="12" md="4" class="d-flex gap-3">
+              <VBtn color="primary" type="submit" :loading="loading" variant="elevated" class="rounded-lg font-weight-bold flex-grow-1">
                 <VIcon start icon="ri-search-line" /> Filter
               </VBtn>
-              <VBtn color="secondary" variant="outlined" @click="printLaporan" :disabled="laporan.length === 0">
+              <VBtn color="secondary" variant="tonal" @click="printLaporan" :disabled="laporan.length === 0" class="rounded-lg font-weight-bold flex-grow-1">
                 <VIcon start icon="ri-printer-line" /> Cetak PDF
               </VBtn>
             </VCol>
@@ -98,47 +109,58 @@ const printLaporan = () => {
     </div>
 
     <!-- Report Table -->
-    <VCard elevation="3" class="print-card">
-      <VCardText v-if="loading" class="text-center pa-6 d-print-none">
-        <VProgressCircular indeterminate color="primary" />
+    <VCard elevation="10" class="print-card rounded-lg overflow-hidden border-t-primary">
+      <VCardText v-if="loading" class="text-center pa-10 d-print-none">
+        <VProgressCircular indeterminate color="primary" size="48" width="4" />
+        <div class="mt-4 text-medium-emphasis font-weight-medium">Menganalisa data laporan...</div>
       </VCardText>
       
-      <VTable v-else hover class="laporan-table">
-        <thead>
+      <VTable v-else hover class="laporan-table custom-table text-no-wrap">
+        <thead class="bg-grey-lighten-4">
           <tr>
-            <th class="text-left font-weight-bold">No</th>
-            <th class="text-left font-weight-bold">ID Transaksi</th>
-            <th class="text-left font-weight-bold">Tanggal</th>
-            <th class="text-left font-weight-bold">Produk & Game</th>
-            <th class="text-right font-weight-bold">Harga Jual</th>
-            <th class="text-right font-weight-bold">Diskon Promo</th>
-            <th class="text-right font-weight-bold">Total Diterima</th>
+            <th class="text-left text-caption font-weight-bold">No</th>
+            <th class="text-left text-caption font-weight-bold">ID Transaksi</th>
+            <th class="text-left text-caption font-weight-bold">Tanggal</th>
+            <th class="text-left text-caption font-weight-bold">Produk & Game</th>
+            <th class="text-right text-caption font-weight-bold">Harga Jual</th>
+            <th class="text-right text-caption font-weight-bold">Diskon Promo</th>
+            <th class="text-right text-caption font-weight-bold">Total Diterima</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(trx, index) in laporan" :key="trx.id">
-            <td>{{ index + 1 }}</td>
-            <td>{{ trx.id }}</td>
-            <td>{{ new Date(trx.tgl_transaksi).toLocaleString('id-ID') }}</td>
+          <tr v-for="(trx, index) in laporan" :key="trx.id" class="transition-swing">
+            <td class="font-weight-medium text-medium-emphasis">{{ index + 1 }}</td>
+            <td class="font-weight-medium">{{ trx.id }}</td>
+            <td>
+              <div class="font-weight-medium">{{ new Date(trx.tgl_transaksi).toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year: 'numeric'}) }}</div>
+              <div class="text-caption text-medium-emphasis">{{ new Date(trx.tgl_transaksi).toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}) }}</div>
+            </td>
             <td>
               <div v-for="detail in trx.details" :key="detail.id">
-                {{ detail.nama_produk }} ({{ detail.nama_game }})
+                <div class="font-weight-bold">{{ detail.nama_produk }}</div>
+                <div class="text-caption text-medium-emphasis">{{ detail.nama_game }}</div>
               </div>
             </td>
-            <td class="text-right">{{ formatRupiah(Number(trx.total_bayar) + Number(trx.nominal_diskon)) }}</td>
-            <td class="text-right text-error">{{ trx.nominal_diskon > 0 ? '-' + formatRupiah(trx.nominal_diskon) : '-' }}</td>
-            <td class="text-right font-weight-medium">{{ formatRupiah(trx.total_bayar) }}</td>
+            <td class="text-right font-weight-medium">{{ formatRupiah(Number(trx.total_bayar) + Number(trx.nominal_diskon)) }}</td>
+            <td class="text-right text-error font-weight-bold">{{ trx.nominal_diskon > 0 ? '-' + formatRupiah(trx.nominal_diskon) : '-' }}</td>
+            <td class="text-right font-weight-bold text-primary">{{ formatRupiah(trx.total_bayar) }}</td>
           </tr>
           <tr v-if="laporan.length === 0">
-            <td colspan="7" class="text-center pa-4">Tidak ada data laporan pada periode ini.</td>
+            <td colspan="7" class="text-center pa-8">
+              <div class="d-print-none">
+                <VIcon icon="ri-folder-open-line" size="48" color="grey-lighten-1" class="mb-3" />
+                <div class="text-h6 text-medium-emphasis">Tidak ada data laporan pada periode ini.</div>
+              </div>
+              <div class="d-none d-print-block">Tidak ada data laporan pada periode ini.</div>
+            </td>
           </tr>
         </tbody>
-        <tfoot v-if="laporan.length > 0">
+        <tfoot v-if="laporan.length > 0" class="bg-grey-lighten-4">
           <tr>
-            <td colspan="4" class="text-right font-weight-bold text-h6">TOTAL KESELURUHAN:</td>
-            <td class="text-right font-weight-bold text-h6">{{ formatRupiah(hitungTotal() + hitungTotalDiskon()) }}</td>
-            <td class="text-right font-weight-bold text-h6 text-error">-{{ formatRupiah(hitungTotalDiskon()) }}</td>
-            <td class="text-right font-weight-bold text-h6 text-primary">{{ formatRupiah(hitungTotal()) }}</td>
+            <td colspan="4" class="text-right font-weight-bold text-body-1 py-4">TOTAL KESELURUHAN:</td>
+            <td class="text-right font-weight-bold text-body-1 py-4">{{ formatRupiah(hitungTotal() + hitungTotalDiskon()) }}</td>
+            <td class="text-right font-weight-bold text-body-1 text-error py-4">-{{ formatRupiah(hitungTotalDiskon()) }}</td>
+            <td class="text-right font-weight-bold text-h6 text-primary py-4">{{ formatRupiah(hitungTotal()) }}</td>
           </tr>
         </tfoot>
       </VTable>

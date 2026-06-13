@@ -80,6 +80,9 @@ watch([isFallbackStateActive, refLoadingIndicator], () => {
           <VBtn variant="text" to="/" prepend-icon="ri-gamepad-line" class="text-white font-weight-medium nav-btn">
             Semua Game
           </VBtn>
+          <VBtn variant="text" to="/blog" prepend-icon="ri-article-line" class="text-white font-weight-medium nav-btn">
+            Kabar Game
+          </VBtn>
           
           <template v-if="userData">
             <VBtn variant="text" to="/member/dashboard" prepend-icon="ri-dashboard-line" class="text-white font-weight-medium nav-btn">
@@ -140,7 +143,14 @@ watch([isFallbackStateActive, refLoadingIndicator], () => {
 
 <style lang="scss">
 .premium-layout {
-  background-color: #f8fafc !important; /* Light slate background */
+  /* Layer 1 (Atas): bg-orange.jpg, Layer 2 (Bawah): bg-pattern.png */
+  background-image: url('/images/bg-orange.jpg'), url('/images/bg-pattern.png') !important;
+  background-position: top center, top left !important;
+  background-size: 100% auto, 400px !important;
+  background-attachment: fixed, fixed !important;
+  background-repeat: no-repeat, repeat !important;
+  background-blend-mode: multiply, normal !important;
+  background-color: #f8fafc !important;
   color: #0f172a;
 }
 

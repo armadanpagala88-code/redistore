@@ -102,9 +102,14 @@ const chartSeries = computed(() => {
 
 <template>
   <div class="pa-4">
-    <div class="mb-6">
-      <h2 class="text-h4 font-weight-bold">Dashboard Statistik</h2>
-      <p class="text-body-1 text-medium-emphasis">Ringkasan performa penjualan Redistore</p>
+    <div class="mb-6 d-flex align-center gap-3">
+      <VAvatar color="primary" variant="tonal" rounded="lg" size="48">
+        <VIcon icon="ri-dashboard-3-line" size="28" />
+      </VAvatar>
+      <div>
+        <h2 class="text-h4 font-weight-bold">Dashboard Statistik</h2>
+        <p class="text-body-2 text-medium-emphasis mb-0">Ringkasan performa penjualan dan pesanan Redistore</p>
+      </div>
     </div>
 
     <VRow class="mb-6">
@@ -149,9 +154,12 @@ const chartSeries = computed(() => {
       </VCol>
     </VRow>
 
-    <VCard elevation="3" class="mb-8 pa-4">
-      <VCardTitle class="px-0 pt-0">Grafik Penjualan (30 Hari Terakhir)</VCardTitle>
-      <div style="height: 300px;">
+    <VCard elevation="6" class="mb-8 rounded-lg border-t-primary overflow-hidden">
+      <VCardTitle class="px-6 pt-6 pb-2 text-h6 font-weight-bold d-flex align-center gap-2">
+        <VIcon icon="ri-bar-chart-box-line" color="primary" />
+        Grafik Penjualan (30 Hari Terakhir)
+      </VCardTitle>
+      <div style="height: 300px;" class="px-4 pb-4">
         <VueApexCharts
           v-if="stats.chart_data.length > 0"
           type="bar"
@@ -162,78 +170,93 @@ const chartSeries = computed(() => {
       </div>
     </VCard>
 
-    <h3 class="text-h5 font-weight-bold mb-4">Transaksi Terbaru</h3>
-    <VCard elevation="3">
-      <VCardText v-if="loading" class="text-center pa-6">
-        <VProgressCircular indeterminate color="primary" />
+    <div class="d-flex align-center gap-2 mb-4">
+      <VIcon icon="ri-history-line" color="primary" size="24" />
+      <h3 class="text-h5 font-weight-bold mb-0">Transaksi Terbaru</h3>
+    </div>
+    <VCard elevation="6" class="rounded-lg border-t-primary overflow-hidden">
+      <VCardText v-if="loading" class="text-center pa-10">
+        <VProgressCircular indeterminate color="primary" size="48" width="4" />
+        <div class="mt-4 text-medium-emphasis font-weight-medium">Memuat transaksi terbaru...</div>
       </VCardText>
       
-      <VTable v-else hover>
-        <thead>
+      <VTable v-else hover class="custom-table text-no-wrap">
+        <thead class="bg-grey-lighten-4">
           <tr>
-            <th class="text-uppercase">ID Transaksi</th>
-            <th class="text-uppercase">Tanggal</th>
-            <th class="text-uppercase">Produk</th>
-            <th class="text-uppercase">User ID</th>
-            <th class="text-uppercase">No. WA</th>
-            <th class="text-uppercase text-right">Total Bayar</th>
-            <th class="text-uppercase text-center">Status</th>
-            <th class="text-uppercase text-center">Bukti</th>
-            <th class="text-uppercase text-center">Aksi</th>
+            <th class="text-uppercase text-caption font-weight-bold">ID Transaksi</th>
+            <th class="text-uppercase text-caption font-weight-bold">Tanggal</th>
+            <th class="text-uppercase text-caption font-weight-bold">Produk</th>
+            <th class="text-uppercase text-caption font-weight-bold">User ID</th>
+            <th class="text-uppercase text-caption font-weight-bold">No. WA</th>
+            <th class="text-uppercase text-caption font-weight-bold text-right">Total Bayar</th>
+            <th class="text-uppercase text-caption font-weight-bold text-center">Status</th>
+            <th class="text-uppercase text-caption font-weight-bold text-center">Bukti</th>
+            <th class="text-uppercase text-caption font-weight-bold text-center">Aksi</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="trx in transactions" :key="trx.id">
-            <td class="font-weight-medium">{{ trx.id }}</td>
-            <td>{{ new Date(trx.tgl_transaksi).toLocaleString('id-ID') }}</td>
+          <tr v-for="trx in transactions" :key="trx.id" class="transition-swing">
+            <td class="font-weight-medium py-3">{{ trx.id }}</td>
+            <td>
+              <div class="font-weight-medium">{{ new Date(trx.tgl_transaksi).toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year: 'numeric'}) }}</div>
+              <div class="text-caption text-medium-emphasis">{{ new Date(trx.tgl_transaksi).toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}) }}</div>
+            </td>
             <td>
               <div v-for="detail in trx.details" :key="detail.id">
-                {{ detail.nama_produk }} ({{ detail.nama_game }})
+                <div class="font-weight-bold">{{ detail.nama_produk }}</div>
+                <div class="text-caption text-medium-emphasis">{{ detail.nama_game }}</div>
               </div>
             </td>
-            <td>{{ trx.user_id_game }} {{ trx.zone_id ? `(${trx.zone_id})` : '' }}</td>
-            <td>{{ trx.no_whatsapp }}</td>
-            <td class="text-right font-weight-bold">{{ formatRupiah(trx.total_bayar) }}</td>
+            <td>
+              <div class="font-weight-medium">{{ trx.user_id_game }}</div>
+              <div class="text-caption text-medium-emphasis" v-if="trx.zone_id">Zone: {{ trx.zone_id }}</div>
+            </td>
+            <td>
+              <div class="d-flex align-center gap-1">
+                <VIcon icon="ri-whatsapp-line" size="14" class="text-success" />
+                {{ trx.no_whatsapp }}
+              </div>
+            </td>
+            <td class="text-right font-weight-bold text-primary">{{ formatRupiah(trx.total_bayar) }}</td>
             <td class="text-center">
               <VChip
                 :color="trx.status_transaksi === 'Success' ? 'success' : (trx.status_transaksi === 'Pending' ? 'warning' : 'error')"
                 size="small"
+                variant="elevated"
+                class="font-weight-bold"
               >
                 {{ trx.status_transaksi }}
               </VChip>
             </td>
             <td class="text-center">
-              <a v-if="trx.bukti_pembayaran" :href="`/uploads/bukti/${trx.bukti_pembayaran}`" target="_blank" class="text-primary text-decoration-none">
-                Lihat
-              </a>
+              <VBtn v-if="trx.bukti_pembayaran" :href="`/uploads/bukti/${trx.bukti_pembayaran}`" target="_blank" size="small" variant="tonal" color="info" icon="ri-image-line" />
               <span v-else class="text-medium-emphasis">-</span>
             </td>
             <td class="text-center">
               <div class="d-flex gap-2 justify-center" v-if="trx.status_transaksi === 'Pending'">
-                <VBtn size="small" color="success" variant="elevated" @click="updateStatus(trx.id, 'Success')">Terima</VBtn>
-                <VBtn size="small" color="error" variant="elevated" @click="updateStatus(trx.id, 'Failed')">Tolak</VBtn>
+                <VBtn size="small" color="success" variant="elevated" @click="updateStatus(trx.id, 'Success')" icon="ri-check-line" />
+                <VBtn size="small" color="error" variant="elevated" @click="updateStatus(trx.id, 'Failed')" icon="ri-close-line" />
               </div>
               <span v-else class="text-medium-emphasis">-</span>
             </td>
           </tr>
           <tr v-if="transactions.length === 0">
-            <td colspan="9" class="text-center pa-4">Belum ada transaksi</td>
+            <td colspan="9" class="text-center pa-8">
+              <VIcon icon="ri-inbox-line" size="48" color="grey-lighten-1" class="mb-3" />
+              <div class="text-h6 text-medium-emphasis">Belum ada transaksi</div>
+            </td>
           </tr>
         </tbody>
       </VTable>
     </VCard>
-
-    <!-- Dialog Pratinjau Foto -->
-    <VDialog v-model="isPreviewOpen" max-width="500">
-      <VCard>
-        <VCardTitle class="d-flex justify-space-between align-center">
-          Bukti Pembayaran
-          <VBtn icon="ri-close-line" variant="text" size="small" @click="isPreviewOpen = false" />
-        </VCardTitle>
-        <VCardText class="pa-0">
-          <VImg :src="currentProof" cover />
-        </VCardText>
-      </VCard>
-    </VDialog>
   </div>
 </template>
+
+<style scoped>
+.border-t-primary {
+  border-top: 4px solid rgb(var(--v-theme-primary)) !important;
+}
+.custom-table tbody tr:hover {
+  background-color: rgba(var(--v-theme-primary), 0.03) !important;
+}
+</style>

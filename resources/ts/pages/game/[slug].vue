@@ -20,6 +20,7 @@ const form = ref({
   zone_id: '',
   produk_voucher_id: null,
   no_whatsapp: '',
+  email_pembeli: '',
   kode_voucher: ''
 })
 
@@ -294,9 +295,20 @@ const checkout = async () => {
                   placeholder="Contoh: 08123456789"
                   variant="outlined"
                   color="primary"
-                  class="mb-6 custom-input"
+                  class="mb-4 custom-input"
                   required
                   prepend-inner-icon="ri-whatsapp-line"
+                />
+
+                <VTextField
+                  v-model="form.email_pembeli"
+                  label="Alamat Email (Opsional)"
+                  placeholder="Untuk pengiriman struk bukti pembayaran"
+                  variant="outlined"
+                  color="primary"
+                  class="mb-6 custom-input"
+                  prepend-inner-icon="ri-mail-line"
+                  type="email"
                 />
 
                 <!-- Promo Code Section -->

@@ -17,7 +17,7 @@ class DigiflazzWebhookController extends Controller
         $payload = $request->getContent();
         $hash = 'sha1=' . hash_hmac('sha1', $payload, $secret);
 
-        if (!hash_equals($hash, $signature)) {
+        if (!$signature || !hash_equals($hash, $signature)) {
             return response()->json(['message' => 'Invalid signature'], 403);
         }
 

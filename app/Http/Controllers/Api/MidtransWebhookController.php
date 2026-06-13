@@ -55,6 +55,22 @@ class MidtransWebhookController extends Controller
                 $digiflazz = new \App\Services\DigiflazzService();
                 $digiflazz->createTransaction($transaksi);
 
+                // Tambahkan Poin Loyalitas jika pembeli adalah Member
+                if ($transaksi->user_id) {
+                    $user = \App\Models\User::find($transaksi->user_id);
+                    if ($user) {
+                        // 1 Poin untuk setiap Rp 1.000
+                        $pointsEarned = floor($transaksi->total_bayar / 1000);
+                        $user->poin += $pointsEarned;
+                        $user->save();
+                    }
+                }
+
+                // Kirim Email Struk
+                if ($transaksi->email_pembeli) {
+                    \Illuminate\Support\Facades\Mail::to($transaksi->email_pembeli)->send(new \App\Mail\InvoiceMail($transaksi));
+                }
+
                 $msg = "Hore! Pembayaran untuk pesanan *$orderId* telah BERHASIL kami terima.\n\nSistem sedang memproses pesanan Anda secara otomatis. Terima kasih telah berbelanja di Redistore!";
                 FonnteService::sendMessage($transaksi->no_whatsapp, $msg);
             }

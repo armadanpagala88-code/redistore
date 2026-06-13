@@ -25,9 +25,19 @@ export default [
     icon: { icon: 'ri-image-edit-line' },
   },
   {
+    title: 'Artikel / Blog',
+    to: { path: '/admin/artikel' },
+    icon: { icon: 'ri-article-line' },
+  },
+  {
+    title: 'Data Member',
+    to: { path: '/admin/pengguna' },
+    icon: { icon: 'ri-group-line' },
+  },
+  {
     title: 'Laporan Penjualan',
     to: { path: '/admin/laporan' },
-    icon: { icon: 'ri-file-chart-line' },
+    icon: { icon: 'ri-bar-chart-box-line' },
   },
   {
     title: 'Pengaturan Web',
