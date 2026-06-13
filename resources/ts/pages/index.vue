@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted } from 'vue'
 import axios from 'axios'
 
 definePage({
@@ -10,25 +10,26 @@ definePage({
 })
 
 const categories = ref<any[]>([])
+const banners = ref<any[]>([])
 const loading = ref(true)
-
-const carouselItems = computed(() => {
-  return categories.value.slice(0, 3) // Show top 3 games in carousel
-})
 
 onMounted(async () => {
   try {
-    const response = await axios.get('/api/kategori-game')
-    categories.value = response.data.data
+    const [catRes, bannerRes] = await Promise.all([
+      axios.get('/api/kategori-game'),
+      axios.get('/api/banners')
+    ])
+    categories.value = catRes.data.data
+    banners.value = bannerRes.data.data
   } catch (error) {
-    console.error('Error fetching categories:', error)
+    console.error('Error fetching data:', error)
   } finally {
     loading.value = false
   }
 })
 
 const getImageUrl = (path: string) => {
-  if (!path) return 'https://placehold.co/800x400?text=Game'
+  if (!path) return 'https://placehold.co/800x400?text=Image'
   return path.startsWith('http') ? path : `/images/${path}`
 }
 </script>
@@ -42,9 +43,9 @@ const getImageUrl = (path: string) => {
     </VRow>
 
     <template v-else>
-      <!-- Hero Carousel -->
+      <!-- Hero Carousel with Banners -->
       <VCarousel
-        v-if="carouselItems.length > 0"
+        v-if="banners.length > 0"
         height="400"
         hide-delimiter-background
         show-arrows="hover"
@@ -52,22 +53,24 @@ const getImageUrl = (path: string) => {
         cycle
       >
         <VCarouselItem
-          v-for="cat in carouselItems"
-          :key="cat.id"
+          v-for="banner in banners"
+          :key="banner.id"
         >
-          <div class="carousel-bg" :style="`background-image: url('${getImageUrl(cat.gambar_logo)}')`">
+          <div class="carousel-bg" :style="`background-image: url('${getImageUrl(banner.gambar_banner)}')`">
             <div class="carousel-overlay d-flex align-end pb-10 pl-10">
               <div>
-                <VChip color="primary" size="small" class="mb-3 font-weight-bold">POPULAR</VChip>
-                <h2 class="text-h3 font-weight-bold text-white mb-2 text-shadow">{{ cat.nama_game }}</h2>
-                <p class="text-body-1 text-white text-shadow-sm mb-4 max-w-500">{{ cat.deskripsi }}</p>
+                <VChip color="primary" size="small" class="mb-3 font-weight-bold">PROMO</VChip>
+                <h2 class="text-h3 font-weight-bold text-white mb-2 text-shadow">{{ banner.judul }}</h2>
+                <p class="text-body-1 text-white text-shadow-sm mb-4 max-w-500">{{ banner.deskripsi }}</p>
                 <VBtn
+                  v-if="banner.link_tujuan"
                   color="primary"
                   size="large"
                   class="rounded-pill px-8 font-weight-bold"
-                  :to="`/game/${cat.slug}`"
+                  :href="banner.link_tujuan"
+                  target="_blank"
                 >
-                  Top Up Sekarang
+                  Lihat Detail
                 </VBtn>
               </div>
             </div>

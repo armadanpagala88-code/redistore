@@ -20,6 +20,11 @@ export default [
     icon: { icon: 'ri-vip-diamond-line' },
   },
   {
+    title: 'Manajemen Banner',
+    to: { path: '/admin/banner' },
+    icon: { icon: 'ri-image-edit-line' },
+  },
+  {
     title: 'Laporan Penjualan',
     to: { path: '/admin/laporan' },
     icon: { icon: 'ri-file-chart-line' },

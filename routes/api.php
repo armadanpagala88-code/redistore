@@ -13,6 +13,7 @@ Route::get('/kategori-game', [KategoriGameController::class, 'index']);
 Route::get('/kategori-game/{slug}', [KategoriGameController::class, 'show']);
 Route::get('/produk-voucher', [ProdukVoucherController::class, 'index']);
 Route::get('/produk-voucher/{id}', [ProdukVoucherController::class, 'show']);
+Route::get('/banners', [App\Http\Controllers\Api\BannerController::class, 'index']);
 
 // Checkout Transaksi
 Route::post('/checkout', [App\Http\Controllers\Api\CheckoutController::class, 'store']);
@@ -40,4 +41,7 @@ Route::middleware('auth:sanctum')->group(function () {
     
     // Produk Voucher
     Route::apiResource('/admin/produk', App\Http\Controllers\Api\Admin\ProdukVoucherController::class);
+    
+    // Banner / Iklan
+    Route::apiResource('/admin/banner', App\Http\Controllers\Api\Admin\BannerController::class);
 });
