@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { useGenerateImageVariant } from '@/@core/composable/useGenerateImageVariant'
-import AuthProvider from '@/views/pages/authentication/AuthProvider.vue'
-import authV2LoginIllustrationBorderedDark from '@images/pages/auth-v2-login-illustration-bordered-dark.png'
-import authV2LoginIllustrationBorderedLight from '@images/pages/auth-v2-login-illustration-bordered-light.png'
-import authV2LoginIllustrationDark from '@images/pages/auth-v2-login-illustration-dark.png'
-import authV2LoginIllustrationLight from '@images/pages/auth-v2-login-illustration-light.png'
+import authV2RegisterIllustrationBorderedDark from '@images/pages/auth-v2-register-illustration-bordered-dark.png'
+import authV2RegisterIllustrationBorderedLight from '@images/pages/auth-v2-register-illustration-bordered-light.png'
+import authV2RegisterIllustrationDark from '@images/pages/auth-v2-register-illustration-dark.png'
+import authV2RegisterIllustrationLight from '@images/pages/auth-v2-register-illustration-light.png'
 import authV2LoginMaskDark from '@images/pages/auth-v2-login-mask-dark.png'
 import authV2LoginMaskLight from '@images/pages/auth-v2-login-mask-light.png'
 import { VNodeRenderer } from '@layouts/components/VNodeRenderer'
@@ -22,39 +21,38 @@ definePage({
 
 const router = useRouter()
 const form = ref({
+  nama_lengkap: '',
   username: '',
+  no_telepon: '',
   password: '',
-  remember: false,
 })
 
 const isLoading = ref(false)
 const errorMessage = ref('')
+const successMessage = ref('')
 
-const handleLogin = async () => {
+const handleRegister = async () => {
   isLoading.value = true
   errorMessage.value = ''
+  successMessage.value = ''
   
   try {
-    const res = await axios.post('/api/login', {
-      username: form.value.username,
-      password: form.value.password
-    })
+    const res = await axios.post('/api/register', form.value)
 
     if (res.data.success) {
       // Simpan token
       localStorage.setItem('admin_token', res.data.data.token)
       localStorage.setItem('user_data', JSON.stringify(res.data.data.user))
       
-      // Redirect sesuai role
-      if (res.data.data.user.role === 'Pelanggan') {
+      successMessage.value = 'Registrasi berhasil! Mengalihkan...'
+      
+      setTimeout(() => {
         router.push('/')
-      } else {
-        router.push('/admin/dashboard')
-      }
+      }, 1500)
     }
   } catch (error: any) {
     if (error.response && error.response.data) {
-      errorMessage.value = error.response.data.message || 'Login gagal'
+      errorMessage.value = error.response.data.message || 'Registrasi gagal'
     } else {
       errorMessage.value = 'Terjadi kesalahan pada server'
     }
@@ -65,7 +63,7 @@ const handleLogin = async () => {
 
 const isPasswordVisible = ref(false)
 const authV2LoginMask = useGenerateImageVariant(authV2LoginMaskLight, authV2LoginMaskDark)
-const authV2LoginIllustration = useGenerateImageVariant (authV2LoginIllustrationLight, authV2LoginIllustrationDark, authV2LoginIllustrationBorderedLight, authV2LoginIllustrationBorderedDark, true)
+const authV2RegisterIllustration = useGenerateImageVariant (authV2RegisterIllustrationLight, authV2RegisterIllustrationDark, authV2RegisterIllustrationBorderedLight, authV2RegisterIllustrationBorderedDark, true)
 </script>
 
 <template>
@@ -88,7 +86,7 @@ const authV2LoginIllustration = useGenerateImageVariant (authV2LoginIllustration
     >
       <div class="d-flex align-center justify-center pa-10">
         <img
-          :src="authV2LoginIllustration"
+          :src="authV2RegisterIllustration"
           class="auth-illustration w-100"
           alt="auth-illustration"
         >
@@ -112,11 +110,11 @@ const authV2LoginIllustration = useGenerateImageVariant (authV2LoginIllustration
       >
         <VCardText>
           <h4 class="text-h4 mb-1">
-            Selamat Datang di <span class="text-capitalize">{{ themeConfig.app.title }}! 👋🏻</span>
+            Daftar Akun Baru 🚀
           </h4>
 
           <p class="mb-0">
-            Login ke akun Anda untuk bertransaksi dan mengelola pesanan.
+            Bergabunglah dengan kami untuk menikmati top up mudah dan murah!
           </p>
         </VCardText>
 
@@ -124,17 +122,37 @@ const authV2LoginIllustration = useGenerateImageVariant (authV2LoginIllustration
           <VAlert v-if="errorMessage" type="error" class="mb-4" variant="tonal">
             {{ errorMessage }}
           </VAlert>
+          
+          <VAlert v-if="successMessage" type="success" class="mb-4" variant="tonal">
+            {{ successMessage }}
+          </VAlert>
 
-          <VForm @submit.prevent="handleLogin">
+          <VForm @submit.prevent="handleRegister">
             <VRow>
-              <!-- username -->
+              <VCol cols="12">
+                <VTextField
+                  v-model="form.nama_lengkap"
+                  autofocus
+                  label="Nama Lengkap"
+                  placeholder="John Doe"
+                  required
+                />
+              </VCol>
+
               <VCol cols="12">
                 <VTextField
                   v-model="form.username"
-                  autofocus
                   label="Username"
-                  type="text"
-                  placeholder="admin"
+                  placeholder="johndoe"
+                  required
+                />
+              </VCol>
+
+              <VCol cols="12">
+                <VTextField
+                  v-model="form.no_telepon"
+                  label="Nomor WhatsApp"
+                  placeholder="08123456789"
                   required
                 />
               </VCol>
@@ -146,31 +164,23 @@ const authV2LoginIllustration = useGenerateImageVariant (authV2LoginIllustration
                   label="Password"
                   placeholder="············"
                   :type="isPasswordVisible ? 'text' : 'password'"
-                  autocomplete="password"
+                  autocomplete="new-password"
                   :append-inner-icon="isPasswordVisible ? 'ri-eye-off-line' : 'ri-eye-line'"
                   @click:append-inner="isPasswordVisible = !isPasswordVisible"
                   required
                 />
 
-                <!-- remember me checkbox -->
-                <div class="d-flex align-center justify-space-between flex-wrap my-6 gap-x-2">
-                  <VCheckbox
-                    v-model="form.remember"
-                    label="Remember me"
-                  />
-                </div>
-
-                <!-- login button -->
                 <VBtn
                   block
                   type="submit"
                   :loading="isLoading"
+                  class="mt-6"
                 >
-                  Login
+                  Daftar
                 </VBtn>
 
                 <div class="text-center mt-4 text-body-2">
-                  Belum punya akun? <RouterLink to="/register" class="text-primary font-weight-bold">Buat Akun</RouterLink>
+                  Sudah punya akun? <RouterLink to="/login" class="text-primary font-weight-bold">Login</RouterLink>
                 </div>
               </VCol>
             </VRow>

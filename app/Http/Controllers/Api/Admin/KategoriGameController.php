@@ -83,12 +83,26 @@ class KategoriGameController extends Controller
 
     public function destroy($id)
     {
-        $kategori = KategoriGame::findOrFail($id);
-        $kategori->delete();
+        try {
+            $kategori = KategoriGame::findOrFail($id);
+            $kategori->delete();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Game berhasil dihapus'
-        ]);
+            return response()->json([
+                'success' => true,
+                'message' => 'Game berhasil dihapus'
+            ]);
+        } catch (\Illuminate\Database\QueryException $e) {
+            // Error code 1451 is for foreign key constraint violation in MySQL
+            if ($e->getCode() == "23000") {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Kategori tidak dapat dihapus karena masih memiliki produk terkait.'
+                ], 400);
+            }
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menghapus kategori: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

@@ -97,8 +97,13 @@ const deleteItem = async (id: string) => {
   try {
     await axios.delete(`/api/admin/produk/${id}`)
     fetchItems()
-  } catch (e) {
-    alert('Gagal menghapus data')
+    alert('Produk berhasil dihapus')
+  } catch (error: any) {
+    if (error.response && error.response.data && error.response.data.message) {
+      alert(error.response.data.message)
+    } else {
+      alert('Gagal menghapus data')
+    }
   }
 }
 

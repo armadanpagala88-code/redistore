@@ -1,12 +1,33 @@
 <script lang="ts" setup>
 import { VNodeRenderer } from '@layouts/components/VNodeRenderer'
 import { themeConfig } from '@themeConfig'
+import { ref, onMounted, watch } from 'vue'
+import axios from 'axios'
 
 const { injectSkinClasses } = useSkins()
 injectSkinClasses()
 
 const isFallbackStateActive = ref(false)
 const refLoadingIndicator = ref<any>(null)
+
+const webSettings = ref({
+  app_name: themeConfig.app.title,
+  app_description: 'Platform Top Up Game Termurah & Terpercaya di Indonesia. Proses instan, otomatis, dan beroperasi 24 jam nonstop.',
+  wa_number: '08123456789'
+})
+
+onMounted(async () => {
+  try {
+    const res = await axios.get('/api/settings')
+    if (res.data.success && res.data.data) {
+      if (res.data.data.app_name) webSettings.value.app_name = res.data.data.app_name
+      if (res.data.data.app_description) webSettings.value.app_description = res.data.data.app_description
+      if (res.data.data.wa_number) webSettings.value.wa_number = res.data.data.wa_number
+    }
+  } catch (e) {
+    console.error('Failed to load settings', e)
+  }
+})
 
 watch([isFallbackStateActive, refLoadingIndicator], () => {
   if (isFallbackStateActive.value && refLoadingIndicator.value)
@@ -27,7 +48,7 @@ watch([isFallbackStateActive, refLoadingIndicator], () => {
         <RouterLink to="/" class="d-flex align-center gap-x-3 text-decoration-none">
           <VNodeRenderer :nodes="themeConfig.app.logo" />
           <span class="text-h5 font-weight-black text-primary text-uppercase tracking-wider" style="color: #1e293b !important;">
-            {{ themeConfig.app.title }}
+            {{ webSettings.app_name }}
           </span>
         </RouterLink>
 
@@ -70,13 +91,13 @@ watch([isFallbackStateActive, refLoadingIndicator], () => {
     <!-- Footer -->
     <VFooter class="premium-footer d-flex flex-column align-center justify-center pa-8 border-t border-opacity-10 mt-auto">
       <div class="text-h6 font-weight-bold mb-2 text-white">
-        {{ themeConfig.app.title }}
+        {{ webSettings.app_name }}
       </div>
       <div class="text-body-2 text-grey-lighten-1 text-center mb-4 max-w-600">
-        Platform Top Up Game Termurah & Terpercaya di Indonesia. Proses instan, otomatis, dan beroperasi 24 jam nonstop.
+        {{ webSettings.app_description }}
       </div>
       <div class="text-caption text-grey-darken-1">
-        &copy; {{ new Date().getFullYear() }} <span class="text-primary">{{ themeConfig.app.title }}</span>. All rights reserved.
+        &copy; {{ new Date().getFullYear() }} <span class="text-primary">{{ webSettings.app_name }}</span>. All rights reserved.
       </div>
     </VFooter>
   </VApp>

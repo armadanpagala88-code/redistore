@@ -25,9 +25,11 @@ declare module 'vue-router/auto-routes' {
     'admin-kategori': RouteRecordInfo<'admin-kategori', '/admin/kategori', Record<never, never>, Record<never, never>>,
     'admin-laporan': RouteRecordInfo<'admin-laporan', '/admin/laporan', Record<never, never>, Record<never, never>>,
     'admin-produk': RouteRecordInfo<'admin-produk', '/admin/produk', Record<never, never>, Record<never, never>>,
+    'admin-settings': RouteRecordInfo<'admin-settings', '/admin/settings', Record<never, never>, Record<never, never>>,
     'game-slug': RouteRecordInfo<'game-slug', '/game/:slug', { slug: ParamValue<true> }, { slug: ParamValue<false> }>,
     'invoice-id': RouteRecordInfo<'invoice-id', '/invoice/:id', { id: ParamValue<true> }, { id: ParamValue<false> }>,
     'login': RouteRecordInfo<'login', '/login', Record<never, never>, Record<never, never>>,
+    'register': RouteRecordInfo<'register', '/register', Record<never, never>, Record<never, never>>,
     'second-page': RouteRecordInfo<'second-page', '/second-page', Record<never, never>, Record<never, never>>,
   }
 }

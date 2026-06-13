@@ -130,8 +130,30 @@ class CheckoutController extends Controller
             'subtotal' => $produk->harga_jual
         ]);
 
+        // Integrate Midtrans
+        $midtrans = new \App\Services\MidtransService();
+        $customerDetails = [
+            'first_name' => 'Pelanggan',
+            'phone' => $request->no_whatsapp,
+        ];
+        $itemDetails = [
+            [
+                'id' => $produk->id,
+                'price' => $totalBayar,
+                'quantity' => 1,
+                'name' => "{$produk->nominal} {$produk->kategori->nama_game}"
+            ]
+        ];
+
+        $snapToken = $midtrans->createTransaction($trxId, $totalBayar, $customerDetails, $itemDetails);
+        
+        if ($snapToken) {
+            $transaksi->snap_token = $snapToken;
+            $transaksi->save();
+        }
+
         // Kirim Notifikasi Tagihan via WA
-        $msg = "Halo!\nTerima kasih telah melakukan pemesanan di *Redistore*.\n\nDetail Pesanan:\n- ID Transaksi: *$trxId*\n- Item: *{$produk->nominal} {$produk->kategori->nama_game}*\n- User ID: *{$request->user_id_game}* " . ($request->zone_id ? "({$request->zone_id})" : "") . "\n- Total Tagihan: *Rp " . number_format($totalBayar, 0, ',', '.') . "*\n\nSilakan selesaikan pembayaran dengan mentransfer ke rekening BCA *1234567890 a.n Redistore*.\nUpload bukti pembayaran Anda melalui link berikut:\n" . url("/invoice/{$trxId}");
+        $msg = "Halo!\nTerima kasih telah melakukan pemesanan di *Redistore*.\n\nDetail Pesanan:\n- ID Transaksi: *$trxId*\n- Item: *{$produk->nominal} {$produk->kategori->nama_game}*\n- User ID: *{$request->user_id_game}* " . ($request->zone_id ? "({$request->zone_id})" : "") . "\n- Total Tagihan: *Rp " . number_format($totalBayar, 0, ',', '.') . "*\n\nSilakan selesaikan pembayaran Anda melalui link berikut:\n" . url("/invoice/{$trxId}");
         
         FonnteService::sendMessage($request->no_whatsapp, $msg);
 

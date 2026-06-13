@@ -28,41 +28,44 @@ const fetchInvoice = async () => {
   }
 }
 
-onMounted(fetchInvoice)
+const payWithMidtrans = () => {
+  if (!invoice.value || !invoice.value.snap_token) return;
 
-const handleUpload = async (event: Event) => {
-  const target = event.target as HTMLInputElement
-  if (target.files && target.files[0]) {
-    fileInput.value = target.files[0]
-  }
-}
-
-const submitBukti = async () => {
-  if (!fileInput.value) {
-    alert('Pilih file bukti pembayaran terlebih dahulu!')
-    return
-  }
-
-  uploadLoading.value = true
-  const formData = new FormData()
-  formData.append('bukti_pembayaran', fileInput.value)
-
-  try {
-    const res = await axios.post(`/api/checkout/${invoice.value.id}/upload-bukti`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
+  // Make sure snap is loaded
+  if (typeof window.snap !== 'undefined') {
+    window.snap.pay(invoice.value.snap_token, {
+      onSuccess: function(result: any) {
+        alert("Pembayaran Berhasil!");
+        fetchInvoice();
+      },
+      onPending: function(result: any) {
+        alert("Menunggu pembayaran Anda!");
+        fetchInvoice();
+      },
+      onError: function(result: any) {
+        alert("Pembayaran Gagal!");
+        fetchInvoice();
+      },
+      onClose: function() {
+        alert("Anda menutup popup tanpa menyelesaikan pembayaran");
       }
-    })
-    if (res.data.success) {
-      alert('Bukti berhasil diunggah! Menunggu konfirmasi admin.')
-      await fetchInvoice()
-    }
-  } catch (e) {
-    alert('Gagal mengunggah bukti.')
-  } finally {
-    uploadLoading.value = false
+    });
+  } else {
+    alert("Sistem pembayaran sedang dimuat, silakan coba beberapa saat lagi.");
   }
 }
+
+onMounted(() => {
+  fetchInvoice();
+  
+  // Load Midtrans Snap Script
+  const script = document.createElement('script');
+  // Use sandbox URL by default. If production, change to app.midtrans.com
+  script.src = 'https://app.sandbox.midtrans.com/snap/snap.js';
+  // You should ideally get the client key from API, but for simplicity we put placeholder here.
+  script.setAttribute('data-client-key', 'SB-Mid-client-YOUR-CLIENT-KEY');
+  document.head.appendChild(script);
+})
 </script>
 
 <template>
@@ -144,30 +147,22 @@ const submitBukti = async () => {
 
         <VCard elevation="4" v-if="invoice.status_transaksi === 'Unpaid'">
           <VCardItem>
-            <VCardTitle class="text-h6 font-weight-bold">Upload Bukti Pembayaran</VCardTitle>
+            <VCardTitle class="text-h6 font-weight-bold">Selesaikan Pembayaran</VCardTitle>
           </VCardItem>
           <VCardText>
             <VAlert type="info" variant="tonal" class="mb-4">
-              Silakan transfer ke rekening <strong>BCA 1234567890 a.n Redistore</strong> sebesar <strong>Rp {{ Number(invoice.total_bayar).toLocaleString('id-ID') }}</strong>.
+              Total tagihan Anda adalah <strong>Rp {{ Number(invoice.total_bayar).toLocaleString('id-ID') }}</strong>. Klik tombol di bawah ini untuk memilih metode pembayaran (QRIS, e-Wallet, Virtual Account, dll).
             </VAlert>
-            
-            <VFileInput
-              label="Pilih Foto Bukti Transfer"
-              accept="image/*"
-              variant="outlined"
-              prepend-icon="mdi-camera"
-              @change="handleUpload"
-            />
             
             <VBtn
               color="primary"
               size="large"
               block
               class="mt-4"
-              :loading="uploadLoading"
-              @click="submitBukti"
+              @click="payWithMidtrans"
+              prepend-icon="ri-secure-payment-line"
             >
-              Kirim Bukti Pembayaran
+              Bayar Sekarang
             </VBtn>
           </VCardText>
         </VCard>

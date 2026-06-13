@@ -28,6 +28,8 @@ class User extends Authenticatable
         'foto_profil',
         'role',
         'is_aktif',
+        'saldo',
+        'level',
     ];
 
     /**

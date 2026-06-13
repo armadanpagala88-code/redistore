@@ -68,12 +68,25 @@ class ProdukVoucherController extends Controller
 
     public function destroy($id)
     {
-        $produk = ProdukVoucher::findOrFail($id);
-        $produk->delete();
+        try {
+            $produk = ProdukVoucher::findOrFail($id);
+            $produk->delete();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Produk berhasil dihapus'
-        ]);
+            return response()->json([
+                'success' => true,
+                'message' => 'Produk berhasil dihapus'
+            ]);
+        } catch (\Illuminate\Database\QueryException $e) {
+            if ($e->getCode() == "23000") {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Produk tidak dapat dihapus karena sudah memiliki riwayat transaksi penjualan.'
+                ], 400);
+            }
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal menghapus produk: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

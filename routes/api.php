@@ -21,8 +21,13 @@ Route::get('/checkout/{id}', [App\Http\Controllers\Api\CheckoutController::class
 Route::post('/checkout/{id}/upload-bukti', [App\Http\Controllers\Api\CheckoutController::class, 'uploadBukti']);
 Route::post('/promo/check', [App\Http\Controllers\Api\CheckoutController::class, 'checkPromo']);
 
+// Midtrans Webhook
+Route::post('/midtrans/webhook', [App\Http\Controllers\Api\MidtransWebhookController::class, 'handle']);
+
 // Autentikasi
 Route::post('/login', [App\Http\Controllers\Api\AuthController::class, 'login']);
+Route::post('/register', [App\Http\Controllers\Api\AuthController::class, 'register']);
+Route::get('/me', [App\Http\Controllers\Api\AuthController::class, 'me'])->middleware('auth:sanctum');
 
 // Rute Admin (Terlindungi)
 Route::middleware('auth:sanctum')->group(function () {
@@ -44,4 +49,10 @@ Route::middleware('auth:sanctum')->group(function () {
     
     // Banner / Iklan
     Route::apiResource('/admin/banner', App\Http\Controllers\Api\Admin\BannerController::class);
+    
+    // Settings
+    Route::post('/admin/settings', [App\Http\Controllers\SettingController::class, 'update']);
 });
+
+// Settings (Public)
+Route::get('/settings', [App\Http\Controllers\SettingController::class, 'index']);

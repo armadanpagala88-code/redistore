@@ -29,4 +29,9 @@ export default [
     to: { path: '/admin/laporan' },
     icon: { icon: 'ri-file-chart-line' },
   },
+  {
+    title: 'Pengaturan Web',
+    to: { path: '/admin/settings' },
+    icon: { icon: 'ri-settings-3-line' },
+  },
 ]

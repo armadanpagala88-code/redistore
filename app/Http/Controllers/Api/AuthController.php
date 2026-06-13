@@ -44,6 +44,45 @@ class AuthController extends Controller
         ]);
     }
 
+    public function register(Request $request)
+    {
+        $request->validate([
+            'nama_lengkap' => 'required|string',
+            'username' => 'required|string|unique:users',
+            'no_telepon' => 'required|string',
+            'password' => 'required|min:6'
+        ]);
+
+        $user = User::create([
+            'nama_lengkap' => $request->nama_lengkap,
+            'username' => $request->username,
+            'no_telepon' => $request->no_telepon,
+            'password' => Hash::make($request->password),
+            'role' => 'Pelanggan',
+            'level' => 'Basic',
+            'saldo' => 0
+        ]);
+
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Registrasi berhasil',
+            'data' => [
+                'user' => $user,
+                'token' => $token
+            ]
+        ]);
+    }
+
+    public function me(Request $request)
+    {
+        return response()->json([
+            'success' => true,
+            'data' => $request->user()
+        ]);
+    }
+
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();
