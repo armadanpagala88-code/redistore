@@ -10,6 +10,9 @@ import authV2LoginMaskLight from '@images/pages/auth-v2-login-mask-light.png'
 import { VNodeRenderer } from '@layouts/components/VNodeRenderer'
 import { themeConfig } from '@themeConfig'
 
+import { useRouter } from 'vue-router'
+import axios from 'axios'
+
 definePage({
   meta: {
     layout: 'blank',
@@ -17,11 +20,44 @@ definePage({
   },
 })
 
+const router = useRouter()
 const form = ref({
-  email: '',
+  username: '',
   password: '',
   remember: false,
 })
+
+const isLoading = ref(false)
+const errorMessage = ref('')
+
+const handleLogin = async () => {
+  isLoading.value = true
+  errorMessage.value = ''
+  
+  try {
+    const res = await axios.post('/api/login', {
+      username: form.value.username,
+      password: form.value.password
+    })
+
+    if (res.data.success) {
+      // Simpan token
+      localStorage.setItem('admin_token', res.data.data.token)
+      localStorage.setItem('user_data', JSON.stringify(res.data.data.user))
+      
+      // Redirect ke dashboard admin
+      router.push('/admin/dashboard')
+    }
+  } catch (error: any) {
+    if (error.response && error.response.data) {
+      errorMessage.value = error.response.data.message || 'Login gagal'
+    } else {
+      errorMessage.value = 'Terjadi kesalahan pada server'
+    }
+  } finally {
+    isLoading.value = false
+  }
+}
 
 const isPasswordVisible = ref(false)
 const authV2LoginMask = useGenerateImageVariant(authV2LoginMaskLight, authV2LoginMaskDark)
@@ -76,21 +112,26 @@ const authV2LoginIllustration = useGenerateImageVariant (authV2LoginIllustration
           </h4>
 
           <p class="mb-0">
-            Please sign-in to your account and start the adventure
+            Login ke panel admin untuk mengelola pesanan.
           </p>
         </VCardText>
 
         <VCardText>
-          <VForm @submit.prevent="() => {}">
+          <VAlert v-if="errorMessage" type="error" class="mb-4" variant="tonal">
+            {{ errorMessage }}
+          </VAlert>
+
+          <VForm @submit.prevent="handleLogin">
             <VRow>
-              <!-- email -->
+              <!-- username -->
               <VCol cols="12">
                 <VTextField
-                  v-model="form.email"
+                  v-model="form.username"
                   autofocus
-                  label="Email"
-                  type="email"
-                  placeholder="johndoe@email.com"
+                  label="Username"
+                  type="text"
+                  placeholder="admin"
+                  required
                 />
               </VCol>
 
@@ -104,6 +145,7 @@ const authV2LoginIllustration = useGenerateImageVariant (authV2LoginIllustration
                   autocomplete="password"
                   :append-inner-icon="isPasswordVisible ? 'ri-eye-off-line' : 'ri-eye-line'"
                   @click:append-inner="isPasswordVisible = !isPasswordVisible"
+                  required
                 />
 
                 <!-- remember me checkbox -->
@@ -112,55 +154,18 @@ const authV2LoginIllustration = useGenerateImageVariant (authV2LoginIllustration
                     v-model="form.remember"
                     label="Remember me"
                   />
-
-                  <a
-                    class="text-primary"
-                    href="javascript:void(0)"
-                  >
-                    Forgot Password?
-                  </a>
                 </div>
 
                 <!-- login button -->
                 <VBtn
                   block
                   type="submit"
+                  :loading="isLoading"
                 >
                   Login
                 </VBtn>
               </VCol>
 
-              <!-- create account -->
-              <VCol
-                cols="12"
-                class="text-body-1 text-center"
-              >
-                <span class="d-inline-block">
-                  New on our platform?
-                </span>
-                <a
-                  class="text-primary ms-1 d-inline-block text-body-1"
-                  href="javascript:void(0)"
-                >
-                  Create an account
-                </a>
-              </VCol>
-
-              <VCol
-                cols="12"
-                class="d-flex align-center"
-              >
-                <VDivider />
-                <span class="mx-4 text-high-emphasis">or</span>
-                <VDivider />
-              </VCol>
-
-              <!-- auth providers -->
-              <VCol
-                cols="12"
-                class="text-center"
-              >
-                <AuthProvider />
               </VCol>
             </VRow>
           </VForm>
