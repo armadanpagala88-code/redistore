@@ -1,42 +1,33 @@
 <script setup lang="ts">
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import axios from 'axios'
 import { PerfectScrollbar } from 'vue3-perfect-scrollbar'
-import avatar1 from '@images/avatars/avatar-1.png'
 
-const userProfileList = [
-  { type: 'divider' },
-  {
-    type: 'navItem',
-    icon: 'ri-user-line',
-    title: 'Profile',
-    href: '#',
-  },
-  {
-    type: 'navItem',
-    icon: 'ri-settings-4-line',
-    title: 'Settings',
-    href: '#',
-  },
-  {
-    type: 'navItem',
-    icon: 'ri-file-text-line',
-    title: 'Billing Plan',
-    href: '#',
-    chipsProps: { color: 'error', text: '4', size: 'small' },
-  },
-  { type: 'divider' },
-  {
-    type: 'navItem',
-    icon: 'ri-money-dollar-circle-line',
-    title: 'Pricing',
-    href: '#',
-  },
-  {
-    type: 'navItem',
-    icon: 'ri-question-line',
-    title: 'FAQ',
-    href: '#',
-  },
-]
+const router = useRouter()
+const userData = ref<any>({
+  nama_lengkap: 'Admin',
+  role: 'Admin'
+})
+
+onMounted(() => {
+  const storedUser = localStorage.getItem('user_data')
+  if (storedUser) {
+    userData.value = JSON.parse(storedUser)
+  }
+})
+
+const logout = async () => {
+  try {
+    await axios.post('/api/logout')
+  } catch (e) {
+    console.error(e)
+  } finally {
+    localStorage.removeItem('admin_token')
+    localStorage.removeItem('user_data')
+    router.push('/login')
+  }
+}
 </script>
 
 <template>
@@ -52,8 +43,9 @@ const userProfileList = [
     <VAvatar
       class="cursor-pointer"
       size="38"
+      color="primary"
     >
-      <VImg :src="avatar1" />
+      <VIcon icon="ri-user-line" color="white" />
 
       <!-- SECTION Menu -->
       <VMenu
@@ -65,56 +57,23 @@ const userProfileList = [
         <VList>
           <VListItem class="px-4">
             <div class="d-flex gap-x-2 align-center">
-              <VAvatar>
-                <VImg :src="avatar1" />
+              <VAvatar color="primary">
+                <VIcon icon="ri-user-line" color="white" />
               </VAvatar>
 
               <div>
                 <div class="text-body-2 font-weight-medium text-high-emphasis">
-                  John Doe
+                  {{ userData.nama_lengkap }}
                 </div>
                 <div class="text-capitalize text-caption text-disabled">
-                  Admin
+                  {{ userData.role }}
                 </div>
               </div>
             </div>
           </VListItem>
 
           <PerfectScrollbar :options="{ wheelPropagation: false }">
-            <template
-              v-for="item in userProfileList"
-              :key="item.title"
-            >
-              <VListItem
-                v-if="item.type === 'navItem'"
-                :href="item.href"
-                class="px-4"
-              >
-                <template #prepend>
-                  <VIcon
-                    :icon="item.icon"
-                    size="22"
-                  />
-                </template>
-
-                <VListItemTitle>{{ item.title }}</VListItemTitle>
-
-                <template
-                  v-if="item.chipsProps"
-                  #append
-                >
-                  <VChip
-                    v-bind="item.chipsProps"
-                    variant="elevated"
-                  />
-                </template>
-              </VListItem>
-
-              <VDivider
-                v-else
-                class="my-1"
-              />
-            </template>
+            <VDivider class="my-1" />
 
             <VListItem class="px-4">
               <VBtn
@@ -122,7 +81,7 @@ const userProfileList = [
                 color="error"
                 size="small"
                 append-icon="ri-logout-box-r-line"
-                :to="{ name: 'login' }"
+                @click="logout"
               >
                 Logout
               </VBtn>
