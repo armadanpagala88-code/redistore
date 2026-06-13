@@ -18,6 +18,7 @@ Route::get('/produk-voucher/{id}', [ProdukVoucherController::class, 'show']);
 Route::post('/checkout', [App\Http\Controllers\Api\CheckoutController::class, 'store']);
 Route::get('/checkout/{id}', [App\Http\Controllers\Api\CheckoutController::class, 'show']);
 Route::post('/checkout/{id}/upload-bukti', [App\Http\Controllers\Api\CheckoutController::class, 'uploadBukti']);
+Route::post('/promo/check', [App\Http\Controllers\Api\CheckoutController::class, 'checkPromo']);
 
 // Autentikasi
 Route::post('/login', [App\Http\Controllers\Api\AuthController::class, 'login']);
@@ -26,6 +27,10 @@ Route::post('/login', [App\Http\Controllers\Api\AuthController::class, 'login'])
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [App\Http\Controllers\Api\AuthController::class, 'logout']);
     
+    // Dasbor & Laporan
+    Route::get('/admin/dashboard-stats', [App\Http\Controllers\Api\Admin\DashboardController::class, 'stats']);
+    Route::get('/admin/laporan', [App\Http\Controllers\Api\Admin\LaporanController::class, 'index']);
+
     // Transaksi
     Route::get('/admin/transaksi', [App\Http\Controllers\Api\Admin\TransaksiController::class, 'index']);
     Route::put('/admin/transaksi/{id}/status', [App\Http\Controllers\Api\Admin\TransaksiController::class, 'updateStatus']);

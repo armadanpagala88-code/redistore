@@ -165,8 +165,6 @@ const authV2LoginIllustration = useGenerateImageVariant (authV2LoginIllustration
                   Login
                 </VBtn>
               </VCol>
-
-              </VCol>
             </VRow>
           </VForm>
         </VCardText>

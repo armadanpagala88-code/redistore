@@ -10,23 +10,103 @@ use App\Models\ProdukVoucher;
 use App\Services\FonnteService;
 use Illuminate\Support\Str;
 
+use App\Models\DiskonVoucher;
+use Carbon\Carbon;
+
 class CheckoutController extends Controller
 {
+    public function checkPromo(Request $request)
+    {
+        $request->validate([
+            'kode_voucher' => 'required|string',
+            'total_bayar' => 'required|numeric'
+        ]);
+
+        $voucher = DiskonVoucher::where('kode_voucher', $request->kode_voucher)->first();
+
+        if (!$voucher) {
+            return response()->json(['success' => false, 'message' => 'Kode promo tidak ditemukan'], 404);
+        }
+
+        if (!$voucher->is_aktif || Carbon::parse($voucher->tgl_kadaluarsa)->isPast()) {
+            return response()->json(['success' => false, 'message' => 'Kode promo sudah tidak aktif atau kadaluarsa'], 400);
+        }
+
+        if ($request->total_bayar < $voucher->minimal_beli) {
+            return response()->json(['success' => false, 'message' => 'Total belanja belum memenuhi syarat minimal pembelian'], 400);
+        }
+
+        if ($voucher->kuota <= 0) {
+            return response()->json(['success' => false, 'message' => 'Kuota voucher sudah habis'], 400);
+        }
+
+        $nominalDiskon = 0;
+        if ($voucher->tipe === 'Persen') {
+            $nominalDiskon = ($voucher->jumlah_potongan / 100) * $request->total_bayar;
+        } else {
+            $nominalDiskon = $voucher->jumlah_potongan;
+        }
+
+        // Jangan sampai diskon melebihi total bayar
+        if ($nominalDiskon > $request->total_bayar) {
+            $nominalDiskon = $request->total_bayar;
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Voucher berhasil diterapkan',
+            'data' => [
+                'diskon_voucher_id' => $voucher->id,
+                'kode_voucher' => $voucher->kode_voucher,
+                'nominal_diskon' => $nominalDiskon,
+                'total_setelah_diskon' => $request->total_bayar - $nominalDiskon
+            ]
+        ]);
+    }
+
     public function store(Request $request)
     {
         $request->validate([
             'user_id_game' => 'required|string',
             'produk_voucher_id' => 'required|exists:produk_vouchers,id',
             'no_whatsapp' => 'required|string',
-            'zone_id' => 'nullable|string'
+            'zone_id' => 'nullable|string',
+            'kode_voucher' => 'nullable|string'
         ]);
 
         $produk = ProdukVoucher::with('kategori')->findOrFail($request->produk_voucher_id);
         
         $trxId = 'TRX-' . date('Ymd') . '-' . strtoupper(Str::random(5));
         
-        // Cek jika produk punya diskon bisa dikembangkan di sini
         $totalBayar = $produk->harga_jual;
+        $nominalDiskon = 0;
+        $diskonVoucherId = null;
+
+        // Cek jika menggunakan promo
+        if ($request->filled('kode_voucher')) {
+            $voucher = DiskonVoucher::where('kode_voucher', $request->kode_voucher)
+                ->where('is_aktif', true)
+                ->whereDate('tgl_kadaluarsa', '>=', Carbon::today())
+                ->first();
+
+            if ($voucher && $totalBayar >= $voucher->minimal_beli && $voucher->kuota > 0) {
+                if ($voucher->tipe === 'Persen') {
+                    $nominalDiskon = ($voucher->jumlah_potongan / 100) * $totalBayar;
+                } else {
+                    $nominalDiskon = $voucher->jumlah_potongan;
+                }
+                
+                if ($nominalDiskon > $totalBayar) {
+                    $nominalDiskon = $totalBayar;
+                }
+
+                $diskonVoucherId = $voucher->id;
+                $totalBayar = $totalBayar - $nominalDiskon;
+
+                // Kurangi kuota voucher
+                $voucher->decrement('kuota');
+            }
+        }
         
         $transaksi = Transaksi::create([
             'id' => $trxId,
@@ -35,6 +115,8 @@ class CheckoutController extends Controller
             'zone_id' => $request->zone_id,
             'no_whatsapp' => $request->no_whatsapp,
             'total_bayar' => $totalBayar,
+            'diskon_voucher_id' => $diskonVoucherId,
+            'nominal_diskon' => $nominalDiskon,
             'status_transaksi' => 'Unpaid'
         ]);
 

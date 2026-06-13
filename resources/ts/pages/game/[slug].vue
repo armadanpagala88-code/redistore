@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import axios from 'axios'
 
@@ -19,7 +19,16 @@ const form = ref({
   user_id_game: '',
   zone_id: '',
   produk_voucher_id: null,
-  no_whatsapp: ''
+  no_whatsapp: '',
+  kode_voucher: ''
+})
+
+const promoState = ref({
+  loading: false,
+  applied: false,
+  message: '',
+  error: false,
+  nominal_diskon: 0
 })
 
 onMounted(async () => {
@@ -36,6 +45,68 @@ onMounted(async () => {
 
 const selectProduct = (id: number) => {
   form.value.produk_voucher_id = id as any
+  // Reset promo if product changed
+  if (promoState.value.applied) {
+    promoState.value.applied = false
+    promoState.value.message = 'Promo direset karena ganti nominal'
+    promoState.value.error = true
+    promoState.value.nominal_diskon = 0
+  }
+}
+
+const selectedProductDetails = computed(() => {
+  if (!category.value || !form.value.produk_voucher_id) return null
+  return category.value.produks.find((p: any) => p.id === form.value.produk_voucher_id)
+})
+
+const checkPromo = async () => {
+  if (!form.value.kode_voucher) {
+    promoState.value.message = 'Masukkan kode voucher terlebih dahulu'
+    promoState.value.error = true
+    return
+  }
+  if (!selectedProductDetails.value) {
+    promoState.value.message = 'Pilih nominal top up terlebih dahulu'
+    promoState.value.error = true
+    return
+  }
+
+  promoState.value.loading = true
+  promoState.value.message = ''
+  promoState.value.error = false
+
+  try {
+    const res = await axios.post('/api/promo/check', {
+      kode_voucher: form.value.kode_voucher,
+      total_bayar: selectedProductDetails.value.harga_jual
+    })
+
+    if (res.data.success) {
+      promoState.value.applied = true
+      promoState.value.error = false
+      promoState.value.message = `Berhasil! Diskon Rp ${Number(res.data.data.nominal_diskon).toLocaleString('id-ID')} diterapkan.`
+      promoState.value.nominal_diskon = res.data.data.nominal_diskon
+    }
+  } catch (error: any) {
+    promoState.value.applied = false
+    promoState.value.error = true
+    promoState.value.message = error.response?.data?.message || 'Kode promo tidak valid'
+    promoState.value.nominal_diskon = 0
+  } finally {
+    promoState.value.loading = false
+  }
+}
+
+const removePromo = () => {
+  form.value.kode_voucher = ''
+  promoState.value.applied = false
+  promoState.value.error = false
+  promoState.value.message = ''
+  promoState.value.nominal_diskon = 0
+}
+
+const formatRupiah = (angka: number) => {
+  return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(angka)
 }
 
 const checkout = async () => {
@@ -45,7 +116,12 @@ const checkout = async () => {
   }
   
   try {
-    const response = await axios.post('/api/checkout', form.value)
+    const payload = { ...form.value }
+    if (!promoState.value.applied) {
+      payload.kode_voucher = '' // Jangan kirim kode jika belum applied
+    }
+
+    const response = await axios.post('/api/checkout', payload)
     if (response.data.success) {
       router.push(`/invoice/${response.data.data.id}`)
     }
@@ -170,9 +246,63 @@ const checkout = async () => {
               label="Nomor WhatsApp"
               placeholder="Contoh: 08123456789"
               variant="outlined"
-              class="mb-4"
+              class="mb-6"
               required
             />
+
+            <!-- Promo Code Section -->
+            <div class="mb-6 p-4 border rounded pa-4 bg-grey-lighten-4">
+              <div class="text-subtitle-2 font-weight-bold mb-2">Punya Kode Voucher / Promo?</div>
+              <div class="d-flex gap-4">
+                <VTextField
+                  v-model="form.kode_voucher"
+                  placeholder="Masukkan Kode"
+                  variant="outlined"
+                  density="compact"
+                  hide-details
+                  :disabled="promoState.applied"
+                />
+                <VBtn 
+                  v-if="!promoState.applied"
+                  color="primary" 
+                  variant="tonal" 
+                  @click="checkPromo" 
+                  :loading="promoState.loading"
+                >
+                  Gunakan
+                </VBtn>
+                <VBtn 
+                  v-else
+                  color="error" 
+                  variant="tonal" 
+                  @click="removePromo"
+                >
+                  Batal
+                </VBtn>
+              </div>
+              <div v-if="promoState.message" class="mt-2 text-caption font-weight-bold" :class="promoState.error ? 'text-error' : 'text-success'">
+                <VIcon :icon="promoState.error ? 'ri-error-warning-line' : 'ri-check-line'" size="14" class="mr-1" />
+                {{ promoState.message }}
+              </div>
+            </div>
+
+            <!-- Ringkasan Harga -->
+            <div v-if="selectedProductDetails" class="mb-6">
+              <div class="d-flex justify-space-between mb-1">
+                <span>Harga Normal</span>
+                <span class="font-weight-medium">{{ formatRupiah(selectedProductDetails.harga_jual) }}</span>
+              </div>
+              <div v-if="promoState.applied" class="d-flex justify-space-between mb-1 text-success">
+                <span>Diskon Voucher</span>
+                <span class="font-weight-medium">- {{ formatRupiah(promoState.nominal_diskon) }}</span>
+              </div>
+              <VDivider class="my-2" />
+              <div class="d-flex justify-space-between text-h6 font-weight-bold">
+                <span>Total Bayar</span>
+                <span class="text-primary">{{ formatRupiah(selectedProductDetails.harga_jual - promoState.nominal_diskon) }}</span>
+              </div>
+            </div>
+
             <VBtn
               color="primary"
               size="x-large"

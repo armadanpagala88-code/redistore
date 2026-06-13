@@ -19,4 +19,9 @@ export default [
     to: { path: '/admin/produk' },
     icon: { icon: 'ri-vip-diamond-line' },
   },
+  {
+    title: 'Laporan Penjualan',
+    to: { path: '/admin/laporan' },
+    icon: { icon: 'ri-file-chart-line' },
+  },
 ]

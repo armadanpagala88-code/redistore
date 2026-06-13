@@ -134,6 +134,11 @@ const submitBukti = async () => {
                 </tr>
               </tbody>
             </VTable>
+
+            <div v-if="invoice.nominal_diskon > 0" class="d-flex justify-space-between mt-4 text-success">
+              <span class="text-subtitle-1">Diskon Promo</span>
+              <span class="text-subtitle-1 font-weight-bold">- Rp {{ Number(invoice.nominal_diskon).toLocaleString('id-ID') }}</span>
+            </div>
           </VCardText>
         </VCard>
 
