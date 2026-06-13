@@ -4,7 +4,7 @@ import axios from 'axios'
 
 definePage({
   meta: {
-    layout: 'blank',
+    layout: 'frontend',
     public: true,
   },
 })
