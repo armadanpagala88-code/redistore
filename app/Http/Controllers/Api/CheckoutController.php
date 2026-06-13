@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Transaksi;
 use App\Models\DetailTransaksi;
 use App\Models\ProdukVoucher;
+use App\Services\FonnteService;
 use Illuminate\Support\Str;
 
 class CheckoutController extends Controller
@@ -47,6 +48,11 @@ class CheckoutController extends Controller
             'subtotal' => $produk->harga_jual
         ]);
 
+        // Kirim Notifikasi Tagihan via WA
+        $msg = "Halo!\nTerima kasih telah melakukan pemesanan di *Redistore*.\n\nDetail Pesanan:\n- ID Transaksi: *$trxId*\n- Item: *{$produk->nominal} {$produk->kategori->nama_game}*\n- User ID: *{$request->user_id_game}* " . ($request->zone_id ? "({$request->zone_id})" : "") . "\n- Total Tagihan: *Rp " . number_format($totalBayar, 0, ',', '.') . "*\n\nSilakan selesaikan pembayaran dengan mentransfer ke rekening BCA *1234567890 a.n Redistore*.\nUpload bukti pembayaran Anda melalui link berikut:\n" . url("/invoice/{$trxId}");
+        
+        FonnteService::sendMessage($request->no_whatsapp, $msg);
+
         return response()->json([
             'success' => true,
             'message' => 'Pesanan berhasil dibuat',
@@ -79,6 +85,10 @@ class CheckoutController extends Controller
             $transaksi->bukti_pembayaran = $filename;
             $transaksi->status_transaksi = 'Pending'; // After upload, waiting for admin approval
             $transaksi->save();
+
+            // Kirim notifikasi WA
+            $msg = "Terima kasih! Bukti pembayaran untuk pesanan *$id* telah kami terima.\n\nPesanan Anda sedang diverifikasi oleh Admin. Kami akan mengabari Anda jika pesanan telah sukses diproses.";
+            FonnteService::sendMessage($transaksi->no_whatsapp, $msg);
 
             return response()->json([
                 'success' => true,
