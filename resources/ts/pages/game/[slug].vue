@@ -43,9 +43,13 @@ onMounted(async () => {
   }
 })
 
+const getImageUrl = (path: string) => {
+  if (!path) return 'https://placehold.co/1200x400?text=Game+Banner'
+  return path.startsWith('http') ? path : `/images/${path}`
+}
+
 const selectProduct = (id: number) => {
   form.value.produk_voucher_id = id as any
-  // Reset promo if product changed
   if (promoState.value.applied) {
     promoState.value.applied = false
     promoState.value.message = 'Promo direset karena ganti nominal'
@@ -118,7 +122,7 @@ const checkout = async () => {
   try {
     const payload = { ...form.value }
     if (!promoState.value.applied) {
-      payload.kode_voucher = '' // Jangan kirim kode jika belum applied
+      payload.kode_voucher = ''
     }
 
     const response = await axios.post('/api/checkout', payload)
@@ -133,205 +137,373 @@ const checkout = async () => {
 </script>
 
 <template>
-  <div>
-    <VRow v-if="loading">
-      <VCol cols="12" class="text-center mt-12">
+  <div class="checkout-wrapper w-100 position-absolute" style="top: 0; left: 0; right: 0;">
+    <VRow v-if="loading" class="mt-16 pt-16">
+      <VCol cols="12" class="text-center">
         <VProgressCircular indeterminate color="primary" size="64" />
       </VCol>
     </VRow>
 
-    <VRow v-else-if="category">
-      <!-- Info Game -->
-      <VCol cols="12" md="4">
-        <VCard elevation="3" class="mb-6 sticky-card">
-          <VImg
-            :src="category.gambar_logo ? `/images/${category.gambar_logo}` : 'https://placehold.co/400x200?text=Game'"
-            height="200"
-            cover
-          />
-          <VCardItem>
-            <VCardTitle class="text-h5 font-weight-bold">{{ category.nama_game }}</VCardTitle>
-            <VCardSubtitle class="mt-2">{{ category.deskripsi }}</VCardSubtitle>
-          </VCardItem>
-          <VCardText>
-            <p class="text-body-2 mb-0">Cara Top Up:</p>
-            <ol class="text-body-2 pl-4">
-              <li>Masukkan User ID (dan Zone ID bila ada)</li>
-              <li>Pilih Nominal Top Up</li>
-              <li>Masukkan Nomor WhatsApp</li>
-              <li>Klik Beli Sekarang</li>
-            </ol>
-          </VCardText>
-        </VCard>
-      </VCol>
-
-      <!-- Form Transaksi -->
-      <VCol cols="12" md="8">
-        <!-- Step 1: User ID -->
-        <VCard elevation="3" class="mb-6">
-          <VCardItem>
-            <VCardTitle class="d-flex align-center gap-2">
-              <VAvatar color="primary" size="32" class="text-white font-weight-bold">1</VAvatar>
-              Masukkan Data Akun
-            </VCardTitle>
-          </VCardItem>
-          <VCardText>
-            <VRow>
-              <VCol cols="12" sm="6">
-                <VTextField
-                  v-model="form.user_id_game"
-                  label="User ID"
-                  placeholder="Contoh: 12345678"
-                  variant="outlined"
-                  required
-                />
-              </VCol>
-              <VCol cols="12" sm="6">
-                <VTextField
-                  v-model="form.zone_id"
-                  label="Zone ID / Server"
-                  placeholder="Contoh: 1234 (Opsional)"
-                  variant="outlined"
-                />
-              </VCol>
-            </VRow>
-          </VCardText>
-        </VCard>
-
-        <!-- Step 2: Nominal -->
-        <VCard elevation="3" class="mb-6">
-          <VCardItem>
-            <VCardTitle class="d-flex align-center gap-2">
-              <VAvatar color="primary" size="32" class="text-white font-weight-bold">2</VAvatar>
-              Pilih Nominal Top Up
-            </VCardTitle>
-          </VCardItem>
-          <VCardText>
-            <VRow v-if="category.produks && category.produks.length > 0">
-              <VCol
-                v-for="prod in category.produks"
-                :key="prod.id"
-                cols="6"
-                sm="4"
-              >
-                <VCard
-                  variant="outlined"
-                  class="cursor-pointer text-center pa-4 transition-swing"
-                  :class="{ 'border-primary bg-primary-lighten-5': form.produk_voucher_id === prod.id }"
-                  @click="selectProduct(prod.id)"
-                  style="border-width: 2px !important;"
-                >
-                  <div class="text-subtitle-1 font-weight-bold mb-1">{{ prod.nominal }}</div>
-                  <div class="text-primary font-weight-bold">Rp {{ Number(prod.harga_jual).toLocaleString('id-ID') }}</div>
-                </VCard>
-              </VCol>
-            </VRow>
-            <VAlert v-else type="info" variant="tonal">
-              Produk belum tersedia untuk game ini.
-            </VAlert>
-          </VCardText>
-        </VCard>
-
-        <!-- Step 3: Checkout -->
-        <VCard elevation="3">
-          <VCardItem>
-            <VCardTitle class="d-flex align-center gap-2">
-              <VAvatar color="primary" size="32" class="text-white font-weight-bold">3</VAvatar>
-              Konfirmasi Pembelian
-            </VCardTitle>
-          </VCardItem>
-          <VCardText>
-            <VTextField
-              v-model="form.no_whatsapp"
-              label="Nomor WhatsApp"
-              placeholder="Contoh: 08123456789"
-              variant="outlined"
-              class="mb-6"
-              required
-            />
-
-            <!-- Promo Code Section -->
-            <div class="mb-6 p-4 border rounded pa-4 bg-grey-lighten-4">
-              <div class="text-subtitle-2 font-weight-bold mb-2">Punya Kode Voucher / Promo?</div>
-              <div class="d-flex gap-4">
-                <VTextField
-                  v-model="form.kode_voucher"
-                  placeholder="Masukkan Kode"
-                  variant="outlined"
-                  density="compact"
-                  hide-details
-                  :disabled="promoState.applied"
-                />
-                <VBtn 
-                  v-if="!promoState.applied"
-                  color="primary" 
-                  variant="tonal" 
-                  @click="checkPromo" 
-                  :loading="promoState.loading"
-                >
-                  Gunakan
-                </VBtn>
-                <VBtn 
-                  v-else
-                  color="error" 
-                  variant="tonal" 
-                  @click="removePromo"
-                >
-                  Batal
-                </VBtn>
-              </div>
-              <div v-if="promoState.message" class="mt-2 text-caption font-weight-bold" :class="promoState.error ? 'text-error' : 'text-success'">
-                <VIcon :icon="promoState.error ? 'ri-error-warning-line' : 'ri-check-line'" size="14" class="mr-1" />
-                {{ promoState.message }}
-              </div>
-            </div>
-
-            <!-- Ringkasan Harga -->
-            <div v-if="selectedProductDetails" class="mb-6">
-              <div class="d-flex justify-space-between mb-1">
-                <span>Harga Normal</span>
-                <span class="font-weight-medium">{{ formatRupiah(selectedProductDetails.harga_jual) }}</span>
-              </div>
-              <div v-if="promoState.applied" class="d-flex justify-space-between mb-1 text-success">
-                <span>Diskon Voucher</span>
-                <span class="font-weight-medium">- {{ formatRupiah(promoState.nominal_diskon) }}</span>
-              </div>
-              <VDivider class="my-2" />
-              <div class="d-flex justify-space-between text-h6 font-weight-bold">
-                <span>Total Bayar</span>
-                <span class="text-primary">{{ formatRupiah(selectedProductDetails.harga_jual - promoState.nominal_diskon) }}</span>
-              </div>
-            </div>
-
-            <VBtn
-              color="primary"
-              size="x-large"
-              block
-              elevation="2"
-              @click="checkout"
-            >
-              Beli Sekarang
+    <template v-else-if="category">
+      <!-- Massive Hero Banner -->
+      <div class="checkout-hero position-relative">
+        <div class="hero-bg" :style="`background-image: url('${getImageUrl(category.gambar_logo)}')`"></div>
+        <div class="hero-overlay"></div>
+        
+        <VContainer class="hero-content h-100 d-flex align-end pb-16" style="max-width: 1200px;">
+          <div>
+            <VBtn variant="tonal" color="white" size="small" class="mb-4" to="/" prepend-icon="ri-arrow-left-line">
+              Kembali
             </VBtn>
-          </VCardText>
-        </VCard>
+            <div class="d-flex align-center gap-4">
+              <VAvatar size="80" rounded="lg" class="elevation-10 border-2 border-white">
+                <VImg :src="getImageUrl(category.gambar_logo)" cover />
+              </VAvatar>
+              <div>
+                <h1 class="text-h3 font-weight-bold text-white mb-1 text-shadow">{{ category.nama_game }}</h1>
+                <p class="text-subtitle-1 text-grey-lighten-2 text-shadow-sm mb-0">Proses Cepat & Otomatis 24 Jam</p>
+              </div>
+            </div>
+          </div>
+        </VContainer>
+      </div>
 
-      </VCol>
-    </VRow>
+      <!-- Main Form Section with Negative Margin -->
+      <VContainer class="form-container position-relative z-1" style="max-width: 1200px; margin-top: -60px;">
+        <VRow>
+          <!-- Left Column: Instructions -->
+          <VCol cols="12" md="4">
+            <VCard elevation="10" class="glass-card mb-6 sticky-card border-primary-top">
+              <VCardItem class="pb-2">
+                <VCardTitle class="text-h6 font-weight-bold d-flex align-center gap-2">
+                  <VIcon icon="ri-information-line" color="primary" />
+                  Cara Top Up
+                </VCardTitle>
+              </VCardItem>
+              <VCardText>
+                <p class="text-body-2 text-medium-emphasis mb-4">{{ category.deskripsi }}</p>
+                <div class="step-list">
+                  <div class="step-item d-flex gap-3 mb-3">
+                    <VAvatar color="primary" variant="tonal" size="28" class="font-weight-bold mt-1">1</VAvatar>
+                    <div class="text-body-2">Masukkan User ID (dan Zone ID bila ada).</div>
+                  </div>
+                  <div class="step-item d-flex gap-3 mb-3">
+                    <VAvatar color="primary" variant="tonal" size="28" class="font-weight-bold mt-1">2</VAvatar>
+                    <div class="text-body-2">Pilih Nominal Top Up yang diinginkan.</div>
+                  </div>
+                  <div class="step-item d-flex gap-3 mb-3">
+                    <VAvatar color="primary" variant="tonal" size="28" class="font-weight-bold mt-1">3</VAvatar>
+                    <div class="text-body-2">Masukkan Nomor WhatsApp aktif.</div>
+                  </div>
+                  <div class="step-item d-flex gap-3 mb-3">
+                    <VAvatar color="primary" variant="tonal" size="28" class="font-weight-bold mt-1">4</VAvatar>
+                    <div class="text-body-2">Gunakan Voucher (opsional) lalu klik Beli Sekarang.</div>
+                  </div>
+                </div>
+              </VCardText>
+            </VCard>
+          </VCol>
+
+          <!-- Right Column: Forms -->
+          <VCol cols="12" md="8">
+            <!-- Step 1: User ID -->
+            <VCard elevation="10" class="glass-card mb-6 border-primary-left">
+              <VCardItem class="bg-surface-variant pa-4">
+                <VCardTitle class="d-flex align-center gap-3 text-h6 font-weight-bold">
+                  <VAvatar color="primary" size="36" class="text-white font-weight-bold elevation-4">1</VAvatar>
+                  Masukkan Data Akun
+                </VCardTitle>
+              </VCardItem>
+              <VCardText class="pa-6">
+                <VRow>
+                  <VCol cols="12" sm="6">
+                    <VTextField
+                      v-model="form.user_id_game"
+                      label="User ID"
+                      placeholder="Contoh: 12345678"
+                      variant="outlined"
+                      color="primary"
+                      required
+                      hide-details="auto"
+                      class="custom-input"
+                    />
+                  </VCol>
+                  <VCol cols="12" sm="6">
+                    <VTextField
+                      v-model="form.zone_id"
+                      label="Zone ID / Server"
+                      placeholder="Contoh: 1234 (Opsional)"
+                      variant="outlined"
+                      color="primary"
+                      hide-details="auto"
+                      class="custom-input"
+                    />
+                  </VCol>
+                </VRow>
+              </VCardText>
+            </VCard>
+
+            <!-- Step 2: Nominal -->
+            <VCard elevation="10" class="glass-card mb-6 border-primary-left">
+              <VCardItem class="bg-surface-variant pa-4">
+                <VCardTitle class="d-flex align-center gap-3 text-h6 font-weight-bold">
+                  <VAvatar color="primary" size="36" class="text-white font-weight-bold elevation-4">2</VAvatar>
+                  Pilih Nominal Top Up
+                </VCardTitle>
+              </VCardItem>
+              <VCardText class="pa-6">
+                <VRow v-if="category.produks && category.produks.length > 0">
+                  <VCol
+                    v-for="prod in category.produks"
+                    :key="prod.id"
+                    cols="6"
+                    md="4"
+                  >
+                    <VCard
+                      variant="outlined"
+                      class="nominal-card cursor-pointer text-center pa-4 transition-swing h-100 d-flex flex-column justify-center"
+                      :class="{ 'selected-card': form.produk_voucher_id === prod.id }"
+                      @click="selectProduct(prod.id)"
+                    >
+                      <div class="selected-badge" v-if="form.produk_voucher_id === prod.id">
+                        <VIcon icon="ri-check-line" color="white" size="16" />
+                      </div>
+                      <div class="text-subtitle-1 font-weight-bold mb-1">{{ prod.nominal }}</div>
+                      <div class="text-primary font-weight-bold mt-auto">{{ formatRupiah(prod.harga_jual) }}</div>
+                    </VCard>
+                  </VCol>
+                </VRow>
+                <VAlert v-else type="info" variant="tonal">
+                  Produk belum tersedia untuk game ini.
+                </VAlert>
+              </VCardText>
+            </VCard>
+
+            <!-- Step 3: Checkout -->
+            <VCard elevation="10" class="glass-card mb-12 border-primary-left">
+              <VCardItem class="bg-surface-variant pa-4">
+                <VCardTitle class="d-flex align-center gap-3 text-h6 font-weight-bold">
+                  <VAvatar color="primary" size="36" class="text-white font-weight-bold elevation-4">3</VAvatar>
+                  Beli Sekarang
+                </VCardTitle>
+              </VCardItem>
+              <VCardText class="pa-6">
+                <VTextField
+                  v-model="form.no_whatsapp"
+                  label="Nomor WhatsApp (Aktif)"
+                  placeholder="Contoh: 08123456789"
+                  variant="outlined"
+                  color="primary"
+                  class="mb-6 custom-input"
+                  required
+                  prepend-inner-icon="ri-whatsapp-line"
+                />
+
+                <!-- Promo Code Section -->
+                <div class="promo-box mb-6 p-4 rounded-lg pa-5">
+                  <div class="d-flex align-center gap-2 mb-3">
+                    <VIcon icon="ri-coupon-3-fill" color="warning" />
+                    <span class="text-subtitle-2 font-weight-bold">Punya Kode Voucher?</span>
+                  </div>
+                  <div class="d-flex gap-3">
+                    <VTextField
+                      v-model="form.kode_voucher"
+                      placeholder="Masukkan Kode"
+                      variant="outlined"
+                      density="compact"
+                      hide-details
+                      bg-color="surface"
+                      :disabled="promoState.applied"
+                      class="promo-input"
+                    />
+                    <VBtn 
+                      v-if="!promoState.applied"
+                      color="primary" 
+                      variant="elevated" 
+                      @click="checkPromo" 
+                      :loading="promoState.loading"
+                      class="px-6 font-weight-bold"
+                    >
+                      Klaim
+                    </VBtn>
+                    <VBtn 
+                      v-else
+                      color="error" 
+                      variant="tonal" 
+                      @click="removePromo"
+                      class="px-6 font-weight-bold"
+                    >
+                      Batal
+                    </VBtn>
+                  </div>
+                  <div v-if="promoState.message" class="mt-3 text-caption font-weight-bold" :class="promoState.error ? 'text-error' : 'text-success'">
+                    <VIcon :icon="promoState.error ? 'ri-error-warning-line' : 'ri-check-line'" size="16" class="mr-1 mb-1" />
+                    {{ promoState.message }}
+                  </div>
+                </div>
+
+                <!-- Ringkasan Harga -->
+                <div v-if="selectedProductDetails" class="summary-box mb-6 pa-5 rounded-lg border">
+                  <div class="text-subtitle-2 text-medium-emphasis mb-3 text-uppercase font-weight-bold">Ringkasan Pembayaran</div>
+                  
+                  <div class="d-flex justify-space-between align-center mb-2">
+                    <span class="text-body-1">{{ selectedProductDetails.nominal }}</span>
+                    <span class="font-weight-medium">{{ formatRupiah(selectedProductDetails.harga_jual) }}</span>
+                  </div>
+                  
+                  <div v-if="promoState.applied" class="d-flex justify-space-between align-center mb-2 text-success">
+                    <span class="text-body-1">Diskon Voucher</span>
+                    <span class="font-weight-bold">- {{ formatRupiah(promoState.nominal_diskon) }}</span>
+                  </div>
+                  
+                  <VDivider class="my-3 border-opacity-25" />
+                  
+                  <div class="d-flex justify-space-between align-end">
+                    <span class="text-h6 font-weight-bold">Total Bayar</span>
+                    <span class="text-h4 font-weight-black text-primary">{{ formatRupiah(selectedProductDetails.harga_jual - promoState.nominal_diskon) }}</span>
+                  </div>
+                </div>
+
+                <VBtn
+                  color="primary"
+                  size="x-large"
+                  block
+                  elevation="8"
+                  @click="checkout"
+                  class="font-weight-bold text-h6 rounded-pill py-3"
+                  style="height: 60px;"
+                >
+                  <VIcon start icon="ri-shopping-cart-2-line" class="mr-2" />
+                  Konfirmasi Pembelian
+                </VBtn>
+              </VCardText>
+            </VCard>
+
+          </VCol>
+        </VRow>
+      </VContainer>
+    </template>
   </div>
 </template>
 
 <style scoped>
+/* Hero Banner */
+.checkout-hero {
+  height: 400px;
+  width: 100%;
+}
+
+.hero-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center 20%;
+  filter: blur(2px);
+}
+
+.hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom, rgba(11, 15, 25, 0.4) 0%, rgba(11, 15, 25, 0.9) 70%, rgba(11, 15, 25, 1) 100%);
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+}
+
+.text-shadow {
+  text-shadow: 0 4px 12px rgba(0,0,0,0.9);
+}
+
+.text-shadow-sm {
+  text-shadow: 0 2px 6px rgba(0,0,0,0.9);
+}
+
+/* Glass Cards */
+.glass-card {
+  background: rgba(30, 41, 59, 0.7) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 16px !important;
+  overflow: hidden;
+}
+
+.border-primary-top {
+  border-top: 4px solid rgb(var(--v-theme-primary)) !important;
+}
+
+.border-primary-left {
+  border-left: 4px solid rgb(var(--v-theme-primary)) !important;
+}
+
 .sticky-card {
   position: sticky;
-  top: 24px;
+  top: 100px;
 }
-.cursor-pointer {
-  cursor: pointer;
+
+/* Nominal Cards */
+.nominal-card {
+  border: 2px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 12px !important;
+  background: rgba(255, 255, 255, 0.02) !important;
+  position: relative;
+  overflow: hidden;
 }
-.border-primary {
+
+.nominal-card:hover {
+  border-color: rgba(var(--v-theme-primary), 0.5) !important;
+  background: rgba(var(--v-theme-primary), 0.05) !important;
+  transform: translateY(-2px);
+}
+
+.selected-card {
   border-color: rgb(var(--v-theme-primary)) !important;
+  background: rgba(var(--v-theme-primary), 0.1) !important;
+  box-shadow: 0 0 15px rgba(var(--v-theme-primary), 0.3) !important;
 }
-.bg-primary-lighten-5 {
-  background-color: rgba(var(--v-theme-primary), 0.05);
+
+.selected-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: rgb(var(--v-theme-primary));
+  width: 30px;
+  height: 30px;
+  border-bottom-left-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Inputs & Boxes */
+.custom-input {
+  background: rgba(15, 23, 42, 0.6);
+  border-radius: 8px;
+}
+
+.promo-box {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px dashed rgba(var(--v-theme-warning), 0.5);
+}
+
+.promo-input {
+  border-radius: 6px;
+}
+
+.summary-box {
+  background: rgba(var(--v-theme-primary), 0.05);
+  border-color: rgba(var(--v-theme-primary), 0.2) !important;
+}
+
+.z-1 {
+  z-index: 1;
 }
 </style>
