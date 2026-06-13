@@ -137,7 +137,7 @@ const checkout = async () => {
 </script>
 
 <template>
-  <div class="checkout-wrapper w-100 position-absolute" style="top: 0; left: 0; right: 0;">
+  <div class="checkout-wrapper w-100" style="margin-top: -48px;">
     <VRow v-if="loading" class="mt-16 pt-16">
       <VCol cols="12" class="text-center">
         <VProgressCircular indeterminate color="primary" size="64" />
@@ -152,16 +152,16 @@ const checkout = async () => {
         
         <VContainer class="hero-content h-100 d-flex align-end pb-16" style="max-width: 1200px;">
           <div>
-            <VBtn variant="tonal" color="white" size="small" class="mb-4" to="/" prepend-icon="ri-arrow-left-line">
+            <VBtn variant="tonal" color="primary" size="small" class="mb-4" to="/" prepend-icon="ri-arrow-left-line">
               Kembali
             </VBtn>
             <div class="d-flex align-center gap-4">
-              <VAvatar size="80" rounded="lg" class="elevation-10 border-2 border-white">
+              <VAvatar size="80" rounded="lg" class="elevation-10 border-2" style="border-color: rgba(0,0,0,0.1) !important;">
                 <VImg :src="getImageUrl(category.gambar_logo)" cover />
               </VAvatar>
               <div>
-                <h1 class="text-h3 font-weight-bold text-white mb-1 text-shadow">{{ category.nama_game }}</h1>
-                <p class="text-subtitle-1 text-grey-lighten-2 text-shadow-sm mb-0">Proses Cepat & Otomatis 24 Jam</p>
+                <h1 class="text-h3 font-weight-bold text-high-emphasis mb-1 text-shadow">{{ category.nama_game }}</h1>
+                <p class="text-subtitle-1 text-medium-emphasis text-shadow-sm mb-0">Proses Cepat & Otomatis 24 Jam</p>
               </div>
             </div>
           </div>
@@ -208,7 +208,7 @@ const checkout = async () => {
           <VCol cols="12" md="8">
             <!-- Step 1: User ID -->
             <VCard elevation="10" class="glass-card mb-6 border-primary-left">
-              <VCardItem class="bg-surface-variant pa-4">
+              <VCardItem class="bg-grey-lighten-4 pa-4">
                 <VCardTitle class="d-flex align-center gap-3 text-h6 font-weight-bold">
                   <VAvatar color="primary" size="36" class="text-white font-weight-bold elevation-4">1</VAvatar>
                   Masukkan Data Akun
@@ -245,7 +245,7 @@ const checkout = async () => {
 
             <!-- Step 2: Nominal -->
             <VCard elevation="10" class="glass-card mb-6 border-primary-left">
-              <VCardItem class="bg-surface-variant pa-4">
+              <VCardItem class="bg-grey-lighten-4 pa-4">
                 <VCardTitle class="d-flex align-center gap-3 text-h6 font-weight-bold">
                   <VAvatar color="primary" size="36" class="text-white font-weight-bold elevation-4">2</VAvatar>
                   Pilih Nominal Top Up
@@ -281,7 +281,7 @@ const checkout = async () => {
 
             <!-- Step 3: Checkout -->
             <VCard elevation="10" class="glass-card mb-12 border-primary-left">
-              <VCardItem class="bg-surface-variant pa-4">
+              <VCardItem class="bg-grey-lighten-4 pa-4">
                 <VCardTitle class="d-flex align-center gap-3 text-h6 font-weight-bold">
                   <VAvatar color="primary" size="36" class="text-white font-weight-bold elevation-4">3</VAvatar>
                   Beli Sekarang
