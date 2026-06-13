@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('kategori_game_id')->constrained('kategori_games')->onDelete('restrict');
             $table->string('nominal', 100);
+            $table->decimal('harga_beli', 15, 2)->default(0);
             $table->decimal('harga_jual', 15, 2)->default(0);
             $table->integer('stok')->default(0);
             $table->string('gambar', 255)->nullable();

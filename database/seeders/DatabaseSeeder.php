@@ -49,9 +49,9 @@ class DatabaseSeeder extends Seeder
         ]);
 
         \App\Models\ProdukVoucher::insert([
-            ['id' => 1, 'kategori_game_id' => 1, 'nominal' => '86 Diamonds', 'harga_jual' => 20000, 'stok' => 100, 'is_aktif' => true],
-            ['id' => 2, 'kategori_game_id' => 1, 'nominal' => '172 Diamonds', 'harga_jual' => 40000, 'stok' => 100, 'is_aktif' => true],
-            ['id' => 3, 'kategori_game_id' => 2, 'nominal' => '140 Diamonds', 'harga_jual' => 20000, 'stok' => 50, 'is_aktif' => true],
+            ['id' => 1, 'kategori_game_id' => 1, 'nominal' => '86 Diamonds', 'harga_beli' => 15000, 'harga_jual' => 20000, 'stok' => 100, 'is_aktif' => true],
+            ['id' => 2, 'kategori_game_id' => 1, 'nominal' => '172 Diamonds', 'harga_beli' => 30000, 'harga_jual' => 40000, 'stok' => 100, 'is_aktif' => true],
+            ['id' => 3, 'kategori_game_id' => 2, 'nominal' => '140 Diamonds', 'harga_beli' => 16000, 'harga_jual' => 20000, 'stok' => 50, 'is_aktif' => true],
         ]);
 
         \App\Models\DiskonVoucher::insert([

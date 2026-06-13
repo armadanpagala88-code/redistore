@@ -13,3 +13,4 @@ class ProdukVoucher extends Model
     {
         return $this->belongsTo(KategoriGame::class, 'kategori_game_id');
     }
+}
