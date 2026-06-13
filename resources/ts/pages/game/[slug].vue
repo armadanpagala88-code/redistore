@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import axios from 'axios'
 
 const route = useRoute()
+const router = useRouter()
 const category = ref<any>(null)
 const loading = ref(true)
 
@@ -30,12 +31,21 @@ const selectProduct = (id: number) => {
   form.value.produk_voucher_id = id as any
 }
 
-const checkout = () => {
+const checkout = async () => {
   if (!form.value.user_id_game || !form.value.produk_voucher_id || !form.value.no_whatsapp) {
     alert('Harap lengkapi User ID, Nominal Top Up, dan No WhatsApp')
     return
   }
-  alert('Proses Checkout... (API transaksi akan segera diimplementasikan)')
+  
+  try {
+    const response = await axios.post('/api/checkout', form.value)
+    if (response.data.success) {
+      router.push(`/invoice/${response.data.data.id}`)
+    }
+  } catch (error) {
+    console.error('Checkout error:', error)
+    alert('Gagal membuat pesanan. Silakan coba lagi.')
+  }
 }
 </script>
 
