@@ -13,6 +13,11 @@ touch database/database.sqlite
 chown -R www-data:www-data database
 chmod -R 775 database
 
+# Create upload directories and set permissions
+mkdir -p public/uploads/profil public/uploads/artikel public/uploads/bukti public/images/banners
+chown -R www-data:www-data public/uploads public/images
+chmod -R 775 public/uploads public/images
+
 # Run migrations automatically
 php artisan migrate --force
 
