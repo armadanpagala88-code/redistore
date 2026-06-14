@@ -8,6 +8,14 @@ php artisan view:cache
 # Create storage link if not exists
 php artisan storage:link
 
+# Setup SQLite database if needed and fix permissions
+touch database/database.sqlite
+chown -R www-data:www-data database
+chmod -R 775 database
+
+# Run migrations automatically
+php artisan migrate --force
+
 # Start PHP-FPM in background
 php-fpm -D
 
