@@ -2,8 +2,9 @@
 FROM node:18-alpine as frontend
 WORKDIR /app
 COPY package*.json ./
-RUN npm install
+RUN npm install --ignore-scripts
 COPY . .
+RUN npm run postinstall
 RUN npm run build
 
 # Stage 2: Setup PHP and Laravel
