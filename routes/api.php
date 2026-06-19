@@ -61,7 +61,7 @@ Route::middleware('auth:sanctum')->group(function () {
     
     // Artikel
     Route::apiResource('admin/artikel', \App\Http\Controllers\Api\Admin\ArtikelController::class);
-    Route::get('admin/pengguna', [\App\Http\Controllers\Api\Admin\PenggunaController::class, 'index']);
+    Route::apiResource('admin/users', \App\Http\Controllers\Api\Admin\UserController::class);
     
     // Settings
     Route::post('/admin/settings', [App\Http\Controllers\SettingController::class, 'update']);

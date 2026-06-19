@@ -25,9 +25,9 @@ export default [
     icon: { icon: 'ri-article-line' },
   },
   {
-    title: 'Data Member',
-    to: { path: '/admin/pengguna' },
-    icon: { icon: 'ri-group-line' },
+    title: 'Manajemen User',
+    to: { path: '/admin/users' },
+    icon: { icon: 'ri-user-settings-line' },
   },
   {
     title: 'Laporan Penjualan',
