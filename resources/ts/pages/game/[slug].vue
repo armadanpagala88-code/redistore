@@ -17,7 +17,6 @@ const loading = ref(true)
 
 const form = ref({
   user_id_game: '',
-  zone_id: '',
   produk_voucher_id: null,
   no_whatsapp: '',
   email_pembeli: '',
@@ -186,7 +185,7 @@ const checkout = async () => {
                 <div class="step-list">
                   <div class="step-item d-flex gap-3 mb-3">
                     <VAvatar color="primary" variant="tonal" size="28" class="font-weight-bold mt-1">1</VAvatar>
-                    <div class="text-body-2">Masukkan User ID (dan Zone ID bila ada).</div>
+                    <div class="text-body-2">Masukkan User ID.</div>
                   </div>
                   <div class="step-item d-flex gap-3 mb-3">
                     <VAvatar color="primary" variant="tonal" size="28" class="font-weight-bold mt-1">2</VAvatar>
@@ -217,7 +216,7 @@ const checkout = async () => {
               </VCardItem>
               <VCardText class="pa-6">
                 <VRow>
-                  <VCol cols="12" sm="6">
+                  <VCol cols="12">
                     <VTextField
                       v-model="form.user_id_game"
                       label="User ID"
@@ -225,17 +224,6 @@ const checkout = async () => {
                       variant="outlined"
                       color="primary"
                       required
-                      hide-details="auto"
-                      class="custom-input"
-                    />
-                  </VCol>
-                  <VCol cols="12" sm="6">
-                    <VTextField
-                      v-model="form.zone_id"
-                      label="Zone ID / Server"
-                      placeholder="Contoh: 1234 (Opsional)"
-                      variant="outlined"
-                      color="primary"
                       hide-details="auto"
                       class="custom-input"
                     />
