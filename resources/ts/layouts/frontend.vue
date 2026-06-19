@@ -62,7 +62,7 @@ watch([isFallbackStateActive, refLoadingIndicator], () => {
 <template>
   <AppLoadingIndicator ref="refLoadingIndicator" />
 
-  <VApp class="premium-layout theme--dark">
+  <VApp class="premium-layout" theme="light">
     <!-- Top Navigation Bar - Glassmorphism -->
     <VAppBar elevation="0" height="80" class="glass-navbar border-b border-opacity-10">
       <VContainer class="d-flex align-center w-100 h-100" style="max-width: 1200px; padding: 0 16px;">
