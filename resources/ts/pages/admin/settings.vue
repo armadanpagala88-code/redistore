@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const form = ref({
   app_name: '',
   app_description: '',
@@ -18,6 +20,10 @@ const snackbar = ref({
 })
 
 onMounted(async () => {
+  if (!localStorage.getItem('admin_token')) {
+    router.push('/login')
+    return
+  }
   try {
     const res = await axios.get('/api/settings')
     if (res.data.success && res.data.data) {

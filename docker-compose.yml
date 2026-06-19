@@ -38,6 +38,19 @@ services:
     networks:
       - redistore-network
 
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - "8080:80"
+    environment:
+      - PMA_HOST=db
+      - PMA_USER=root
+      - PMA_PASSWORD=secret
+    depends_on:
+      - db
+    networks:
+      - redistore-network
+
 networks:
   redistore-network:
     driver: bridge
