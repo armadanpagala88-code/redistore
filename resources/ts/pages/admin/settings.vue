@@ -14,6 +14,7 @@ const form = ref({
   midtrans_server_key: '',
   midtrans_client_key: '',
   midtrans_is_production: '0',
+  midtrans_payment_link: '',
 })
 
 const loading = ref(true)
@@ -41,6 +42,7 @@ onMounted(async () => {
       if (res.data.data.midtrans_server_key) form.value.midtrans_server_key = res.data.data.midtrans_server_key
       if (res.data.data.midtrans_client_key) form.value.midtrans_client_key = res.data.data.midtrans_client_key
       if (res.data.data.midtrans_is_production !== undefined) form.value.midtrans_is_production = String(res.data.data.midtrans_is_production)
+      if (res.data.data.midtrans_payment_link) form.value.midtrans_payment_link = res.data.data.midtrans_payment_link
     }
   } catch (e) {
     console.error('Error fetching settings', e)
@@ -205,6 +207,20 @@ const saveSettings = async () => {
                     density="comfortable"
                     color="primary"
                     prepend-inner-icon="ri-key-line"
+                  />
+                </VCol>
+
+                <VCol cols="12">
+                  <VTextField
+                    v-model="form.midtrans_payment_link"
+                    label="Payment Link (Manual)"
+                    placeholder="Contoh: https://app.sandbox.midtrans.com/payment-links/..."
+                    variant="outlined"
+                    density="comfortable"
+                    color="primary"
+                    prepend-inner-icon="ri-link"
+                    hint="Tautan statis untuk pembayaran manual"
+                    persistent-hint
                   />
                 </VCol>
 
