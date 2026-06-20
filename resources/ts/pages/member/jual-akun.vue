@@ -1,0 +1,345 @@
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'
+import axios from 'axios'
+
+definePage({
+  meta: {
+    layout: 'frontend',
+    public: false,
+  },
+})
+
+const items = ref<any[]>([])
+const loading = ref(true)
+
+const fetchItems = async () => {
+  try {
+    const res = await axios.get('/api/member/akun-game')
+    items.value = res.data.data
+  } catch (error) {
+    console.error(error)
+  } finally {
+    loading.value = false
+  }
+}
+
+const kategoris = ref<any[]>([])
+const fetchKategori = async () => {
+  try {
+    const res = await axios.get('/api/kategori-game')
+    kategoris.value = res.data.data
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+onMounted(() => {
+  fetchItems()
+  fetchKategori()
+})
+
+const isDialogVisible = ref(false)
+const form = ref({
+  kategori_game_id: null,
+  judul_akun: '',
+  deskripsi_akun: '',
+  harga: 0,
+  login_via: '',
+  email_akun: '',
+  password_akun: '',
+  catatan_akun: ''
+})
+const fileInput = ref<any>(null)
+const isSubmitting = ref(false)
+
+const openAddModal = () => {
+  form.value = { 
+    kategori_game_id: null,
+    judul_akun: '',
+    deskripsi_akun: '',
+    harga: 0,
+    login_via: '',
+    email_akun: '',
+    password_akun: '',
+    catatan_akun: ''
+  }
+  fileInput.value = null
+  isDialogVisible.value = true
+}
+
+const handleFile = (e: any) => {
+  if (e.target.files && e.target.files[0]) {
+    fileInput.value = e.target.files[0]
+  }
+}
+
+const saveItem = async () => {
+  if (!fileInput.value) {
+    alert('Gambar utama wajib diupload!')
+    return
+  }
+
+  isSubmitting.value = true
+  const formData = new FormData()
+  formData.append('kategori_game_id', form.value.kategori_game_id as any)
+  formData.append('judul_akun', form.value.judul_akun)
+  formData.append('deskripsi_akun', form.value.deskripsi_akun)
+  formData.append('harga', form.value.harga.toString())
+  formData.append('login_via', form.value.login_via)
+  formData.append('email_akun', form.value.email_akun)
+  formData.append('password_akun', form.value.password_akun)
+  formData.append('catatan_akun', form.value.catatan_akun)
+  formData.append('gambar_utama', fileInput.value)
+
+  try {
+    const res = await axios.post('/api/member/akun-game', formData)
+    alert(res.data.message)
+    isDialogVisible.value = false
+    fetchItems()
+  } catch (e: any) {
+    if (e.response && e.response.data && e.response.data.message) {
+      alert(e.response.data.message)
+    } else {
+      alert('Gagal memposting akun')
+    }
+  } finally {
+    isSubmitting.value = false
+  }
+}
+
+const deleteItem = async (id: string) => {
+  if (!confirm('Yakin ingin menghapus postingan ini?')) return
+  try {
+    const res = await axios.delete(`/api/member/akun-game/${id}`)
+    alert(res.data.message)
+    fetchItems()
+  } catch (error: any) {
+    if (error.response && error.response.data && error.response.data.message) {
+      alert(error.response.data.message)
+    } else {
+      alert('Gagal menghapus data')
+    }
+  }
+}
+
+const formatRupiah = (value: number) => {
+  return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(value)
+}
+
+const statusColor = (status: string) => {
+  switch (status) {
+    case 'Pending': return 'warning'
+    case 'Tersedia': return 'success'
+    case 'Terjual': return 'info'
+    case 'Ditolak': return 'error'
+    default: return 'grey'
+  }
+}
+</script>
+
+<template>
+  <VContainer class="py-8">
+    <div class="d-flex flex-column flex-md-row justify-space-between align-md-center mb-6 gap-4">
+      <div>
+        <h2 class="text-h4 font-weight-bold d-flex align-center gap-2">
+          <VIcon icon="ri-store-2-line" color="primary" />
+          Jual Akun Game
+        </h2>
+        <p class="text-body-2 text-medium-emphasis mb-0 mt-1">Kelola daftar akun game yang Anda jual.</p>
+      </div>
+      <div class="d-flex gap-3">
+        <VBtn color="secondary" variant="tonal" to="/member/dashboard" prepend-icon="ri-arrow-left-line">Kembali</VBtn>
+        <VBtn color="primary" prepend-icon="ri-add-line" @click="openAddModal" class="rounded-lg font-weight-bold">Posting Akun Baru</VBtn>
+      </div>
+    </div>
+
+    <VCard elevation="10" class="border-t-primary rounded-lg overflow-hidden">
+      <VCardText v-if="loading" class="text-center pa-10">
+        <VProgressCircular indeterminate color="primary" size="48" width="4" />
+        <div class="mt-4 text-medium-emphasis font-weight-medium">Memuat data...</div>
+      </VCardText>
+      
+      <VTable v-else hover class="custom-table text-no-wrap">
+        <thead class="bg-grey-lighten-4">
+          <tr>
+            <th class="text-uppercase text-caption font-weight-bold">Info Akun</th>
+            <th class="text-uppercase text-caption font-weight-bold">Game</th>
+            <th class="text-uppercase text-caption font-weight-bold">Harga</th>
+            <th class="text-uppercase text-caption font-weight-bold text-center">Status</th>
+            <th class="text-uppercase text-caption font-weight-bold text-center">Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="item in items" :key="item.id" class="transition-swing">
+            <td class="py-3">
+              <div class="d-flex align-center gap-3">
+                <VAvatar rounded="lg" size="48" color="surface-variant" variant="tonal" class="elevation-1">
+                  <VImg :src="`/images/akun/${item.gambar_utama}`" cover />
+                </VAvatar>
+                <div>
+                  <div class="font-weight-bold text-high-emphasis">{{ item.judul_akun }}</div>
+                  <div class="text-caption text-medium-emphasis">Login via: {{ item.login_via }}</div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <VChip size="small" variant="tonal" color="primary">{{ item.kategori?.nama_game }}</VChip>
+            </td>
+            <td class="font-weight-bold text-success">{{ formatRupiah(item.harga) }}</td>
+            <td class="text-center">
+              <VChip :color="statusColor(item.status)" size="small" variant="elevated" class="font-weight-bold">
+                {{ item.status }}
+              </VChip>
+            </td>
+            <td class="text-center">
+              <div class="d-flex justify-center gap-2">
+                <VBtn v-if="item.status !== 'Terjual'" icon="ri-delete-bin-line" variant="tonal" size="small" color="error" @click="deleteItem(item.id)" />
+                <span v-else class="text-caption text-medium-emphasis">Terkunci</span>
+              </div>
+            </td>
+          </tr>
+          <tr v-if="items.length === 0">
+            <td colspan="5" class="text-center pa-8">
+              <VIcon icon="ri-store-3-line" size="48" color="grey-lighten-1" class="mb-3" />
+              <div class="text-h6 text-medium-emphasis">Anda belum memposting akun apapun</div>
+            </td>
+          </tr>
+        </tbody>
+      </VTable>
+    </VCard>
+
+    <!-- Dialog Posting Akun -->
+    <VDialog v-model="isDialogVisible" max-width="600" scrollable>
+      <VCard class="rounded-lg">
+        <VCardTitle class="px-6 pt-6 d-flex justify-space-between align-center text-h5 font-weight-bold">
+          Posting Akun Baru
+          <VBtn icon="ri-close-line" variant="text" size="small" @click="isDialogVisible = false" />
+        </VCardTitle>
+        <VDivider />
+        <VCardText class="px-6 pb-6 pt-4" style="max-height: 70vh;">
+          <VAlert type="info" variant="tonal" class="mb-4 text-body-2">
+            Akun yang Anda posting akan di-review terlebih dahulu oleh Admin sebelum muncul di katalog publik. Pastikan Anda memasukkan data yang valid!
+          </VAlert>
+          
+          <VForm @submit.prevent="saveItem">
+            <VSelect 
+              v-model="form.kategori_game_id" 
+              :items="kategoris" 
+              item-title="nama_game" 
+              item-value="id" 
+              label="Pilih Game" 
+              required 
+              variant="outlined" 
+              density="comfortable" 
+              class="mb-4" 
+            />
+            
+            <VTextField 
+              v-model="form.judul_akun" 
+              label="Judul Postingan" 
+              placeholder="Contoh: Akun MLBB Mythic Glory Murah" 
+              required 
+              variant="outlined" 
+              density="comfortable" 
+              class="mb-4" 
+            />
+            
+            <VTextarea 
+              v-model="form.deskripsi_akun" 
+              label="Deskripsi Akun (Spek lengkap)" 
+              rows="4" 
+              required 
+              variant="outlined" 
+              density="comfortable" 
+              class="mb-4" 
+            />
+            
+            <VRow>
+              <VCol cols="6">
+                <VTextField 
+                  v-model.number="form.harga" 
+                  type="number" 
+                  label="Harga Jual (Rp)" 
+                  required 
+                  variant="outlined" 
+                  density="comfortable" 
+                  class="mb-4" 
+                />
+              </VCol>
+              <VCol cols="6">
+                <VTextField 
+                  v-model="form.login_via" 
+                  label="Login Via (Moonton, FB, dll)" 
+                  required 
+                  variant="outlined" 
+                  density="comfortable" 
+                  class="mb-4" 
+                />
+              </VCol>
+            </VRow>
+            
+            <VDivider class="mb-4" />
+            <div class="text-subtitle-2 font-weight-bold mb-3 text-error">Data Privasi (Hanya diberikan ke pembeli setelah lunas)</div>
+            
+            <VRow>
+              <VCol cols="6">
+                <VTextField 
+                  v-model="form.email_akun" 
+                  label="Email Akun" 
+                  required 
+                  variant="outlined" 
+                  density="comfortable" 
+                  class="mb-4" 
+                />
+              </VCol>
+              <VCol cols="6">
+                <VTextField 
+                  v-model="form.password_akun" 
+                  label="Password Akun" 
+                  required 
+                  variant="outlined" 
+                  density="comfortable" 
+                  class="mb-4" 
+                />
+              </VCol>
+            </VRow>
+            
+            <VTextField 
+              v-model="form.catatan_akun" 
+              label="Catatan Tambahan (Opsional)" 
+              variant="outlined" 
+              density="comfortable" 
+              class="mb-4" 
+            />
+            
+            <VFileInput 
+              label="Screenshot Akun / Profil Game" 
+              accept="image/*" 
+              variant="outlined" 
+              density="comfortable" 
+              prepend-inner-icon="ri-image-add-line" 
+              prepend-icon="" 
+              class="mb-4" 
+              @change="handleFile" 
+              required
+            />
+            
+            <div class="d-flex justify-end gap-3 mt-4">
+              <VBtn variant="tonal" color="secondary" @click="isDialogVisible = false" class="px-6 rounded-lg">Batal</VBtn>
+              <VBtn type="submit" color="primary" variant="elevated" :loading="isSubmitting" class="px-6 rounded-lg font-weight-bold">Posting Akun</VBtn>
+            </div>
+          </VForm>
+        </VCardText>
+      </VCard>
+    </VDialog>
+  </VContainer>
+</template>
+
+<style scoped>
+.border-t-primary {
+  border-top: 4px solid rgb(var(--v-theme-primary)) !important;
+}
+.custom-table tbody tr:hover {
+  background-color: rgba(var(--v-theme-primary), 0.03) !important;
+}
+</style>

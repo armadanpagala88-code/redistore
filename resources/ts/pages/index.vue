@@ -9,17 +9,17 @@ definePage({
   },
 })
 
-const categories = ref<any[]>([])
+const akunGames = ref<any[]>([])
 const banners = ref<any[]>([])
 const loading = ref(true)
 
 onMounted(async () => {
   try {
-    const [catRes, bannerRes] = await Promise.all([
-      axios.get('/api/kategori-game'),
+    const [akunRes, bannerRes] = await Promise.all([
+      axios.get('/api/akun-games'),
       axios.get('/api/banners')
     ])
-    categories.value = catRes.data.data
+    akunGames.value = akunRes.data.data
     banners.value = bannerRes.data.data
   } catch (error) {
     console.error('Error fetching data:', error)
@@ -31,6 +31,15 @@ onMounted(async () => {
 const getImageUrl = (path: string) => {
   if (!path) return 'https://placehold.co/400x400/f1f5f9/94a3b8.png?text=Icon'
   return path.startsWith('http') ? path : `/images/${path}`
+}
+
+const getAkunImage = (path: string) => {
+  if (!path) return 'https://placehold.co/400x400/f1f5f9/94a3b8.png?text=Image'
+  return `/images/akun/${path}`
+}
+
+const formatRupiah = (angka: number) => {
+  return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(angka)
 }
 </script>
 
@@ -87,38 +96,60 @@ const getImageUrl = (path: string) => {
       </div>
 
       <!-- Section Title ala UniPin -->
-      <div class="d-flex align-center mb-6">
+      <div class="d-flex align-center mb-6 justify-space-between">
         <h2 class="text-h5 font-weight-bold text-high-emphasis d-flex align-center gap-2">
-          <VIcon icon="ri-gamepad-fill" color="primary" size="28" />
-          Populer
+          <VIcon icon="ri-store-2-fill" color="primary" size="28" />
+          Marketplace Akun Game
         </h2>
       </div>
 
       <!-- Game Grid ala UniPin -->
       <VRow dense class="match-unipin-grid">
         <VCol
-          v-for="cat in categories"
-          :key="cat.id"
+          v-for="akun in akunGames"
+          :key="akun.id"
           cols="6"
           sm="4"
           md="3"
-          lg="2"
+          lg="3"
         >
-          <VCard elevation="2" class="h-100 d-flex flex-column unipin-card rounded-lg" :to="`/game/${cat.slug}`">
-            <div class="img-wrapper bg-surface">
+          <VCard elevation="2" class="h-100 d-flex flex-column unipin-card rounded-lg" :to="`/akun/${akun.id}`">
+            <div class="img-wrapper bg-surface" style="position: relative;">
               <VImg
-                :src="getImageUrl(cat.gambar_logo)"
-                height="150"
+                :src="getAkunImage(akun.gambar_utama)"
+                height="180"
                 cover
                 class="game-img"
               />
+              <VChip 
+                color="primary" 
+                size="small" 
+                variant="elevated"
+                class="font-weight-bold position-absolute" 
+                style="bottom: 8px; left: 8px; z-index: 2;"
+              >
+                {{ akun.kategori?.nama_game }}
+              </VChip>
             </div>
             
-            <VCardItem class="pa-3 text-center card-content flex-grow-1 d-flex flex-column justify-center">
-              <VCardTitle class="text-subtitle-2 font-weight-bold text-high-emphasis mb-0 line-clamp-1" style="font-size: 0.9rem !important;">{{ cat.nama_game }}</VCardTitle>
-              <VCardSubtitle class="text-caption text-medium-emphasis mt-1 line-clamp-1">{{ cat.deskripsi }}</VCardSubtitle>
+            <VCardItem class="pa-4 text-left card-content flex-grow-1 d-flex flex-column justify-space-between">
+              <div>
+                <VCardTitle class="text-subtitle-1 font-weight-bold text-high-emphasis mb-1 line-clamp-2" style="line-height: 1.3;">{{ akun.judul_akun }}</VCardTitle>
+                <div class="text-success font-weight-black text-h6 mt-2">{{ formatRupiah(akun.harga) }}</div>
+              </div>
+              <div class="d-flex justify-space-between align-center mt-4">
+                <span class="text-caption text-medium-emphasis">Via: {{ akun.login_via }}</span>
+                <VBtn size="small" color="primary" variant="tonal" class="rounded-pill font-weight-bold px-4">Beli</VBtn>
+              </div>
             </VCardItem>
           </VCard>
+        </VCol>
+        
+        <VCol cols="12" v-if="akunGames.length === 0">
+          <div class="text-center pa-12">
+            <VIcon icon="ri-store-3-line" size="64" color="grey-lighten-1" class="mb-4" />
+            <h3 class="text-h5 font-weight-bold text-medium-emphasis">Belum ada akun game yang dijual</h3>
+          </div>
         </VCol>
       </VRow>
     </template>

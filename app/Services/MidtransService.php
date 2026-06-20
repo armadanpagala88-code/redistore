@@ -9,11 +9,13 @@ class MidtransService
 {
     public function __construct()
     {
+        $settingServerKey = \App\Models\Setting::where('key', 'midtrans_server_key')->first();
+        $settingIsProd = \App\Models\Setting::where('key', 'midtrans_is_production')->first();
+
         // Set your Merchant Server Key
-        Config::$serverKey = env('MIDTRANS_SERVER_KEY', 'SB-Mid-server-YOUR-KEY-HERE');
+        Config::$serverKey = $settingServerKey && !empty($settingServerKey->value) ? $settingServerKey->value : env('MIDTRANS_SERVER_KEY', 'SB-Mid-server-YOUR-KEY-HERE');
         // Set to Development/Sandbox Environment (default). Set to true for Production Environment (accept real transaction).
-        Config::$isProduction = env('MIDTRANS_IS_PRODUCTION', false);
-        // Set sanitization on (default)
+        Config::$isProduction = $settingIsProd && $settingIsProd->value === '1' ? true : env('MIDTRANS_IS_PRODUCTION', false);
         Config::$isSanitized = true;
         // Set 3DS transaction for credit card to true
         Config::$is3ds = true;

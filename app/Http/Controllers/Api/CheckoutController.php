@@ -11,6 +11,7 @@ use App\Services\FonnteService;
 use Illuminate\Support\Str;
 
 use App\Models\DiskonVoucher;
+use App\Models\AkunGame;
 use Carbon\Carbon;
 
 class CheckoutController extends Controller
@@ -67,19 +68,35 @@ class CheckoutController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'user_id_game' => 'required|string',
-            'produk_voucher_id' => 'required|exists:produk_vouchers,id',
+            'tipe_transaksi' => 'required|in:TopUp,BeliAkun',
             'no_whatsapp' => 'required|string',
             'email_pembeli' => 'nullable|email',
+            'kode_voucher' => 'nullable|string',
+            // Jika TopUp
+            'produk_voucher_id' => 'required_if:tipe_transaksi,TopUp|exists:produk_vouchers,id',
+            'user_id_game' => 'required_if:tipe_transaksi,TopUp|string',
             'zone_id' => 'nullable|string',
-            'kode_voucher' => 'nullable|string'
+            // Jika BeliAkun
+            'akun_game_id' => 'required_if:tipe_transaksi,BeliAkun|exists:akun_games,id'
         ]);
 
-        $produk = ProdukVoucher::with('kategori')->findOrFail($request->produk_voucher_id);
-        
         $trxId = 'TRX-' . date('Ymd') . '-' . strtoupper(Str::random(5));
         
-        $totalBayar = $produk->harga_jual;
+        $totalBayar = 0;
+        $namaItem = '';
+        
+        if ($request->tipe_transaksi === 'TopUp') {
+            $produk = ProdukVoucher::with('kategori')->findOrFail($request->produk_voucher_id);
+            $totalBayar = $produk->harga_jual;
+            $namaItem = "{$produk->nominal} {$produk->kategori->nama_game}";
+        } else {
+            $akunGame = AkunGame::with('kategori')->findOrFail($request->akun_game_id);
+            if ($akunGame->status !== 'Tersedia') {
+                return response()->json(['success' => false, 'message' => 'Akun tidak tersedia atau sudah terjual'], 400);
+            }
+            $totalBayar = $akunGame->harga;
+            $namaItem = "Akun Game: {$akunGame->judul_akun} ({$akunGame->kategori->nama_game})";
+        }
         $nominalDiskon = 0;
         $diskonVoucherId = null;
 
@@ -111,8 +128,10 @@ class CheckoutController extends Controller
         
         $transaksi = Transaksi::create([
             'id' => $trxId,
-            'user_id' => auth('sanctum')->id(), // akan null jika tidak login
+            'user_id' => auth('sanctum')->id(),
+            'tipe_transaksi' => $request->tipe_transaksi,
             'user_id_game' => $request->user_id_game,
+            'akun_game_id' => $request->akun_game_id,
             'zone_id' => $request->zone_id,
             'no_whatsapp' => $request->no_whatsapp,
             'email_pembeli' => $request->email_pembeli,
@@ -122,15 +141,31 @@ class CheckoutController extends Controller
             'status_transaksi' => 'Unpaid'
         ]);
 
-        DetailTransaksi::create([
-            'transaksi_id' => $trxId,
-            'produk_voucher_id' => $produk->id,
-            'nama_produk' => $produk->nominal,
-            'nama_game' => $produk->kategori->nama_game,
-            'harga_satuan' => $produk->harga_jual,
-            'jumlah' => 1,
-            'subtotal' => $produk->harga_jual
-        ]);
+        if ($request->tipe_transaksi === 'TopUp') {
+            DetailTransaksi::create([
+                'transaksi_id' => $trxId,
+                'produk_voucher_id' => $request->produk_voucher_id,
+                'nama_produk' => $namaItem,
+                'nama_game' => $produk->kategori->nama_game,
+                'harga_satuan' => $produk->harga_jual,
+                'jumlah' => 1,
+                'subtotal' => $produk->harga_jual
+            ]);
+        } else {
+            // Ubah status akun menjadi diproses/pending (optional, tapi baiknya dikunci dulu)
+            $akunGame->status = 'Pending';
+            $akunGame->save();
+
+            DetailTransaksi::create([
+                'transaksi_id' => $trxId,
+                'produk_voucher_id' => null,
+                'nama_produk' => $namaItem,
+                'nama_game' => $akunGame->kategori->nama_game,
+                'harga_satuan' => $akunGame->harga,
+                'jumlah' => 1,
+                'subtotal' => $akunGame->harga
+            ]);
+        }
 
         // Integrate Midtrans
         $midtrans = new \App\Services\MidtransService();
@@ -140,10 +175,10 @@ class CheckoutController extends Controller
         ];
         $itemDetails = [
             [
-                'id' => $produk->id,
+                'id' => $request->tipe_transaksi === 'TopUp' ? $request->produk_voucher_id : "AKUN-{$request->akun_game_id}",
                 'price' => $totalBayar,
                 'quantity' => 1,
-                'name' => "{$produk->nominal} {$produk->kategori->nama_game}"
+                'name' => substr($namaItem, 0, 50)
             ]
         ];
 
@@ -155,7 +190,7 @@ class CheckoutController extends Controller
         }
 
         // Kirim Notifikasi Tagihan via WA
-        $msg = "Halo!\nTerima kasih telah melakukan pemesanan di *Redistore*.\n\nDetail Pesanan:\n- ID Transaksi: *$trxId*\n- Item: *{$produk->nominal} {$produk->kategori->nama_game}*\n- User ID: *{$request->user_id_game}* " . ($request->zone_id ? "({$request->zone_id})" : "") . "\n- Total Tagihan: *Rp " . number_format($totalBayar, 0, ',', '.') . "*\n\nSilakan selesaikan pembayaran Anda melalui link berikut:\n" . url("/invoice/{$trxId}");
+        $msg = "Halo!\nTerima kasih telah melakukan pemesanan di *Redistore*.\n\nDetail Pesanan:\n- ID Transaksi: *$trxId*\n- Item: *$namaItem*\n- Total Tagihan: *Rp " . number_format($totalBayar, 0, ',', '.') . "*\n\nSilakan selesaikan pembayaran Anda melalui link berikut:\n" . url("/invoice/{$trxId}");
         
         FonnteService::sendMessage($request->no_whatsapp, $msg);
 

@@ -12,6 +12,19 @@ class SettingController extends Controller
      */
     public function index()
     {
+        $settings = Setting::whereNotIn('key', ['fonnte_token', 'midtrans_server_key'])->pluck('value', 'key');
+        // We will allow midtrans_client_key to be public as it is needed for frontend
+        return response()->json([
+            'success' => true,
+            'data' => $settings
+        ]);
+    }
+
+    /**
+     * Get ALL settings for admin panel
+     */
+    public function adminIndex()
+    {
         $settings = Setting::all()->pluck('value', 'key');
         return response()->json([
             'success' => true,

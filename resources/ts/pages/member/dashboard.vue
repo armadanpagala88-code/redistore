@@ -167,9 +167,10 @@ const handlePhotoUpload = async (event: any) => {
               <VBtn size="small" color="warning" variant="elevated" @click="isRedeemDialogVisible = true">Tukar</VBtn>
             </VCard>
 
-            <VBtn block color="primary" prepend-icon="ri-wallet-3-line">
-              Top Up Saldo
+            <VBtn block color="primary" variant="elevated" class="mb-3" to="/member/jual-akun" prepend-icon="ri-store-2-line">
+              Mulai Jual Akun Game
             </VBtn>
+            
           </VCard>
         </VCol>
 

@@ -55,16 +55,28 @@ const payWithMidtrans = () => {
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
   fetchInvoice();
   
-  // Load Midtrans Snap Script
-  const script = document.createElement('script');
-  // Use sandbox URL by default. If production, change to app.midtrans.com
-  script.src = 'https://app.sandbox.midtrans.com/snap/snap.js';
-  // You should ideally get the client key from API, but for simplicity we put placeholder here.
-  script.setAttribute('data-client-key', 'SB-Mid-client-YOUR-CLIENT-KEY');
-  document.head.appendChild(script);
+  try {
+    const res = await axios.get('/api/settings');
+    let isProd = false;
+    let clientKey = 'SB-Mid-client-YOUR-CLIENT-KEY';
+
+    if (res.data.success && res.data.data) {
+      if (res.data.data.midtrans_is_production === '1') isProd = true;
+      if (res.data.data.midtrans_client_key) clientKey = res.data.data.midtrans_client_key;
+    }
+
+    // Load Midtrans Snap Script
+    const script = document.createElement('script');
+    script.src = isProd ? 'https://app.midtrans.com/snap/snap.js' : 'https://app.sandbox.midtrans.com/snap/snap.js';
+    script.setAttribute('data-client-key', clientKey);
+    document.head.appendChild(script);
+
+  } catch (e) {
+    console.error('Failed to load midtrans settings', e);
+  }
 })
 </script>
 

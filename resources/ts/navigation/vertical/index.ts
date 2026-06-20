@@ -9,11 +9,11 @@ export default [
     to: { path: '/admin/kategori' },
     icon: { icon: 'ri-gamepad-line' },
   },
-  {
-    title: 'Produk Voucher',
-    to: { path: '/admin/produk' },
-    icon: { icon: 'ri-vip-diamond-line' },
-  },
+  // {
+  //   title: 'Produk Voucher',
+  //   to: { path: '/admin/produk' },
+  //   icon: { icon: 'ri-vip-diamond-line' },
+  // },
   {
     title: 'Manajemen Banner',
     to: { path: '/admin/banner' },
@@ -33,6 +33,16 @@ export default [
     title: 'Laporan Penjualan',
     to: { path: '/admin/laporan' },
     icon: { icon: 'ri-bar-chart-box-line' },
+  },
+  {
+    title: 'Persetujuan Akun',
+    to: { path: '/admin/persetujuan-akun' },
+    icon: { icon: 'ri-checkbox-multiple-line' },
+  },
+  {
+    title: 'Manajemen Kupon',
+    to: { path: '/admin/kupon' },
+    icon: { icon: 'ri-ticket-2-line' },
   },
   {
     title: 'Pengaturan Web',

@@ -9,6 +9,11 @@ const form = ref({
   app_description: '',
   wa_number: '',
   instagram: '',
+  biaya_admin_persen: 5,
+  fonnte_token: '',
+  midtrans_server_key: '',
+  midtrans_client_key: '',
+  midtrans_is_production: '0',
 })
 
 const loading = ref(true)
@@ -25,12 +30,17 @@ onMounted(async () => {
     return
   }
   try {
-    const res = await axios.get('/api/settings')
+    const res = await axios.get('/api/admin/settings')
     if (res.data.success && res.data.data) {
-      form.value.app_name = res.data.data.app_name || ''
-      form.value.app_description = res.data.data.app_description || ''
-      form.value.wa_number = res.data.data.wa_number || ''
-      form.value.instagram = res.data.data.instagram || ''
+      if (res.data.data.app_name) form.value.app_name = res.data.data.app_name
+      if (res.data.data.app_description) form.value.app_description = res.data.data.app_description
+      if (res.data.data.wa_number) form.value.wa_number = res.data.data.wa_number
+      if (res.data.data.instagram) form.value.instagram = res.data.data.instagram
+      if (res.data.data.biaya_admin_persen) form.value.biaya_admin_persen = res.data.data.biaya_admin_persen
+      if (res.data.data.fonnte_token) form.value.fonnte_token = res.data.data.fonnte_token
+      if (res.data.data.midtrans_server_key) form.value.midtrans_server_key = res.data.data.midtrans_server_key
+      if (res.data.data.midtrans_client_key) form.value.midtrans_client_key = res.data.data.midtrans_client_key
+      if (res.data.data.midtrans_is_production !== undefined) form.value.midtrans_is_production = String(res.data.data.midtrans_is_production)
     }
   } catch (e) {
     console.error('Error fetching settings', e)
@@ -132,6 +142,86 @@ const saveSettings = async () => {
                     density="comfortable"
                     color="primary"
                     prepend-inner-icon="ri-instagram-line"
+                  />
+                </VCol>
+
+                <VCol cols="12">
+                  <VTextField
+                    v-model.number="form.biaya_admin_persen"
+                    type="number"
+                    label="Biaya Admin Transaksi Jual Akun (%)"
+                    placeholder="Contoh: 5"
+                    variant="outlined"
+                    density="comfortable"
+                    color="primary"
+                    prepend-inner-icon="ri-percent-line"
+                    hint="Persentase potongan saldo penjual saat akun laku terjual"
+                    persistent-hint
+                  />
+                </VCol>
+
+                <VCol cols="12">
+                  <VTextField
+                    v-model="form.fonnte_token"
+                    label="Token API Fonnte (WhatsApp Gateway)"
+                    placeholder="Masukkan Token Fonnte Anda"
+                    variant="outlined"
+                    density="comfortable"
+                    color="primary"
+                    prepend-inner-icon="ri-message-3-line"
+                    hint="Token untuk pengiriman notifikasi WhatsApp otomatis. Dapatkan dari fonnte.com"
+                    persistent-hint
+                  />
+                </VCol>
+
+                <VCol cols="12">
+                  <VDivider class="my-4" />
+                  <div class="text-subtitle-1 font-weight-bold mb-4 d-flex align-center gap-2">
+                    <VIcon icon="ri-bank-card-line" color="primary" />
+                    Pengaturan Payment Gateway (Midtrans)
+                  </div>
+                </VCol>
+
+                <VCol cols="12" md="6">
+                  <VTextField
+                    v-model="form.midtrans_server_key"
+                    label="Server Key"
+                    placeholder="SB-Mid-server-xxx"
+                    variant="outlined"
+                    density="comfortable"
+                    color="primary"
+                    prepend-inner-icon="ri-key-2-line"
+                    hint="Dapatkan dari dashboard Midtrans Anda"
+                    persistent-hint
+                  />
+                </VCol>
+
+                <VCol cols="12" md="6">
+                  <VTextField
+                    v-model="form.midtrans_client_key"
+                    label="Client Key"
+                    placeholder="SB-Mid-client-xxx"
+                    variant="outlined"
+                    density="comfortable"
+                    color="primary"
+                    prepend-inner-icon="ri-key-line"
+                  />
+                </VCol>
+
+                <VCol cols="12">
+                  <VSelect
+                    v-model="form.midtrans_is_production"
+                    :items="[
+                      { title: 'Sandbox (Testing)', value: '0' },
+                      { title: 'Production (Live)', value: '1' }
+                    ]"
+                    label="Environment"
+                    variant="outlined"
+                    density="comfortable"
+                    color="primary"
+                    prepend-inner-icon="ri-global-line"
+                    hint="Gunakan Sandbox saat masa percobaan/development."
+                    persistent-hint
                   />
                 </VCol>
 

@@ -77,14 +77,17 @@ watch([isFallbackStateActive, refLoadingIndicator], () => {
 
         <!-- Nav Items -->
         <div class="d-none d-md-flex align-center gap-4">
-          <VBtn variant="text" to="/" prepend-icon="ri-gamepad-line" class="text-white font-weight-medium nav-btn">
-            Semua Game
+          <VBtn variant="text" to="/" prepend-icon="ri-store-2-line" class="text-white font-weight-medium nav-btn">
+            Marketplace
           </VBtn>
           <VBtn variant="text" to="/blog" prepend-icon="ri-article-line" class="text-white font-weight-medium nav-btn">
             Kabar Game
           </VBtn>
           
           <template v-if="userData">
+            <VBtn variant="text" to="/member/jual-akun" prepend-icon="ri-store-2-line" class="text-white font-weight-medium nav-btn">
+              Jual Akun
+            </VBtn>
             <VBtn variant="text" to="/member/dashboard" prepend-icon="ri-dashboard-line" class="text-white font-weight-medium nav-btn">
               Dashboard Saya
             </VBtn>

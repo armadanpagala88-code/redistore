@@ -16,7 +16,8 @@ class FonnteService
      */
     public static function sendMessage($target, $message)
     {
-        $token = env('FONNTE_TOKEN');
+        $settingToken = \App\Models\Setting::where('key', 'fonnte_token')->first();
+        $token = $settingToken && !empty($settingToken->value) ? $settingToken->value : env('FONNTE_TOKEN');
 
         if (empty($token) || $token === 'your_fonnte_token_here') {
             Log::warning('Fonnte token tidak diset. Pesan tidak dikirim: ' . $message);
