@@ -92,6 +92,23 @@ class MidtransWebhookController extends Controller
                         $pointsEarned = floor($transaksi->total_bayar / 1000);
                         $user->poin += $pointsEarned;
                         $user->save();
+
+                        // Logic Referral Reward (Sistem Afiliasi)
+                        if ($user->referred_by) {
+                            $referrer = \App\Models\User::find($user->referred_by);
+                            if ($referrer) {
+                                // Default reward: 50 poin & saldo 0 per trx. Nanti bisa diubah via settings DB
+                                $rewardPointsSetting = \App\Models\Setting::where('key', 'referral_reward_points')->first();
+                                $rewardBalanceSetting = \App\Models\Setting::where('key', 'referral_reward_balance')->first();
+                                
+                                $rewardPoints = $rewardPointsSetting ? (int)$rewardPointsSetting->value : 50;
+                                $rewardBalance = $rewardBalanceSetting ? (float)$rewardBalanceSetting->value : 0;
+                                
+                                $referrer->poin += $rewardPoints;
+                                $referrer->saldo += $rewardBalance;
+                                $referrer->save();
+                            }
+                        }
                     }
                 }
 

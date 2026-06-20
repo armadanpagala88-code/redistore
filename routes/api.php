@@ -44,22 +44,45 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/member/dashboard', [App\Http\Controllers\Api\MemberController::class, 'dashboard']);
     Route::post('/member/redeem-points', [App\Http\Controllers\Api\MemberController::class, 'redeemPoints']);
     Route::post('/member/update-photo', [App\Http\Controllers\Api\MemberController::class, 'updatePhoto']);
+    Route::get('/member/referrals', [App\Http\Controllers\Api\MemberController::class, 'referrals']);
     
     // Member Akun Game
     Route::get('/member/akun-game', [\App\Http\Controllers\Api\Member\AkunGameController::class, 'index']);
     Route::post('/member/akun-game', [\App\Http\Controllers\Api\Member\AkunGameController::class, 'store']);
     Route::get('/member/akun-game/{id}', [\App\Http\Controllers\Api\Member\AkunGameController::class, 'show']);
+
+    // Chat / Messages
+    Route::get('/chat/conversations', [\App\Http\Controllers\Api\ChatController::class, 'getConversations']);
+    Route::post('/chat/start', [\App\Http\Controllers\Api\ChatController::class, 'startConversation']);
+    Route::get('/chat/{conversationId}', [\App\Http\Controllers\Api\ChatController::class, 'getMessages']);
+    Route::post('/chat/{conversationId}', [\App\Http\Controllers\Api\ChatController::class, 'sendMessage']);
+    
+    // Support Tickets (User)
+    Route::get('/tickets', [\App\Http\Controllers\Api\TicketController::class, 'myTickets']);
+    Route::post('/tickets', [\App\Http\Controllers\Api\TicketController::class, 'createTicket']);
+    Route::get('/tickets/{id}', [\App\Http\Controllers\Api\TicketController::class, 'showTicket']);
+    Route::post('/tickets/{id}/reply', [\App\Http\Controllers\Api\TicketController::class, 'replyTicket']);
+    
     Route::delete('/member/akun-game/{id}', [\App\Http\Controllers\Api\Member\AkunGameController::class, 'destroy']);
     
     // Dasbor & Laporan
     Route::get('/admin/dashboard-stats', [App\Http\Controllers\Api\Admin\DashboardController::class, 'stats']);
     Route::get('/admin/laporan', [App\Http\Controllers\Api\Admin\LaporanController::class, 'index']);
+    Route::get('/admin/laporan/pdf', [App\Http\Controllers\Api\Admin\LaporanController::class, 'exportPdf']);
 
     // Admin Persetujuan Akun
     Route::get('/admin/akun-game', [\App\Http\Controllers\Api\Admin\AkunGameController::class, 'index']);
     Route::get('/admin/akun-game/{id}', [\App\Http\Controllers\Api\Admin\AkunGameController::class, 'show']);
     Route::put('/admin/akun-game/{id}/status', [\App\Http\Controllers\Api\Admin\AkunGameController::class, 'updateStatus']);
     Route::delete('/admin/akun-game/{id}', [\App\Http\Controllers\Api\Admin\AkunGameController::class, 'destroy']);
+    
+    // Support Tickets (Admin)
+    Route::get('/admin/tickets', [\App\Http\Controllers\Api\TicketController::class, 'adminTickets']);
+    Route::post('/admin/tickets/{id}/close', [\App\Http\Controllers\Api\TicketController::class, 'closeTicket']);
+    
+    // Chat Monitoring (Admin)
+    Route::get('/admin/chats/conversations', [\App\Http\Controllers\Api\Admin\ChatController::class, 'getConversations']);
+    Route::get('/admin/chats/{conversationId}', [\App\Http\Controllers\Api\Admin\ChatController::class, 'getMessages']);
 
     // Transaksi
     Route::get('/admin/transaksi', [App\Http\Controllers\Api\Admin\TransaksiController::class, 'index']);
@@ -91,3 +114,6 @@ Route::get('/settings', [App\Http\Controllers\SettingController::class, 'index']
 // Artikel (Public)
 Route::get('/artikels', [App\Http\Controllers\Api\ArtikelController::class, 'index']);
 Route::get('/artikels/{slug}', [App\Http\Controllers\Api\ArtikelController::class, 'show']);
+Route::get('/public/artikel/{id}', [\App\Http\Controllers\Api\PublicArtikelController::class, 'show']);
+
+Route::get('/public/flash-sales', [\App\Http\Controllers\Api\PublicFlashSaleController::class, 'active']);

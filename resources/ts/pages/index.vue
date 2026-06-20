@@ -11,16 +11,25 @@ definePage({
 
 const akunGames = ref<any[]>([])
 const banners = ref<any[]>([])
+const flashSales = ref<any[]>([])
 const loading = ref(true)
+const currentTime = ref(new Date().getTime())
 
 onMounted(async () => {
+  // Update time for countdown every second
+  setInterval(() => {
+    currentTime.value = new Date().getTime()
+  }, 1000)
+
   try {
-    const [akunRes, bannerRes] = await Promise.all([
+    const [akunRes, bannerRes, fsRes] = await Promise.all([
       axios.get('/api/akun-games'),
-      axios.get('/api/banners')
+      axios.get('/api/banners'),
+      axios.get('/api/public/flash-sales')
     ])
     akunGames.value = akunRes.data.data
     banners.value = bannerRes.data.data
+    flashSales.value = fsRes.data.data
   } catch (error) {
     console.error('Error fetching data:', error)
   } finally {
@@ -40,6 +49,19 @@ const getAkunImage = (path: string) => {
 
 const formatRupiah = (angka: number) => {
   return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(angka)
+}
+
+const getCountdown = (endTimeStr: string) => {
+  const endTime = new Date(endTimeStr).getTime()
+  const distance = endTime - currentTime.value
+
+  if (distance < 0) return 'Berakhir'
+
+  const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+  const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))
+  const seconds = Math.floor((distance % (1000 * 60)) / 1000)
+
+  return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
 }
 </script>
 
@@ -95,8 +117,68 @@ const formatRupiah = (angka: number) => {
         </div>
       </div>
 
+      <!-- Flash Sale Section -->
+      <div v-for="fs in flashSales" :key="fs.id" class="mb-12">
+        <div class="d-flex align-center mb-6 bg-error rounded-lg pa-4 elevation-3 justify-space-between">
+          <h2 class="text-h5 font-weight-bold text-white d-flex align-center gap-2 mb-0">
+            <VIcon icon="ri-flashlight-fill" color="warning" size="28" class="animate-pulse" />
+            {{ fs.nama_promo }}
+          </h2>
+          <div class="d-flex align-center gap-3">
+            <span class="text-white font-weight-medium">Berakhir Dalam:</span>
+            <VChip color="white" variant="elevated" class="text-error font-weight-bold text-h6 px-4" size="large">
+              {{ getCountdown(fs.waktu_selesai) }}
+            </VChip>
+          </div>
+        </div>
+
+        <VRow dense class="match-unipin-grid">
+          <VCol
+            v-for="item in fs.items"
+            :key="item.id"
+            cols="6"
+            sm="4"
+            md="3"
+            lg="3"
+          >
+            <VCard elevation="2" class="h-100 d-flex flex-column unipin-card rounded-lg border-error position-relative">
+              <VChip 
+                color="error" 
+                size="small" 
+                class="position-absolute font-weight-bold" 
+                style="top: 10px; right: 10px; z-index: 2;"
+              >
+                Diskon!
+              </VChip>
+              <div class="text-center pt-4">
+                <VIcon icon="ri-ticket-2-line" size="64" color="primary" class="opacity-80" />
+              </div>
+              <VCardItem class="pa-4 text-left flex-grow-1 d-flex flex-column justify-end">
+                <VCardTitle class="text-subtitle-1 font-weight-bold text-high-emphasis mb-1 line-clamp-2">
+                  {{ item.produk?.nama_produk || 'Voucher Game' }}
+                </VCardTitle>
+                <div class="d-flex flex-column mt-2">
+                  <span class="text-decoration-line-through text-caption text-medium-emphasis">{{ formatRupiah(item.produk?.harga || 0) }}</span>
+                  <div class="text-error font-weight-black text-h6">{{ formatRupiah(item.harga_flash_sale) }}</div>
+                </div>
+                <div class="d-flex justify-space-between align-center mt-4">
+                  <VProgressLinear
+                    :model-value="(item.stok_promo / 100) * 100"
+                    color="error"
+                    height="8"
+                    class="rounded-pill mr-3"
+                  />
+                  <span class="text-caption font-weight-bold text-error whitespace-nowrap">Sisa {{ item.stok_promo }}</span>
+                </div>
+                <VBtn size="small" color="error" class="w-100 rounded-pill font-weight-bold mt-4" :to="`/produk/${item.produk?.id}`">Beli Sekarang</VBtn>
+              </VCardItem>
+            </VCard>
+          </VCol>
+        </VRow>
+      </div>
+
       <!-- Section Title ala UniPin -->
-      <div class="d-flex align-center mb-6 justify-space-between">
+      <div class="d-flex align-center mb-6 justify-space-between mt-8">
         <h2 class="text-h5 font-weight-bold text-high-emphasis d-flex align-center gap-2">
           <VIcon icon="ri-store-2-fill" color="primary" size="28" />
           Marketplace Akun Game

@@ -31,6 +31,8 @@ class User extends Authenticatable
         'saldo',
         'level',
         'poin',
+        'kode_referral',
+        'referred_by',
     ];
 
     /**
@@ -54,5 +56,20 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function referrer()
+    {
+        return $this->belongsTo(User::class, 'referred_by');
+    }
+
+    public function referrals()
+    {
+        return $this->hasMany(User::class, 'referred_by');
+    }
+
+    public function tickets()
+    {
+        return $this->hasMany(Ticket::class);
     }
 }

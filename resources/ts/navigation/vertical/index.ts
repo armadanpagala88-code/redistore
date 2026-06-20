@@ -45,6 +45,16 @@ export default [
     icon: { icon: 'ri-ticket-2-line' },
   },
   {
+    title: 'Monitoring Chat',
+    to: { path: '/admin/chats' },
+    icon: { icon: 'ri-chat-search-line' },
+  },
+  {
+    title: 'Support Ticket',
+    to: { path: '/admin/tickets' },
+    icon: { icon: 'ri-customer-service-2-line' },
+  },
+  {
     title: 'Pengaturan Web',
     to: { path: '/admin/settings' },
     icon: { icon: 'ri-settings-3-line' },

@@ -50,8 +50,17 @@ class AuthController extends Controller
             'nama_lengkap' => 'required|string',
             'username' => 'required|string|unique:users',
             'no_telepon' => 'required|string',
-            'password' => 'required|min:6'
+            'password' => 'required|min:6',
+            'kode_referral' => 'nullable|string|exists:users,kode_referral'
         ]);
+
+        $referred_by = null;
+        if ($request->filled('kode_referral')) {
+            $referrer = User::where('kode_referral', $request->kode_referral)->first();
+            if ($referrer) {
+                $referred_by = $referrer->id;
+            }
+        }
 
         $user = User::create([
             'nama_lengkap' => $request->nama_lengkap,
@@ -60,7 +69,9 @@ class AuthController extends Controller
             'password' => Hash::make($request->password),
             'role' => 'Pelanggan',
             'level' => 'Basic',
-            'saldo' => 0
+            'saldo' => 0,
+            'kode_referral' => 'REF-' . strtoupper(substr($request->username, 0, 4)) . rand(1000, 9999),
+            'referred_by' => $referred_by
         ]);
 
         $token = $user->createToken('auth_token')->plainTextToken;

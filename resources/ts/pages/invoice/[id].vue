@@ -32,8 +32,8 @@ const payWithMidtrans = () => {
   if (!invoice.value || !invoice.value.snap_token) return;
 
   // Make sure snap is loaded
-  if (typeof window.snap !== 'undefined') {
-    window.snap.pay(invoice.value.snap_token, {
+  if (typeof (window as any).snap !== 'undefined') {
+    (window as any).snap.pay(invoice.value.snap_token, {
       onSuccess: function(result: any) {
         alert("Pembayaran Berhasil!");
         fetchInvoice();

@@ -25,6 +25,7 @@ const form = ref({
   username: '',
   no_telepon: '',
   password: '',
+  kode_referral: '',
 })
 
 const isLoading = ref(false)
@@ -159,6 +160,15 @@ const authV2RegisterIllustration = useGenerateImageVariant (authV2RegisterIllust
 
               <!-- password -->
               <VCol cols="12">
+                <VTextField
+                  v-model="form.kode_referral"
+                  label="Kode Referral (Opsional)"
+                  placeholder="Contoh: REF-JANE1234"
+                  hint="Masukkan kode referral dari teman Anda jika ada"
+                  persistent-hint
+                  class="mb-4"
+                />
+
                 <VTextField
                   v-model="form.password"
                   label="Password"

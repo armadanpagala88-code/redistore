@@ -107,4 +107,35 @@ class MemberController extends Controller
             'message' => 'Gagal mengupload foto'
         ], 400);
     }
+
+    public function referrals(Request $request)
+    {
+        $user = $request->user();
+        
+        $referrals = \App\Models\User::where('referred_by', $user->id)
+            ->select('id', 'nama_lengkap', 'username', 'created_at')
+            ->orderBy('created_at', 'desc')
+            ->get();
+            
+        $total_referrals = $referrals->count();
+        
+        $rewardPointsSetting = \App\Models\Setting::where('key', 'referral_reward_points')->first();
+        $rewardBalanceSetting = \App\Models\Setting::where('key', 'referral_reward_balance')->first();
+        
+        $rewardPoints = $rewardPointsSetting ? (int)$rewardPointsSetting->value : 50;
+        $rewardBalance = $rewardBalanceSetting ? (float)$rewardBalanceSetting->value : 0;
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'kode_referral' => $user->kode_referral,
+                'total_referrals' => $total_referrals,
+                'referrals' => $referrals,
+                'reward_info' => [
+                    'points_per_trx' => $rewardPoints,
+                    'balance_per_trx' => $rewardBalance
+                ]
+            ]
+        ]);
+    }
 }

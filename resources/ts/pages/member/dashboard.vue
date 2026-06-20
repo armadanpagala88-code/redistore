@@ -14,14 +14,19 @@ const router = useRouter()
 const user = ref<any>(null)
 const mutasi = ref<any[]>([])
 const transaksi = ref<any[]>([])
+const chats = ref<any[]>([])
 const loading = ref(true)
 
 const fetchDashboard = async () => {
   try {
-    const res = await axios.get('/api/member/dashboard')
-    user.value = res.data.data.user
-    mutasi.value = res.data.data.mutasi_terakhir
-    transaksi.value = res.data.data.transaksi_terakhir
+    const [dashRes, chatRes] = await Promise.all([
+      axios.get('/api/member/dashboard'),
+      axios.get('/api/chat/conversations')
+    ])
+    user.value = dashRes.data.data.user
+    mutasi.value = dashRes.data.data.mutasi_terakhir
+    transaksi.value = dashRes.data.data.transaksi_terakhir
+    chats.value = chatRes.data.data.slice(0, 5) // Ambil 5 terbaru
   } catch (error) {
     console.error(error)
     router.push('/login')
@@ -41,6 +46,16 @@ const formatRupiah = (angka: number) => {
 const formatDate = (dateString: string) => {
   const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit' }
   return new Date(dateString).toLocaleDateString('id-ID', options)
+}
+
+const getOtherParty = (conv: any) => {
+  if (!user.value) return 'Unknown'
+  return conv.buyer_id === user.value.id ? conv.seller?.username : conv.buyer?.username
+}
+
+const getRole = (conv: any) => {
+  if (!user.value) return ''
+  return conv.buyer_id === user.value.id ? 'Penjual' : 'Pembeli'
 }
 
 const isRedeemDialogVisible = ref(false)
@@ -238,6 +253,52 @@ const handlePhotoUpload = async (event: any) => {
               Belum ada mutasi saldo.
             </VCardText>
           </VCard>
+
+          <!-- Riwayat Obrolan / Chat -->
+          <VCard elevation="3" class="mt-6 mb-6">
+            <div class="px-4 pt-4 pb-2 d-flex justify-space-between align-center">
+              <VCardTitle class="text-h6 font-weight-bold pa-0">Riwayat Chat Terbaru</VCardTitle>
+              <VBtn size="small" variant="text" color="primary" to="/member/chat" append-icon="ri-arrow-right-line">
+                Lihat Semua
+              </VBtn>
+            </div>
+            <VList v-if="chats.length > 0" lines="two" class="bg-transparent">
+              <template v-for="(conv, index) in chats" :key="conv.id">
+                <VListItem @click="router.push(`/member/chat/${conv.id}`)" class="py-3 cursor-pointer">
+                  <template #prepend>
+                    <VAvatar color="info" variant="tonal" size="48">
+                      <VIcon icon="ri-chat-3-line" size="24" />
+                    </VAvatar>
+                  </template>
+
+                  <VListItemTitle class="font-weight-bold text-subtitle-1 mb-1">
+                    {{ getOtherParty(conv) }}
+                    <VChip size="x-small" :color="getRole(conv) === 'Penjual' ? 'warning' : 'info'" class="ml-2">
+                      {{ getRole(conv) }}
+                    </VChip>
+                  </VListItemTitle>
+                  
+                  <VListItemSubtitle class="text-medium-emphasis">
+                    <div class="d-flex align-center gap-1">
+                      <VIcon icon="ri-gamepad-line" size="small" />
+                      {{ conv.akun_game?.judul_akun || 'Akun Game Terhapus' }}
+                    </div>
+                  </VListItemSubtitle>
+
+                  <template #append>
+                    <div class="text-caption text-medium-emphasis">
+                      {{ new Date(conv.updated_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) }}
+                    </div>
+                  </template>
+                </VListItem>
+                <VDivider v-if="index < chats.length - 1" />
+              </template>
+            </VList>
+            <VCardText v-else class="text-center text-medium-emphasis py-6">
+              <VIcon icon="ri-chat-1-line" size="32" class="opacity-50 mb-2" />
+              <p class="mb-0">Belum ada riwayat obrolan.</p>
+            </VCardText>
+          </VCard>
         </VCol>
       </VRow>
     </div>
@@ -275,3 +336,13 @@ const handlePhotoUpload = async (event: any) => {
     </VDialog>
   </div>
 </template>
+
+<style scoped>
+.cursor-pointer {
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.cursor-pointer:hover {
+  background-color: rgba(var(--v-theme-primary), 0.05);
+}
+</style>

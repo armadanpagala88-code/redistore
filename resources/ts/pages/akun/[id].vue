@@ -26,6 +26,7 @@ const form = ref({
 })
 
 const isCheckingOut = ref(false)
+const isStartingChat = ref(false)
 const userData = ref<any>(null)
 
 onMounted(async () => {
@@ -88,6 +89,31 @@ const submitCheckout = async () => {
     isCheckingOut.value = false
   }
 }
+
+const startChat = async () => {
+  if (!userData.value) {
+    alert('Silakan login terlebih dahulu untuk memulai chat')
+    router.push('/login')
+    return
+  }
+  
+  if (userData.value.id === akun.value.user_id) {
+    alert('Anda tidak bisa chat dengan akun milik Anda sendiri')
+    return
+  }
+
+  isStartingChat.value = true
+  try {
+    const res = await axios.post('/api/chat/start', { akun_game_id: akun.value.id })
+    if (res.data.success) {
+      router.push(`/member/chat/${res.data.data.id}`)
+    }
+  } catch (e: any) {
+    alert('Gagal memulai obrolan: ' + (e.response?.data?.message || 'Error'))
+  } finally {
+    isStartingChat.value = false
+  }
+}
 </script>
 
 <template>
@@ -127,6 +153,19 @@ const submitCheckout = async () => {
                   <VIcon icon="ri-store-2-line" />
                   <span>Penjual: <strong>{{ akun.penjual?.username || 'Member' }}</strong></span>
                 </div>
+                
+                <VBtn
+                  v-if="akun.penjual"
+                  color="info"
+                  variant="tonal"
+                  size="small"
+                  class="ml-auto"
+                  prepend-icon="ri-chat-3-line"
+                  :loading="isStartingChat"
+                  @click="startChat"
+                >
+                  Chat Penjual
+                </VBtn>
               </div>
 
               <VDivider class="mb-6" />
