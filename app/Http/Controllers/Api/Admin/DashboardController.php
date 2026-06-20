@@ -22,32 +22,32 @@ class DashboardController extends Controller
         $transaksiSukses = Transaksi::where('status_transaksi', 'Success')->count();
         $transaksiPending = Transaksi::whereIn('status_transaksi', ['Unpaid', 'Pending'])->count();
 
-        // Data for Sales Chart (last 30 days)
-        $startDate = Carbon::now()->subDays(29)->startOfDay();
-        
+        // Data for Sales Chart (12 Months of Current Year)
         $salesData = Transaksi::where('status_transaksi', 'Success')
-            ->where('tgl_transaksi', '>=', $startDate)
+            ->whereYear('tgl_transaksi', $thisYear)
             ->select(
-                DB::raw('DATE(tgl_transaksi) as date'),
+                DB::raw('MONTH(tgl_transaksi) as month'),
                 DB::raw('SUM(total_bayar) as total')
             )
-            ->groupBy('date')
-            ->orderBy('date', 'ASC')
+            ->groupBy('month')
+            ->orderBy('month', 'ASC')
             ->get();
 
-        // Format data to ensure all 30 days are present
+        // Format data to ensure all 12 months are present
         $chartData = [];
-        for ($i = 29; $i >= 0; $i--) {
-            $dateStr = Carbon::now()->subDays($i)->format('Y-m-d');
+        $months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+        
+        for ($i = 1; $i <= 12; $i++) {
             $chartData[] = [
-                'date' => $dateStr,
+                'date' => $months[$i - 1],
+                'month_num' => $i,
                 'total' => 0
             ];
         }
 
         foreach ($salesData as $data) {
             foreach ($chartData as &$item) {
-                if ($item['date'] == $data->date) {
+                if ($item['month_num'] == $data->month) {
                     $item['total'] = (float)$data->total;
                     break;
                 }

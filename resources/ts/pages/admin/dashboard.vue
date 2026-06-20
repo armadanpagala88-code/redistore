@@ -77,11 +77,16 @@ const chartOptions = computed(() => {
     dataLabels: { enabled: false },
     xaxis: {
       categories: stats.value.chart_data.map((d: any) => d.date),
-      labels: { show: false }
+      labels: { show: true }
     },
     yaxis: {
+      decimalsInFloat: 0,
       labels: {
-        formatter: (value: number) => 'Rp ' + (value / 1000) + 'k'
+        formatter: (value: number) => {
+          if (value >= 1000000) return 'Rp ' + +(value / 1000000).toFixed(1) + ' Jt'
+          if (value >= 1000) return 'Rp ' + +(value / 1000).toFixed(1) + ' Rb'
+          return 'Rp ' + Math.round(value)
+        }
       }
     },
     tooltip: {
@@ -157,7 +162,7 @@ const chartSeries = computed(() => {
     <VCard elevation="6" class="mb-8 rounded-lg border-t-primary overflow-hidden">
       <VCardTitle class="px-6 pt-6 pb-2 text-h6 font-weight-bold d-flex align-center gap-2">
         <VIcon icon="ri-bar-chart-box-line" color="primary" />
-        Grafik Penjualan (30 Hari Terakhir)
+        Grafik Penjualan (Tahun Ini)
       </VCardTitle>
       <div style="height: 300px;" class="px-4 pb-4">
         <VueApexCharts
