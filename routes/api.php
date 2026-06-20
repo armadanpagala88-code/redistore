@@ -129,6 +129,6 @@ Route::get('/settings', [App\Http\Controllers\SettingController::class, 'index']
 // Artikel (Public)
 Route::get('/artikels', [App\Http\Controllers\Api\ArtikelController::class, 'index']);
 Route::get('/artikels/{slug}', [App\Http\Controllers\Api\ArtikelController::class, 'show']);
-Route::get('/public/artikel/{id}', [\App\Http\Controllers\Api\PublicArtikelController::class, 'show']);
+
 
 Route::get('/public/flash-sales', [\App\Http\Controllers\Api\PublicFlashSaleController::class, 'active']);

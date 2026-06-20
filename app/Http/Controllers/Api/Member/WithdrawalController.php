@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Withdrawal;
 use App\Models\MutasiSaldo;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
 class WithdrawalController extends Controller
@@ -75,15 +76,8 @@ class WithdrawalController extends Controller
             ], 400);
         }
 
-        if ($user->saldo < $request->nominal) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Saldo Anda tidak mencukupi'
-            ], 400);
-        }
-
         // Cek apakah masih ada penarikan yang pending
-        $pending = Withdrawal::where('user_id', $user->id)->where('status', 'Pending')->first();
+        $pending = Withdrawal::where('user_id', auth()->id())->where('status', 'Pending')->first();
         if ($pending) {
             return response()->json([
                 'success' => false,
@@ -93,6 +87,17 @@ class WithdrawalController extends Controller
 
         try {
             DB::beginTransaction();
+
+            // Lock user row for update to prevent race conditions (double spending)
+            $user = User::where('id', auth()->id())->lockForUpdate()->first();
+
+            if ($user->saldo < $request->nominal) {
+                DB::rollBack();
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Saldo Anda tidak mencukupi'
+                ], 400);
+            }
 
             // Kurangi saldo
             $user->saldo -= $request->nominal;
