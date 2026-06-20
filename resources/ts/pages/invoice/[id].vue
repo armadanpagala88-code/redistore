@@ -15,6 +15,7 @@ const invoice = ref<any>(null)
 const loading = ref(true)
 const fileInput = ref<any>(null)
 const uploadLoading = ref(false)
+const paymentLink = ref('')
 
 const fetchInvoice = async () => {
   try {
@@ -29,29 +30,34 @@ const fetchInvoice = async () => {
 }
 
 const payWithMidtrans = () => {
-  if (!invoice.value || !invoice.value.snap_token) return;
-
-  // Make sure snap is loaded
-  if (typeof (window as any).snap !== 'undefined') {
-    (window as any).snap.pay(invoice.value.snap_token, {
-      onSuccess: function(result: any) {
-        alert("Pembayaran Berhasil!");
-        fetchInvoice();
-      },
-      onPending: function(result: any) {
-        alert("Menunggu pembayaran Anda!");
-        fetchInvoice();
-      },
-      onError: function(result: any) {
-        alert("Pembayaran Gagal!");
-        fetchInvoice();
-      },
-      onClose: function() {
-        alert("Anda menutup popup tanpa menyelesaikan pembayaran");
-      }
-    });
+  if (invoice.value && invoice.value.snap_token) {
+    // Make sure snap is loaded
+    if (typeof (window as any).snap !== 'undefined') {
+      (window as any).snap.pay(invoice.value.snap_token, {
+        onSuccess: function(result: any) {
+          alert("Pembayaran Berhasil!");
+          fetchInvoice();
+        },
+        onPending: function(result: any) {
+          alert("Menunggu pembayaran Anda!");
+          fetchInvoice();
+        },
+        onError: function(result: any) {
+          alert("Pembayaran Gagal!");
+          fetchInvoice();
+        },
+        onClose: function() {
+          alert("Anda menutup popup tanpa menyelesaikan pembayaran");
+        }
+      });
+    } else {
+      alert("Sistem pembayaran sedang dimuat, silakan coba beberapa saat lagi.");
+    }
+  } else if (paymentLink.value) {
+    // Fallback ke payment link manual jika snap token tidak ada
+    window.location.href = paymentLink.value;
   } else {
-    alert("Sistem pembayaran sedang dimuat, silakan coba beberapa saat lagi.");
+    alert("Sistem pembayaran sedang dimuat atau tidak tersedia. Silakan hubungi admin.");
   }
 }
 
@@ -66,6 +72,7 @@ onMounted(async () => {
     if (res.data.success && res.data.data) {
       if (res.data.data.midtrans_is_production === '1') isProd = true;
       if (res.data.data.midtrans_client_key) clientKey = res.data.data.midtrans_client_key;
+      if (res.data.data.midtrans_payment_link) paymentLink.value = res.data.data.midtrans_payment_link;
     }
 
     // Load Midtrans Snap Script
