@@ -39,6 +39,7 @@ onMounted(() => {
 })
 
 const isDialogVisible = ref(false)
+const editId = ref<string | null>(null)
 const form = ref({
   kategori_game_id: null,
   judul_akun: '',
@@ -53,6 +54,7 @@ const fileInput = ref<any>(null)
 const isSubmitting = ref(false)
 
 const openAddModal = () => {
+  editId.value = null
   form.value = { 
     kategori_game_id: null,
     judul_akun: '',
@@ -67,6 +69,22 @@ const openAddModal = () => {
   isDialogVisible.value = true
 }
 
+const editItem = (item: any) => {
+  editId.value = item.id
+  form.value = {
+    kategori_game_id: item.kategori_game_id,
+    judul_akun: item.judul_akun,
+    deskripsi_akun: item.deskripsi_akun,
+    harga: item.harga,
+    login_via: item.login_via,
+    email_akun: item.email_akun,
+    password_akun: item.password_akun,
+    catatan_akun: item.catatan_akun || ''
+  }
+  fileInput.value = null
+  isDialogVisible.value = true
+}
+
 const handleFile = (e: any) => {
   if (e.target.files && e.target.files[0]) {
     fileInput.value = e.target.files[0]
@@ -74,7 +92,7 @@ const handleFile = (e: any) => {
 }
 
 const saveItem = async () => {
-  if (!fileInput.value) {
+  if (!editId.value && !fileInput.value) {
     alert('Gambar utama wajib diupload!')
     return
   }
@@ -89,10 +107,15 @@ const saveItem = async () => {
   formData.append('email_akun', form.value.email_akun)
   formData.append('password_akun', form.value.password_akun)
   formData.append('catatan_akun', form.value.catatan_akun)
-  formData.append('gambar_utama', fileInput.value)
+  
+  if (fileInput.value) {
+    formData.append('gambar_utama', fileInput.value)
+  }
 
   try {
-    const res = await axios.post('/api/member/akun-game', formData)
+    const url = editId.value ? `/api/member/akun-game/${editId.value}` : '/api/member/akun-game'
+    const res = await axios.post(url, formData)
+    
     alert(res.data.message)
     isDialogVisible.value = false
     fetchItems()
@@ -193,7 +216,10 @@ const statusColor = (status: string) => {
             </td>
             <td class="text-center">
               <div class="d-flex justify-center gap-2">
-                <VBtn v-if="item.status !== 'Terjual'" icon="ri-delete-bin-line" variant="tonal" size="small" color="error" @click="deleteItem(item.id)" />
+                <template v-if="item.status !== 'Terjual'">
+                  <VBtn icon="ri-pencil-line" variant="tonal" size="small" color="primary" @click="editItem(item)" />
+                  <VBtn icon="ri-delete-bin-line" variant="tonal" size="small" color="error" @click="deleteItem(item.id)" />
+                </template>
                 <span v-else class="text-caption text-medium-emphasis">Terkunci</span>
               </div>
             </td>
@@ -208,11 +234,11 @@ const statusColor = (status: string) => {
       </VTable>
     </VCard>
 
-    <!-- Dialog Posting Akun -->
+    <!-- Dialog Posting/Edit Akun -->
     <VDialog v-model="isDialogVisible" max-width="600" scrollable>
       <VCard class="rounded-lg">
         <VCardTitle class="px-6 pt-6 d-flex justify-space-between align-center text-h5 font-weight-bold">
-          Posting Akun Baru
+          {{ editId ? 'Edit Akun Game' : 'Posting Akun Baru' }}
           <VBtn icon="ri-close-line" variant="text" size="small" @click="isDialogVisible = false" />
         </VCardTitle>
         <VDivider />
@@ -313,7 +339,7 @@ const statusColor = (status: string) => {
             />
             
             <VFileInput 
-              label="Screenshot Akun / Profil Game" 
+              :label="editId ? 'Ubah Screenshot Akun (Kosongkan jika tidak diubah)' : 'Screenshot Akun / Profil Game'" 
               accept="image/*" 
               variant="outlined" 
               density="comfortable" 
@@ -321,12 +347,14 @@ const statusColor = (status: string) => {
               prepend-icon="" 
               class="mb-4" 
               @change="handleFile" 
-              required
+              :required="!editId"
             />
             
             <div class="d-flex justify-end gap-3 mt-4">
               <VBtn variant="tonal" color="secondary" @click="isDialogVisible = false" class="px-6 rounded-lg">Batal</VBtn>
-              <VBtn type="submit" color="primary" variant="elevated" :loading="isSubmitting" class="px-6 rounded-lg font-weight-bold">Posting Akun</VBtn>
+              <VBtn type="submit" color="primary" variant="elevated" :loading="isSubmitting" class="px-6 rounded-lg font-weight-bold">
+                {{ editId ? 'Simpan Perubahan' : 'Posting Akun' }}
+              </VBtn>
             </div>
           </VForm>
         </VCardText>

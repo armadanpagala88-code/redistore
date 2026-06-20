@@ -50,6 +50,11 @@ export default [
     icon: { icon: 'ri-chat-search-line' },
   },
   {
+    title: 'Penarikan Dana',
+    to: { path: '/admin/withdrawals' },
+    icon: { icon: 'ri-bank-card-line' },
+  },
+  {
     title: 'Support Ticket',
     to: { path: '/admin/tickets' },
     icon: { icon: 'ri-customer-service-2-line' },

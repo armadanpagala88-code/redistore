@@ -37,8 +37,12 @@ Route::post('/register', [App\Http\Controllers\Api\AuthController::class, 'regis
 Route::get('/me', [App\Http\Controllers\Api\AuthController::class, 'me'])->middleware('auth:sanctum');
 
 // Rute Admin & Member (Terlindungi)
-Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/logout', [App\Http\Controllers\Api\AuthController::class, 'logout']);
+Route::middleware(['auth:sanctum'])->group(function () {
+    
+    // Member Withdrawals
+    Route::get('/member/withdrawals', [\App\Http\Controllers\Api\Member\WithdrawalController::class, 'index']);
+    Route::post('/member/withdrawals', [\App\Http\Controllers\Api\Member\WithdrawalController::class, 'store']);
+    Route::put('/member/withdrawals/bank', [\App\Http\Controllers\Api\Member\WithdrawalController::class, 'updateBank']);
     
     // Member Routes
     Route::get('/member/dashboard', [App\Http\Controllers\Api\MemberController::class, 'dashboard']);
@@ -50,6 +54,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/member/akun-game', [\App\Http\Controllers\Api\Member\AkunGameController::class, 'index']);
     Route::post('/member/akun-game', [\App\Http\Controllers\Api\Member\AkunGameController::class, 'store']);
     Route::get('/member/akun-game/{id}', [\App\Http\Controllers\Api\Member\AkunGameController::class, 'show']);
+    Route::post('/member/akun-game/{id}', [\App\Http\Controllers\Api\Member\AkunGameController::class, 'update']);
+    Route::delete('/member/akun-game/{id}', [\App\Http\Controllers\Api\Member\AkunGameController::class, 'destroy']);
 
     // Chat / Messages
     Route::get('/chat/conversations', [\App\Http\Controllers\Api\ChatController::class, 'getConversations']);
@@ -63,49 +69,58 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/tickets/{id}', [\App\Http\Controllers\Api\TicketController::class, 'showTicket']);
     Route::post('/tickets/{id}/reply', [\App\Http\Controllers\Api\TicketController::class, 'replyTicket']);
     
-    Route::delete('/member/akun-game/{id}', [\App\Http\Controllers\Api\Member\AkunGameController::class, 'destroy']);
-    
-    // Dasbor & Laporan
-    Route::get('/admin/dashboard-stats', [App\Http\Controllers\Api\Admin\DashboardController::class, 'stats']);
-    Route::get('/admin/laporan', [App\Http\Controllers\Api\Admin\LaporanController::class, 'index']);
-    Route::get('/admin/laporan/pdf', [App\Http\Controllers\Api\Admin\LaporanController::class, 'exportPdf']);
+    // ==========================================
+    // ADMIN ROUTES
+    // ==========================================
+    Route::middleware([\App\Http\Middleware\AdminMiddleware::class])->group(function () {
+        Route::get('/admin/dashboard', [\App\Http\Controllers\Api\Admin\DashboardController::class, 'index']);
 
-    // Admin Persetujuan Akun
-    Route::get('/admin/akun-game', [\App\Http\Controllers\Api\Admin\AkunGameController::class, 'index']);
-    Route::get('/admin/akun-game/{id}', [\App\Http\Controllers\Api\Admin\AkunGameController::class, 'show']);
-    Route::put('/admin/akun-game/{id}/status', [\App\Http\Controllers\Api\Admin\AkunGameController::class, 'updateStatus']);
-    Route::delete('/admin/akun-game/{id}', [\App\Http\Controllers\Api\Admin\AkunGameController::class, 'destroy']);
-    
-    // Support Tickets (Admin)
-    Route::get('/admin/tickets', [\App\Http\Controllers\Api\TicketController::class, 'adminTickets']);
-    Route::post('/admin/tickets/{id}/close', [\App\Http\Controllers\Api\TicketController::class, 'closeTicket']);
-    
-    // Chat Monitoring (Admin)
-    Route::get('/admin/chats/conversations', [\App\Http\Controllers\Api\Admin\ChatController::class, 'getConversations']);
-    Route::get('/admin/chats/{conversationId}', [\App\Http\Controllers\Api\Admin\ChatController::class, 'getMessages']);
+        // Admin Withdrawals
+        Route::get('/admin/withdrawals', [\App\Http\Controllers\Api\Admin\WithdrawalController::class, 'index']);
+        Route::put('/admin/withdrawals/{id}/status', [\App\Http\Controllers\Api\Admin\WithdrawalController::class, 'updateStatus']);
 
-    // Transaksi
-    Route::get('/admin/transaksi', [App\Http\Controllers\Api\Admin\TransaksiController::class, 'index']);
-    Route::put('/admin/transaksi/{id}/status', [App\Http\Controllers\Api\Admin\TransaksiController::class, 'updateStatus']);
-    
-    // Kategori Game
-    Route::apiResource('/admin/kategori', App\Http\Controllers\Api\Admin\KategoriGameController::class);
-    
-    // Produk Voucher
-    Route::apiResource('/admin/produk', App\Http\Controllers\Api\Admin\ProdukVoucherController::class);
-    Route::post('/admin/digiflazz/sync', [App\Http\Controllers\Api\Admin\DigiflazzSyncController::class, 'sync']);
-    
-    // Banner / Iklan
-    Route::apiResource('/admin/banner', App\Http\Controllers\Api\Admin\BannerController::class);
-    
-    // Artikel
-    Route::apiResource('admin/artikel', \App\Http\Controllers\Api\Admin\ArtikelController::class);
-    Route::apiResource('admin/users', \App\Http\Controllers\Api\Admin\UserController::class);
-    Route::apiResource('admin/kupon', \App\Http\Controllers\Api\Admin\DiskonVoucherController::class);
-    
-    // Settings
-    Route::get('/admin/settings', [App\Http\Controllers\SettingController::class, 'adminIndex']);
-    Route::post('/admin/settings', [App\Http\Controllers\SettingController::class, 'update']);
+        // Dasbor & Laporan
+        Route::get('/admin/dashboard-stats', [App\Http\Controllers\Api\Admin\DashboardController::class, 'stats']);
+        Route::get('/admin/laporan', [App\Http\Controllers\Api\Admin\LaporanController::class, 'index']);
+        Route::get('/admin/laporan/pdf', [App\Http\Controllers\Api\Admin\LaporanController::class, 'exportPdf']);
+
+        // Admin Persetujuan Akun
+        Route::get('/admin/akun-game', [\App\Http\Controllers\Api\Admin\AkunGameController::class, 'index']);
+        Route::get('/admin/akun-game/{id}', [\App\Http\Controllers\Api\Admin\AkunGameController::class, 'show']);
+        Route::put('/admin/akun-game/{id}/status', [\App\Http\Controllers\Api\Admin\AkunGameController::class, 'updateStatus']);
+        Route::delete('/admin/akun-game/{id}', [\App\Http\Controllers\Api\Admin\AkunGameController::class, 'destroy']);
+        
+        // Support Tickets (Admin)
+        Route::get('/admin/tickets', [\App\Http\Controllers\Api\TicketController::class, 'adminTickets']);
+        Route::post('/admin/tickets/{id}/close', [\App\Http\Controllers\Api\TicketController::class, 'closeTicket']);
+        
+        // Chat Monitoring (Admin)
+        Route::get('/admin/chats/conversations', [\App\Http\Controllers\Api\Admin\ChatController::class, 'getConversations']);
+        Route::get('/admin/chats/{conversationId}', [\App\Http\Controllers\Api\Admin\ChatController::class, 'getMessages']);
+
+        // Transaksi
+        Route::get('/admin/transaksi', [App\Http\Controllers\Api\Admin\TransaksiController::class, 'index']);
+        Route::put('/admin/transaksi/{id}/status', [App\Http\Controllers\Api\Admin\TransaksiController::class, 'updateStatus']);
+        
+        // Kategori Game
+        Route::apiResource('/admin/kategori', App\Http\Controllers\Api\Admin\KategoriGameController::class);
+        
+        // Produk Voucher
+        Route::apiResource('/admin/produk', App\Http\Controllers\Api\Admin\ProdukVoucherController::class);
+        Route::post('/admin/digiflazz/sync', [App\Http\Controllers\Api\Admin\DigiflazzSyncController::class, 'sync']);
+        
+        // Banner / Iklan
+        Route::apiResource('/admin/banner', App\Http\Controllers\Api\Admin\BannerController::class);
+        
+        // Artikel
+        Route::apiResource('admin/artikel', \App\Http\Controllers\Api\Admin\ArtikelController::class);
+        Route::apiResource('admin/users', \App\Http\Controllers\Api\Admin\UserController::class);
+        Route::apiResource('admin/kupon', \App\Http\Controllers\Api\Admin\DiskonVoucherController::class);
+        
+        // Settings
+        Route::get('/admin/settings', [App\Http\Controllers\SettingController::class, 'adminIndex']);
+        Route::post('/admin/settings', [App\Http\Controllers\SettingController::class, 'update']);
+    });
 });
 
 // Settings (Public)

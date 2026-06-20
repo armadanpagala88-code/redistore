@@ -16,7 +16,7 @@ class LaporanController extends Controller
             'end_date' => 'nullable|date|after_or_equal:start_date'
         ]);
 
-        $query = Transaksi::with(['details'])->where('status_transaksi', 'Success');
+        $query = Transaksi::with(['details', 'user'])->where('status_transaksi', 'Success');
 
         if ($request->filled('start_date')) {
             $query->whereDate('tgl_transaksi', '>=', $request->start_date);
@@ -41,7 +41,7 @@ class LaporanController extends Controller
             'end_date' => 'nullable|date|after_or_equal:start_date'
         ]);
 
-        $query = Transaksi::with(['details'])->where('status_transaksi', 'Success');
+        $query = Transaksi::with(['details', 'user'])->where('status_transaksi', 'Success');
 
         if ($request->filled('start_date')) {
             $query->whereDate('tgl_transaksi', '>=', $request->start_date);

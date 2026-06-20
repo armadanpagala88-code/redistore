@@ -33,6 +33,9 @@ class User extends Authenticatable
         'poin',
         'kode_referral',
         'referred_by',
+        'nama_bank',
+        'nomor_rekening',
+        'atas_nama',
     ];
 
     /**

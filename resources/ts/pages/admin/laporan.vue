@@ -120,6 +120,7 @@ const printLaporan = () => {
           <tr>
             <th class="text-left text-caption font-weight-bold">No</th>
             <th class="text-left text-caption font-weight-bold">ID Transaksi</th>
+            <th class="text-left text-caption font-weight-bold">Pelanggan</th>
             <th class="text-left text-caption font-weight-bold">Tanggal</th>
             <th class="text-left text-caption font-weight-bold">Produk & Game</th>
             <th class="text-right text-caption font-weight-bold">Harga Jual</th>
@@ -131,6 +132,10 @@ const printLaporan = () => {
           <tr v-for="(trx, index) in laporan" :key="trx.id" class="transition-swing">
             <td class="font-weight-medium text-medium-emphasis">{{ index + 1 }}</td>
             <td class="font-weight-medium">{{ trx.id }}</td>
+            <td>
+              <div class="font-weight-bold">{{ trx.user ? trx.user.nama_lengkap : 'Tamu (Guest)' }}</div>
+              <div class="text-caption text-medium-emphasis">{{ trx.user ? '@' + trx.user.username : trx.no_whatsapp }}</div>
+            </td>
             <td>
               <div class="font-weight-medium">{{ new Date(trx.tgl_transaksi).toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year: 'numeric'}) }}</div>
               <div class="text-caption text-medium-emphasis">{{ new Date(trx.tgl_transaksi).toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}) }}</div>
@@ -146,7 +151,7 @@ const printLaporan = () => {
             <td class="text-right font-weight-bold text-primary">{{ formatRupiah(trx.total_bayar) }}</td>
           </tr>
           <tr v-if="laporan.length === 0">
-            <td colspan="7" class="text-center pa-8">
+            <td colspan="8" class="text-center pa-8">
               <div class="d-print-none">
                 <VIcon icon="ri-folder-open-line" size="48" color="grey-lighten-1" class="mb-3" />
                 <div class="text-h6 text-medium-emphasis">Tidak ada data laporan pada periode ini.</div>
@@ -157,7 +162,7 @@ const printLaporan = () => {
         </tbody>
         <tfoot v-if="laporan.length > 0" class="bg-grey-lighten-4">
           <tr>
-            <td colspan="4" class="text-right font-weight-bold text-body-1 py-4">TOTAL KESELURUHAN:</td>
+            <td colspan="5" class="text-right font-weight-bold text-body-1 py-4">TOTAL KESELURUHAN:</td>
             <td class="text-right font-weight-bold text-body-1 py-4">{{ formatRupiah(hitungTotal() + hitungTotalDiskon()) }}</td>
             <td class="text-right font-weight-bold text-body-1 text-error py-4">-{{ formatRupiah(hitungTotalDiskon()) }}</td>
             <td class="text-right font-weight-bold text-h6 text-primary py-4">{{ formatRupiah(hitungTotal()) }}</td>

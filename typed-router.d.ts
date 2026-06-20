@@ -32,6 +32,7 @@ declare module 'vue-router/auto-routes' {
     'admin-settings': RouteRecordInfo<'admin-settings', '/admin/settings', Record<never, never>, Record<never, never>>,
     'admin-tickets': RouteRecordInfo<'admin-tickets', '/admin/tickets', Record<never, never>, Record<never, never>>,
     'admin-users': RouteRecordInfo<'admin-users', '/admin/users', Record<never, never>, Record<never, never>>,
+    'admin-withdrawals': RouteRecordInfo<'admin-withdrawals', '/admin/withdrawals', Record<never, never>, Record<never, never>>,
     'akun-id': RouteRecordInfo<'akun-id', '/akun/:id', { id: ParamValue<true> }, { id: ParamValue<false> }>,
     'blog': RouteRecordInfo<'blog', '/blog', Record<never, never>, Record<never, never>>,
     'blog-slug': RouteRecordInfo<'blog-slug', '/blog/:slug', { slug: ParamValue<true> }, { slug: ParamValue<false> }>,
@@ -46,6 +47,7 @@ declare module 'vue-router/auto-routes' {
     'member-ticket': RouteRecordInfo<'member-ticket', '/member/ticket', Record<never, never>, Record<never, never>>,
     'member-ticket-id': RouteRecordInfo<'member-ticket-id', '/member/ticket/:id', { id: ParamValue<true> }, { id: ParamValue<false> }>,
     'member-ticket-create': RouteRecordInfo<'member-ticket-create', '/member/ticket/create', Record<never, never>, Record<never, never>>,
+    'member-withdrawals': RouteRecordInfo<'member-withdrawals', '/member/withdrawals', Record<never, never>, Record<never, never>>,
     'register': RouteRecordInfo<'register', '/register', Record<never, never>, Record<never, never>>,
     'second-page': RouteRecordInfo<'second-page', '/second-page', Record<never, never>, Record<never, never>>,
   }

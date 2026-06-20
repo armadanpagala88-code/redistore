@@ -107,10 +107,11 @@
             <tr>
                 <th class="text-center" width="5%">No</th>
                 <th width="15%">ID Transaksi</th>
-                <th width="20%">Tanggal</th>
+                <th width="15%">Pelanggan</th>
+                <th width="15%">Tanggal</th>
                 <th width="15%">Tipe</th>
-                <th width="25%">No Whatsapp / Kontak</th>
-                <th class="text-right" width="20%">Total Bayar (Rp)</th>
+                <th width="20%">No Whatsapp / Kontak</th>
+                <th class="text-right" width="15%">Total Bayar (Rp)</th>
             </tr>
         </thead>
         <tbody>
@@ -118,19 +119,23 @@
             <tr>
                 <td class="text-center">{{ $index + 1 }}</td>
                 <td>{{ $trx->id }}</td>
+                <td>
+                    <b>{{ $trx->user ? $trx->user->nama_lengkap : 'Tamu' }}</b><br>
+                    <small style="color: #666;">{{ $trx->user ? '@'.$trx->user->username : '-' }}</small>
+                </td>
                 <td>{{ \Carbon\Carbon::parse($trx->tgl_transaksi)->format('d/m/Y H:i') }}</td>
-                <td>{{ $trx->tipe_transaksi }}</td>
+                <td>{{ $trx->tipe_transaksi ?? 'Lainnya' }}</td>
                 <td>{{ $trx->no_whatsapp }}</td>
                 <td class="text-right">{{ number_format($trx->total_bayar, 0, ',', '.') }}</td>
             </tr>
             @empty
             <tr>
-                <td colspan="6" class="text-center">Tidak ada data transaksi sukses pada periode ini.</td>
+                <td colspan="7" class="text-center">Tidak ada data transaksi sukses pada periode ini.</td>
             </tr>
             @endforelse
             @if(count($laporan) > 0)
             <tr class="total-row">
-                <td colspan="5" class="text-right">TOTAL PENDAPATAN</td>
+                <td colspan="6" class="text-right">TOTAL PENDAPATAN</td>
                 <td class="text-right">{{ number_format($total_pendapatan, 0, ',', '.') }}</td>
             </tr>
             @endif
