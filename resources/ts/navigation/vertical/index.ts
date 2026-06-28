@@ -30,6 +30,11 @@ export default [
     icon: { icon: 'ri-user-settings-line' },
   },
   {
+    title: 'Data Transaksi',
+    to: { path: '/admin/transaksi' },
+    icon: { icon: 'ri-shopping-cart-line' },
+  },
+  {
     title: 'Laporan Penjualan',
     to: { path: '/admin/laporan' },
     icon: { icon: 'ri-bar-chart-box-line' },
