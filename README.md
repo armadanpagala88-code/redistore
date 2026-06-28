@@ -75,23 +75,42 @@ Pastikan sistem/server Anda telah meng-install:
    ```
 
 4. **Migrasi Database & Data Dummy**
-   Untuk mendapatkan struktur database sekaligus data dummy (Game, Produk, Voucher Promo, Pengaturan, Akun Default):
+   Jika menggunakan MySQL/MariaDB lokal, pastikan Anda telah membuat database kosong (misal: `redistore`), lalu sesuaikan bagian database di file `.env`:
+   ```env
+   DB_CONNECTION=mysql
+   DB_HOST=127.0.0.1
+   DB_PORT=3306
+   DB_DATABASE=redistore
+   DB_USERNAME=root
+   DB_PASSWORD=
+   ```
+   Setelah itu jalankan perintah berikut untuk membuat tabel dan data dummy:
    ```bash
-   touch database/database.sqlite
    php artisan migrate:fresh --seed
    ```
+   *(Jika ingin memakai SQLite, biarkan `.env` default dan jalankan `touch database/database.sqlite` sebelum migrasi)*
 
-5. **Install Dependensi Frontend (Node.js/Vue)**
+5. **Link Storage (Untuk Gambar/File)**
+   Agar file atau gambar produk bisa diakses publik:
+   ```bash
+   php artisan storage:link
+   ```
+
+6. **Install Dependensi Frontend (Node.js/Vue)**
    ```bash
    npm install
    ```
 
-6. **Menjalankan Server**
-   Jalankan perintah ini untuk menyalakan server Backend dan merender Frontend secara bersamaan:
+7. **Menjalankan Server**
+   Buka dua tab terminal. Di terminal pertama, jalankan server backend Laravel:
+   ```bash
+   php artisan serve
+   ```
+   Di terminal kedua, jalankan frontend Vite:
    ```bash
    npm run dev
    ```
-   Aplikasi siap diakses melalui: `http://localhost:8000`
+   Aplikasi siap diakses melalui browser di: `http://localhost:8000`
 
 ## 🔑 Pengguna Default (Akses Admin)
 
