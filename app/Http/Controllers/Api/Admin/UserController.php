@@ -39,7 +39,7 @@ class UserController extends Controller
             'is_aktif' => $request->is_aktif ?? true,
             'saldo' => 0,
             'poin' => 0,
-            'level' => 'Bronze'
+            'level' => 'Basic'
         ]);
 
         return response()->json([
