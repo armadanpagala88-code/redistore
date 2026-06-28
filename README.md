@@ -84,11 +84,21 @@ Pastikan sistem/server Anda telah meng-install:
    DB_USERNAME=root
    DB_PASSWORD=
    ```
-   Setelah itu jalankan perintah berikut untuk membuat tabel dan data dummy:
+   Setelah itu jalankan perintah berikut untuk membuat tabel beserta data utama (Akun Admin & Owner):
    ```bash
    php artisan migrate:fresh --seed
    ```
    *(Jika ingin memakai SQLite, biarkan `.env` default dan jalankan `touch database/database.sqlite` sebelum migrasi)*
+
+   **Generate Dummy Data Tambahan (Opsional):**
+   Untuk keperluan testing tampilan dan fitur, Anda bisa men-generate data dummy tambahan seperti akun member, produk voucher, dan data jualan. Jalankan perintah seeder berikut satu per satu:
+   ```bash
+   # Membuat 10 dummy pelanggan dan 20 akun game jualan
+   php artisan db:seed --class=DummyDataSeeder
+
+   # Membuat 50 dummy produk voucher beserta kategorinya
+   php artisan db:seed --class=DummyVoucherSeeder
+   ```
 
 5. **Link Storage (Untuk Gambar/File)**
    Agar file atau gambar produk bisa diakses publik:
