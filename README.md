@@ -43,20 +43,25 @@ Pastikan sistem/server Anda telah meng-install:
 ## 💻 Cara Instalasi & Menjalankan Aplikasi
 
 1. **Clone Repositori**
+   Pertama-tama, clone *source code* ini ke komputer lokal Anda:
    ```bash
    git clone https://github.com/armadanpagala88-code/redistore.git
    cd redistore
    ```
 
 2. **Install Dependensi Backend (PHP/Laravel)**
+   Pastikan Anda sudah menginstall Composer, lalu jalankan:
    ```bash
    composer install
    ```
 
 3. **Konfigurasi Environment & Integrasi API**
-   Salin file konfigurasi lingkungan dasar:
+   Salin file konfigurasi lingkungan dasar menjadi `.env`:
    ```bash
    cp .env.example .env
+   ```
+   Lalu hasilkan *Application Key*:
+   ```bash
    php artisan key:generate
    ```
    **PENTING:** Buka file `.env` Anda dan isi *Credentials* untuk API pihak ketiga agar fitur otomatis berjalan:
@@ -74,8 +79,8 @@ Pastikan sistem/server Anda telah meng-install:
    FONNTE_TOKEN=token_fonnte_anda
    ```
 
-4. **Migrasi Database & Data Dummy**
-   Jika menggunakan MySQL/MariaDB lokal, pastikan Anda telah membuat database kosong (misal: `redistore`), lalu sesuaikan bagian database di file `.env`:
+4. **Konfigurasi Database**
+   Buka file `.env` dan atur koneksi database Anda (defaultnya menggunakan MySQL/MariaDB). Buat database kosong terlebih dahulu (misal: `redistore`), lalu sesuaikan konfigurasi berikut:
    ```env
    DB_CONNECTION=mysql
    DB_HOST=127.0.0.1
@@ -84,48 +89,54 @@ Pastikan sistem/server Anda telah meng-install:
    DB_USERNAME=root
    DB_PASSWORD=
    ```
-   Setelah itu jalankan perintah berikut untuk membuat tabel beserta data utama (Akun Admin & Owner):
+   *(Catatan: Jika Anda ingin menggunakan SQLite, biarkan `DB_CONNECTION=sqlite` dan hapus konfigurasi `DB_HOST` dkk. Lalu buat file kosong dengan perintah `touch database/database.sqlite`)*
+
+5. **Migrasi Database & Seeding Data**
+   Setelah database diatur, buat struktur tabel dan masukkan data dasar (Akun Admin & Owner) dengan menjalankan perintah berikut:
    ```bash
    php artisan migrate:fresh --seed
    ```
-   *(Jika ingin memakai SQLite, biarkan `.env` default dan jalankan `touch database/database.sqlite` sebelum migrasi)*
 
-   **Generate Dummy Data Tambahan (Opsional):**
-   Untuk keperluan testing tampilan dan fitur, Anda bisa men-generate data dummy tambahan seperti akun member, produk voucher, dan data jualan. Jalankan perintah seeder berikut satu per satu:
+   **Generate Dummy Data (Opsional tapi Sangat Disarankan):**
+   Untuk memudahkan *testing* atau pratinjau tampilan web, sistem ini dilengkapi dengan data dummy. Anda wajib menjalankan seeder berikut jika ingin web terisi data dummy akun game dan produk:
    ```bash
-   # Membuat 10 dummy pelanggan dan 20 akun game jualan
+   # Masukkan 10 dummy pelanggan dan 20 akun game jualan
    php artisan db:seed --class=DummyDataSeeder
 
-   # Membuat 50 dummy produk voucher beserta kategorinya
+   # Masukkan 50 dummy produk voucher beserta kategorinya
    php artisan db:seed --class=DummyVoucherSeeder
    ```
 
-5. **Link Storage (Untuk Gambar/File)**
-   Agar file atau gambar produk bisa diakses publik:
+6. **Link Storage (Untuk Gambar/File)**
+   Agar file gambar produk dan banner bisa diakses secara publik, jalankan:
    ```bash
    php artisan storage:link
    ```
 
-6. **Install Dependensi Frontend (Node.js/Vue)**
+7. **Install Dependensi Frontend (Node.js/Vue)**
+   Jalankan perintah ini untuk menginstall semua paket Node yang dibutuhkan (pastikan Node.js terinstall):
    ```bash
    npm install
    ```
 
-7. **Menjalankan Server**
-   Buka dua tab terminal. Di terminal pertama, jalankan server backend Laravel:
+8. **Menjalankan Aplikasi (Development)**
+   Buka dua jendela/tab terminal secara bersamaan di dalam folder proyek.
+   
+   Di terminal pertama, jalankan server backend Laravel:
    ```bash
    php artisan serve
    ```
-   Di terminal kedua, jalankan frontend Vite:
+   
+   Di terminal kedua, jalankan *compiler* frontend Vite:
    ```bash
    npm run dev
    ```
-   Aplikasi siap diakses melalui browser di: `http://localhost:8000`
+   Aplikasi Anda siap diakses melalui browser di alamat: `http://localhost:8000` (atau `http://127.0.0.1:8000`).
 
 ## 🔑 Pengguna Default (Akses Admin)
 
-Setelah menjalankan Seeder, Anda bisa *Login* ke Panel Admin dengan kredensial:
-- **Admin**: `username`: admin | `password`: password
+Setelah menjalankan `php artisan migrate:fresh --seed`, Anda bisa *Login* ke Panel Admin dengan kredensial berikut:
+- **Admin Utama**: `username`: admin | `password`: password
 - **Owner**: `username`: owner | `password`: password
 
 ## 📝 Lisensi & Hak Cipta
