@@ -202,7 +202,8 @@ watch(currentDir, () => {
 // check if any value set in cookie
 const isCookieHasAnyValue = ref(false)
 
-const { locale } = useI18n({ useScope: 'global' })
+// const { locale } = useI18n({ useScope: 'global' })
+const locale = ref('id') // mock locale
 
 const isActiveLangRTL = computed(() => {
   const lang = themeConfig.app.i18n.langConfig.find(l => l.i18nLang === locale.value)
@@ -213,7 +214,8 @@ const isActiveLangRTL = computed(() => {
 watch([
   () => vuetifyTheme.current.value.colors.primary,
   configStore.$state,
-  locale,
+  // locale,
+
 ], () => {
   const initialConfigValue = [
     staticPrimaryColor,

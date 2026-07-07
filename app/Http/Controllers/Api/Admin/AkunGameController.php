@@ -10,7 +10,7 @@ class AkunGameController extends Controller
 {
     public function index()
     {
-        $akuns = AkunGame::with(['kategori', 'penjual'])->latest()->get();
+        $akuns = AkunGame::with(['kategori', 'penjual'])->latest()->paginate(15);
             
         return response()->json([
             'success' => true,

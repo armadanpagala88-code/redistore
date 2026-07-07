@@ -15,7 +15,6 @@ const form = ref({
   midtrans_client_key: '',
   midtrans_is_production: '0',
   midtrans_payment_link: '',
-  theme_color_primary: '#666CFF',
 })
 
 const loading = ref(true)
@@ -44,7 +43,6 @@ onMounted(async () => {
       if (res.data.data.midtrans_client_key) form.value.midtrans_client_key = res.data.data.midtrans_client_key
       if (res.data.data.midtrans_is_production !== undefined) form.value.midtrans_is_production = String(res.data.data.midtrans_is_production)
       if (res.data.data.midtrans_payment_link) form.value.midtrans_payment_link = res.data.data.midtrans_payment_link
-      if (res.data.data.theme_color_primary) form.value.theme_color_primary = res.data.data.theme_color_primary
     }
   } catch (e) {
     console.error('Error fetching settings', e)
@@ -176,35 +174,6 @@ const saveSettings = async () => {
                     hint="Token untuk pengiriman notifikasi WhatsApp otomatis. Dapatkan dari fonnte.com"
                     persistent-hint
                   />
-                </VCol>
-
-                <VCol cols="12">
-                  <VDivider class="my-4" />
-                  <div class="text-subtitle-1 font-weight-bold mb-4 d-flex align-center gap-2">
-                    <VIcon icon="ri-palette-line" color="primary" />
-                    Pengaturan Tema & Tampilan
-                  </div>
-                </VCol>
-
-                <VCol cols="12" md="6">
-                  <VTextField
-                    v-model="form.theme_color_primary"
-                    label="Warna Utama Tema (Primary Color)"
-                    placeholder="#666CFF"
-                    variant="outlined"
-                    density="comfortable"
-                    prepend-inner-icon="ri-paint-brush-line"
-                    hint="Pilih warna dominan yang akan digunakan oleh website"
-                    persistent-hint
-                  >
-                    <template #append-inner>
-                      <input 
-                        type="color" 
-                        v-model="form.theme_color_primary" 
-                        style="width: 32px; height: 32px; border: none; cursor: pointer; padding: 0; border-radius: 4px;"
-                      />
-                    </template>
-                  </VTextField>
                 </VCol>
 
                 <VCol cols="12">

@@ -64,7 +64,7 @@ watch([
     </template>
 
     <!-- 👉 Customizer -->
-    <!-- <TheCustomizer /> -->
+    <TheCustomizer />
   </VerticalNavLayout>
 </template>
 

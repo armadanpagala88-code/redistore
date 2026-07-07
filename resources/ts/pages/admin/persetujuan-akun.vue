@@ -4,6 +4,8 @@ import axios from 'axios'
 
 const items = ref<any[]>([])
 const loading = ref(true)
+const page = ref(1)
+const totalPages = ref(1)
 
 const isEditDialogVisible = ref(false)
 const editingItem = ref<any>(null)
@@ -16,9 +18,15 @@ const newCoverImage = ref<File | null>(null)
 const isSubmittingEdit = ref(false)
 
 const fetchItems = async () => {
+  loading.value = true
   try {
-    const res = await axios.get('/api/admin/akun-game')
-    items.value = res.data.data
+    const res = await axios.get(`/api/admin/akun-game?page=${page.value}`)
+    if (res.data.data.data) {
+      items.value = res.data.data.data
+      totalPages.value = res.data.data.last_page || 1
+    } else {
+      items.value = res.data.data
+    }
   } catch (error) {
     console.error(error)
   } finally {
@@ -169,7 +177,7 @@ const submitEdit = async () => {
                 </div>
               </div>
             </td>
-            <td><VChip size="small" variant="tonal" :color="getGameColor(item.kategori?.nama_game)">{{ item.kategori?.nama_game }}</VChip></td>
+            <td><VChip size="small" variant="elevated" class="font-weight-bold" :color="getGameColor(item.kategori?.nama_game)">{{ item.kategori?.nama_game }}</VChip></td>
             <td>
               <div class="font-weight-medium">{{ item.penjual?.nama_lengkap }}</div>
               <div class="text-caption text-medium-emphasis">{{ item.penjual?.username }}</div>
@@ -202,6 +210,16 @@ const submitEdit = async () => {
           </tr>
         </tbody>
       </VTable>
+
+      <div class="d-flex justify-center my-4" v-if="totalPages > 1">
+        <VPagination
+          v-model="page"
+          :length="totalPages"
+          :total-visible="5"
+          @update:model-value="fetchItems"
+          active-color="primary"
+        />
+      </div>
     </VCard>
 
     <!-- Dialog Edit Produk -->

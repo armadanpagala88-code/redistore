@@ -46,7 +46,7 @@ import { VNodeRenderer } from '@layouts/components/VNodeRenderer'
     </template>
 
     <!-- 👉 Customizer -->
-    <!-- <TheCustomizer /> -->
+    <TheCustomizer />
   </HorizontalNavLayout>
 </template>
 

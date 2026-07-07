@@ -14,6 +14,7 @@ const banners = ref<any[]>([])
 const flashSales = ref<any[]>([])
 const loading = ref(true)
 const currentTime = ref(new Date().getTime())
+const selectedCategory = ref<string>('Semua')
 
 onMounted(async () => {
   // Update time for countdown every second
@@ -63,6 +64,31 @@ const getCountdown = (endTimeStr: string) => {
 
   return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
 }
+
+const getGameColor = (nama_game: string) => {
+  const name = (nama_game || '').toLowerCase()
+  if (name.includes('mobile legends') || name.includes('mlbb')) return 'info'
+  if (name.includes('free fire') || name.includes('ff')) return 'warning'
+  if (name.includes('genshin')) return 'success'
+  if (name.includes('pubg')) return 'secondary'
+  if (name.includes('valorant')) return 'error'
+  return 'primary'
+}
+
+const uniqueCategories = computed(() => {
+  const cats = new Set<string>()
+  akunGames.value.forEach(akun => {
+    if (akun.kategori?.nama_game) {
+      cats.add(akun.kategori.nama_game)
+    }
+  })
+  return ['Semua', ...Array.from(cats)]
+})
+
+const filteredAkunGames = computed(() => {
+  if (selectedCategory.value === 'Semua') return akunGames.value
+  return akunGames.value.filter(akun => akun.kategori?.nama_game === selectedCategory.value)
+})
 </script>
 
 <template>
@@ -178,17 +204,35 @@ const getCountdown = (endTimeStr: string) => {
       </div>
 
       <!-- Section Title ala UniPin -->
-      <div class="d-flex align-center mb-6 justify-space-between mt-8">
+      <div class="d-flex flex-column flex-md-row align-md-center mb-6 justify-space-between mt-8 gap-4">
         <h2 class="text-h5 font-weight-bold text-high-emphasis d-flex align-center gap-2">
           <VIcon icon="ri-store-2-fill" color="primary" size="28" />
           Marketplace Akun Game
         </h2>
+        
+        <!-- Category Filter -->
+        <VChipGroup
+          v-model="selectedCategory"
+          mandatory
+          class="custom-chip-group"
+        >
+          <VChip
+            v-for="cat in uniqueCategories"
+            :key="cat"
+            :value="cat"
+            variant="elevated"
+            :class="['font-weight-medium px-4 mx-1', selectedCategory === cat ? 'text-white' : 'text-high-emphasis']"
+            :color="selectedCategory === cat ? 'primary' : 'surface'"
+          >
+            {{ cat }}
+          </VChip>
+        </VChipGroup>
       </div>
 
       <!-- Game Grid ala UniPin -->
       <VRow dense class="match-unipin-grid">
         <VCol
-          v-for="akun in akunGames"
+          v-for="akun in filteredAkunGames"
           :key="akun.id"
           cols="6"
           sm="4"
@@ -204,7 +248,7 @@ const getCountdown = (endTimeStr: string) => {
                 class="game-img"
               />
               <VChip 
-                color="primary" 
+                :color="getGameColor(akun.kategori?.nama_game)" 
                 size="small" 
                 variant="elevated"
                 class="font-weight-bold position-absolute" 
@@ -227,7 +271,7 @@ const getCountdown = (endTimeStr: string) => {
           </VCard>
         </VCol>
         
-        <VCol cols="12" v-if="akunGames.length === 0">
+        <VCol cols="12" v-if="filteredAkunGames.length === 0">
           <div class="text-center pa-12">
             <VIcon icon="ri-store-3-line" size="64" color="grey-lighten-1" class="mb-4" />
             <h3 class="text-h5 font-weight-bold text-medium-emphasis">Belum ada akun game yang dijual</h3>
