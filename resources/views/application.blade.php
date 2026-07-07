@@ -6,7 +6,7 @@
   <link rel="icon" href="{{ asset('favicon.ico') }}" />
   <meta name="robots" content="noindex, nofollow" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Materialize - Vuejs Admin Template</title>
+  <title>Redistore</title>
   <link rel="stylesheet" type="text/css" href="{{ asset('loader.css') }}" />
   @vite(['resources/ts/main.ts'])
 </head>

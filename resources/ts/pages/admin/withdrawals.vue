@@ -2,12 +2,6 @@
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
 
-definePage({
-  meta: {
-    layout: 'admin',
-    public: false,
-  },
-})
 
 const items = ref<any[]>([])
 const loading = ref(true)

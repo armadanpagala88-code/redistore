@@ -88,6 +88,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/admin/akun-game', [\App\Http\Controllers\Api\Admin\AkunGameController::class, 'index']);
         Route::get('/admin/akun-game/{id}', [\App\Http\Controllers\Api\Admin\AkunGameController::class, 'show']);
         Route::put('/admin/akun-game/{id}/status', [\App\Http\Controllers\Api\Admin\AkunGameController::class, 'updateStatus']);
+        Route::post('/admin/akun-game/{id}', [\App\Http\Controllers\Api\Admin\AkunGameController::class, 'update']);
         Route::delete('/admin/akun-game/{id}', [\App\Http\Controllers\Api\Admin\AkunGameController::class, 'destroy']);
         
         // Support Tickets (Admin)

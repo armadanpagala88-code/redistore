@@ -5,6 +5,16 @@ import axios from 'axios'
 const items = ref<any[]>([])
 const loading = ref(true)
 
+const isEditDialogVisible = ref(false)
+const editingItem = ref<any>(null)
+const editForm = ref({
+  judul_akun: '',
+  login_via: '',
+  harga: 0
+})
+const newCoverImage = ref<File | null>(null)
+const isSubmittingEdit = ref(false)
+
 const fetchItems = async () => {
   try {
     const res = await axios.get('/api/admin/akun-game')
@@ -63,6 +73,56 @@ const statusColor = (status: string) => {
     default: return 'grey'
   }
 }
+
+const getGameColor = (nama_game: string) => {
+  const name = (nama_game || '').toLowerCase()
+  if (name.includes('mobile legends') || name.includes('mlbb')) return 'info'
+  if (name.includes('free fire') || name.includes('ff')) return 'warning'
+  if (name.includes('genshin')) return 'success'
+  if (name.includes('pubg')) return 'secondary'
+  if (name.includes('valorant')) return 'error'
+  return 'primary'
+}
+
+const openEditDialog = (item: any) => {
+  editingItem.value = item
+  editForm.value = {
+    judul_akun: item.judul_akun,
+    login_via: item.login_via,
+    harga: item.harga
+  }
+  newCoverImage.value = null
+  isEditDialogVisible.value = true
+}
+
+const submitEdit = async () => {
+  if (!editingItem.value) return
+  isSubmittingEdit.value = true
+  
+  const formData = new FormData()
+  formData.append('judul_akun', editForm.value.judul_akun)
+  formData.append('login_via', editForm.value.login_via)
+  formData.append('harga', editForm.value.harga.toString())
+  
+  if (newCoverImage.value) {
+    formData.append('gambar_utama', newCoverImage.value)
+  }
+  
+  try {
+    const res = await axios.post(`/api/admin/akun-game/${editingItem.value.id}`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+    alert(res.data.message)
+    isEditDialogVisible.value = false
+    fetchItems()
+  } catch (error: any) {
+    alert(error.response?.data?.message || 'Gagal menyimpan perubahan')
+  } finally {
+    isSubmittingEdit.value = false
+  }
+}
 </script>
 
 <template>
@@ -109,7 +169,7 @@ const statusColor = (status: string) => {
                 </div>
               </div>
             </td>
-            <td><VChip size="small" variant="tonal" color="primary">{{ item.kategori?.nama_game }}</VChip></td>
+            <td><VChip size="small" variant="tonal" :color="getGameColor(item.kategori?.nama_game)">{{ item.kategori?.nama_game }}</VChip></td>
             <td>
               <div class="font-weight-medium">{{ item.penjual?.nama_lengkap }}</div>
               <div class="text-caption text-medium-emphasis">{{ item.penjual?.username }}</div>
@@ -129,6 +189,7 @@ const statusColor = (status: string) => {
                   Tolak
                 </VBtn>
                 
+                <VBtn v-if="item.status !== 'Terjual'" icon="ri-pencil-line" variant="tonal" size="small" color="primary" @click="openEditDialog(item)" />
                 <VBtn v-if="item.status !== 'Terjual' && item.status !== 'Pending'" icon="ri-delete-bin-line" variant="tonal" size="small" color="error" @click="deleteItem(item.id)" />
               </div>
             </td>
@@ -142,6 +203,65 @@ const statusColor = (status: string) => {
         </tbody>
       </VTable>
     </VCard>
+
+    <!-- Dialog Edit Produk -->
+    <VDialog v-model="isEditDialogVisible" max-width="600">
+      <VCard class="rounded-lg">
+        <VCardTitle class="px-6 pt-6 d-flex justify-space-between align-center text-h5 font-weight-bold bg-primary text-white">
+          Edit Data Akun
+          <VBtn icon="ri-close-line" variant="text" size="small" color="white" @click="isEditDialogVisible = false" />
+        </VCardTitle>
+        <VCardText class="pa-6">
+          <VForm @submit.prevent="submitEdit">
+            <VTextField 
+              v-model="editForm.judul_akun" 
+              label="Judul Akun" 
+              variant="outlined" 
+              class="mb-4"
+              required 
+            />
+            
+            <VTextField 
+              v-model="editForm.login_via" 
+              label="Login Via (Contoh: Facebook, VK, Moonton)" 
+              variant="outlined" 
+              class="mb-4"
+              required 
+            />
+            
+            <VTextField 
+              v-model="editForm.harga" 
+              label="Harga" 
+              type="number"
+              variant="outlined" 
+              class="mb-4"
+              required 
+            />
+
+            <VFileInput 
+              v-model="newCoverImage"
+              label="Ganti Cover Gambar (Kosongkan jika tidak ingin ganti)"
+              accept="image/*"
+              variant="outlined"
+              class="mb-6"
+              prepend-icon=""
+              prepend-inner-icon="ri-image-add-line"
+            />
+            
+            <VBtn 
+              type="submit" 
+              color="primary" 
+              block 
+              size="large" 
+              class="font-weight-bold"
+              :loading="isSubmittingEdit"
+            >
+              Simpan Perubahan
+            </VBtn>
+          </VForm>
+        </VCardText>
+      </VCard>
+    </VDialog>
   </div>
 </template>
 

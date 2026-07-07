@@ -198,7 +198,7 @@ const getCountdown = (endTimeStr: string) => {
           <VCard elevation="2" class="h-100 d-flex flex-column unipin-card rounded-lg" :to="`/akun/${akun.id}`">
             <div class="img-wrapper bg-surface" style="position: relative;">
               <VImg
-                :src="getAkunImage(akun.gambar_utama)"
+                :src="getImageUrl(akun.kategori?.gambar_logo)"
                 height="180"
                 cover
                 class="game-img"

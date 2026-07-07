@@ -213,15 +213,23 @@ const printLaporan = () => {
   .laporan-table {
     border-collapse: collapse;
     width: 100%;
+    table-layout: auto;
   }
 
   .laporan-table th, .laporan-table td {
     border: 1px solid #ddd;
-    padding: 8px;
+    padding: 6px !important;
+    white-space: normal !important; /* Override text-no-wrap */
+    word-break: break-word;
+    font-size: 11px !important;
   }
 
   .laporan-table th {
     background-color: #f2f2f2 !important;
+  }
+
+  .text-no-wrap {
+    white-space: normal !important;
   }
 }
 </style>
