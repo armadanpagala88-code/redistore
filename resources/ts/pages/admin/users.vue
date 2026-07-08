@@ -199,12 +199,12 @@ const deleteUser = async (id: string) => {
           <VForm @submit.prevent="saveUser">
             <VTextField v-model="form.nama_lengkap" label="Nama Lengkap" required variant="outlined" density="comfortable" class="mb-4" />
             
-            <VRow>
-              <VCol cols="12" md="6" class="pb-0">
-                <VTextField v-model="form.username" label="Username" required variant="outlined" density="comfortable" class="mb-4" />
+            <VRow class="mb-2">
+              <VCol cols="12" md="6">
+                <VTextField v-model="form.username" label="Username" required variant="outlined" density="comfortable" />
               </VCol>
-              <VCol cols="12" md="6" class="pb-0">
-                <VTextField v-model="form.email" label="Email" type="email" required variant="outlined" density="comfortable" class="mb-4" />
+              <VCol cols="12" md="6">
+                <VTextField v-model="form.email" label="Email" type="email" required variant="outlined" density="comfortable" />
               </VCol>
             </VRow>
 
