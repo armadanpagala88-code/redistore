@@ -55,8 +55,13 @@ onMounted(async () => {
 })
 
 const getAkunImage = (path: string) => {
-  if (!path) return 'https://placehold.co/800x600/f1f5f9/94a3b8.png?text=Image'
+  if (!path) return ''
   return `/images/akun/${path}`
+}
+
+const getImageUrl = (path: string) => {
+  if (!path) return 'https://placehold.co/800x600/f1f5f9/94a3b8.png?text=Image'
+  return path.startsWith('http') ? path : `/images/${path}`
 }
 
 const formatRupiah = (angka: number) => {
@@ -134,7 +139,7 @@ const startChat = async () => {
         <!-- Left Column: Image & Details -->
         <VCol cols="12" md="7">
           <VCard elevation="5" class="rounded-lg overflow-hidden mb-6">
-            <VImg :src="getAkunImage(akun.gambar_utama)" height="400" cover class="bg-grey-lighten-4" />
+            <VImg :src="akun.gambar_utama ? getAkunImage(akun.gambar_utama) : getImageUrl(akun.kategori?.gambar_logo)" height="400" cover class="bg-grey-lighten-4" />
           </VCard>
 
           <VCard elevation="3" class="rounded-lg border-t-primary mb-6">

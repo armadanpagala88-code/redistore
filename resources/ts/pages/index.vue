@@ -242,7 +242,7 @@ const filteredAkunGames = computed(() => {
           <VCard elevation="2" class="h-100 d-flex flex-column unipin-card rounded-lg" :to="`/akun/${akun.id}`">
             <div class="img-wrapper bg-surface" style="position: relative;">
               <VImg
-                :src="getImageUrl(akun.gambar_utama || akun.kategori?.gambar_logo)"
+                :src="akun.gambar_utama ? getAkunImage(akun.gambar_utama) : getImageUrl(akun.kategori?.gambar_logo)"
                 height="180"
                 cover
                 class="game-img"
