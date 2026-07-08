@@ -16,6 +16,7 @@ const form = ref({
   midtrans_is_production: '0',
   midtrans_payment_link: '',
 })
+const logoFile = ref<File[]>([])
 
 const loading = ref(true)
 const saving = ref(false)
@@ -54,7 +55,18 @@ onMounted(async () => {
 const saveSettings = async () => {
   saving.value = true
   try {
-    const res = await axios.post('/api/admin/settings', form.value)
+    const formData = new FormData()
+    for (const [key, value] of Object.entries(form.value)) {
+      formData.append(key, String(value))
+    }
+    
+    if (logoFile.value && logoFile.value.length > 0) {
+      formData.append('logo', logoFile.value[0])
+    }
+
+    const res = await axios.post('/api/admin/settings', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    })
     if (res.data.success) {
       snackbar.value = {
         show: true,
@@ -97,7 +109,24 @@ const saveSettings = async () => {
           <VCardText class="pa-6" v-if="!loading">
             <VForm @submit.prevent="saveSettings">
               <VRow>
-                <VCol cols="12">
+                <VCol cols="12" md="4" class="d-flex flex-column align-center justify-center border rounded-lg pa-4 mb-4">
+                  <VImg src="/resources/images/logo.png" max-width="150" max-height="150" contain class="mb-4" />
+                  <VFileInput
+                    v-model="logoFile"
+                    label="Ganti Logo Website"
+                    accept="image/png, image/jpeg"
+                    variant="outlined"
+                    density="compact"
+                    prepend-icon=""
+                    prepend-inner-icon="ri-image-add-line"
+                    hint="Disarankan format PNG transparan"
+                    persistent-hint
+                    class="w-100"
+                  />
+                </VCol>
+                <VCol cols="12" md="8">
+                  <VRow>
+                    <VCol cols="12">
                   <VTextField
                     v-model="form.app_name"
                     label="Nama Website"
@@ -122,8 +151,10 @@ const saveSettings = async () => {
                     rows="3"
                   />
                 </VCol>
+              </VRow>
+            </VCol>
 
-                <VCol cols="12" md="6">
+            <VCol cols="12" md="6">
                   <VTextField
                     v-model="form.wa_number"
                     label="Nomor WhatsApp CS"

@@ -39,7 +39,13 @@ class SettingController extends Controller
     {
         $data = $request->all();
 
+        if ($request->hasFile('logo')) {
+            $file = $request->file('logo');
+            $file->move(resource_path('images'), 'logo.png');
+        }
+
         foreach ($data as $key => $value) {
+            if ($key === 'logo') continue;
             Setting::updateOrCreate(
                 ['key' => $key],
                 ['value' => $value]
