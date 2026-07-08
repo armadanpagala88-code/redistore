@@ -245,7 +245,7 @@ const submitEdit = async () => {
           @update:model-value="fetchItems"
           active-color="primary"
         />
-      </div>
+      </VCardText>
     </VCard>
 
     <!-- Dialog Edit Produk -->
