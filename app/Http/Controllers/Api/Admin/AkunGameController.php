@@ -8,9 +8,26 @@ use App\Models\AkunGame;
 
 class AkunGameController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $akuns = AkunGame::with(['kategori', 'penjual'])->latest()->paginate(15);
+        $query = AkunGame::with(['kategori', 'penjual'])->latest();
+
+        if ($request->has('search') && $request->search != '') {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('judul_akun', 'like', "%{$search}%")
+                  ->orWhere('login_via', 'like', "%{$search}%")
+                  ->orWhereHas('penjual', function ($q2) use ($search) {
+                      $q2->where('nama_lengkap', 'like', "%{$search}%")
+                         ->orWhere('username', 'like', "%{$search}%");
+                  })
+                  ->orWhereHas('kategori', function ($q2) use ($search) {
+                      $q2->where('nama_game', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        $akuns = $query->paginate(15);
             
         return response()->json([
             'success' => true,

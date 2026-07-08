@@ -16,11 +16,13 @@ const editForm = ref({
 })
 const newCoverImage = ref<File | null>(null)
 const isSubmittingEdit = ref(false)
+const searchQuery = ref('')
+let searchTimeout: any = null
 
 const fetchItems = async () => {
   loading.value = true
   try {
-    const res = await axios.get(`/api/admin/akun-game?page=${page.value}`)
+    const res = await axios.get(`/api/admin/akun-game?page=${page.value}&search=${searchQuery.value}`)
     if (res.data.data.data) {
       items.value = res.data.data.data
       totalPages.value = res.data.data.last_page || 1
@@ -37,6 +39,14 @@ const fetchItems = async () => {
 onMounted(() => {
   fetchItems()
 })
+
+const onSearch = () => {
+  clearTimeout(searchTimeout)
+  searchTimeout = setTimeout(() => {
+    page.value = 1
+    fetchItems()
+  }, 500)
+}
 
 const updateStatus = async (id: string, status: string) => {
   if (!confirm(`Yakin ingin mengubah status akun ini menjadi ${status}?`)) return
@@ -144,6 +154,19 @@ const submitEdit = async () => {
         </h2>
         <p class="text-body-2 text-medium-emphasis mb-0 mt-1">Review dan setujui postingan akun game dari member.</p>
       </div>
+      <div style="min-width: 300px;">
+        <VTextField
+          v-model="searchQuery"
+          prepend-inner-icon="ri-search-line"
+          placeholder="Cari nama akun, penjual, game..."
+          variant="outlined"
+          density="comfortable"
+          hide-details
+          clearable
+          @input="onSearch"
+          @click:clear="onSearch"
+        />
+      </div>
     </div>
 
     <!-- Data Table Card -->
@@ -204,14 +227,17 @@ const submitEdit = async () => {
           </tr>
           <tr v-if="items.length === 0">
             <td colspan="6" class="text-center pa-8">
-              <VIcon icon="ri-checkbox-blank-circle-line" size="48" color="grey-lighten-1" class="mb-3" />
-              <div class="text-h6 text-medium-emphasis">Belum ada akun yang diposting</div>
+              <VIcon icon="ri-search-eye-line" size="48" color="grey-lighten-1" class="mb-3" />
+              <div class="text-h6 text-medium-emphasis">
+                {{ searchQuery ? 'Tidak ada hasil untuk pencarian ini' : 'Belum ada akun yang diposting' }}
+              </div>
             </td>
           </tr>
         </tbody>
       </VTable>
-
-      <div class="d-flex justify-center my-4" v-if="totalPages > 1">
+      
+      <VDivider />
+      <VCardText class="d-flex align-center flex-wrap justify-space-between gap-4 py-3" v-if="totalPages > 1">
         <VPagination
           v-model="page"
           :length="totalPages"
