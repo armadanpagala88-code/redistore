@@ -14,7 +14,7 @@ export const { themeConfig, layoutConfig } = defineThemeConfig({
     title: 'redistore',
 
     // ❗ if you have SVG logo and want it to adapt according to theme color, you have to apply color as `color: rgb(var(--v-global-theme-primary))`
-    logo: h('img', { src: logo, alt: 'logo', style: 'height: 32px;' }),
+    logo: h('img', { src: '/images/logo.png', alt: 'logo', style: 'height: 32px;' }),
     contentWidth: ContentWidth.Boxed,
     contentLayoutNav: AppContentLayoutNav.Vertical,
     overlayNavFromBreakpoint: breakpointsVuetifyV3.lg - 1, // 1 for matching with vuetify breakpoint. Docs: https://next.vuetifyjs.com/en/features/display-and-platform/

@@ -41,7 +41,8 @@ class SettingController extends Controller
 
         if ($request->hasFile('logo')) {
             $file = $request->file('logo');
-            $file->move(resource_path('images'), 'logo.png');
+            $file->move(public_path('images'), 'logo.png');
+            @copy(public_path('images/logo.png'), resource_path('images/logo.png'));
         }
 
         foreach ($data as $key => $value) {

@@ -17,6 +17,7 @@ const form = ref({
   midtrans_payment_link: '',
 })
 const logoFile = ref<File[]>([])
+const logoPreviewUrl = ref('/images/logo.png?t=' + new Date().getTime())
 
 const loading = ref(true)
 const saving = ref(false)
@@ -73,6 +74,7 @@ const saveSettings = async () => {
         message: 'Pengaturan berhasil disimpan!',
         color: 'success'
       }
+      logoPreviewUrl.value = '/images/logo.png?t=' + new Date().getTime()
     }
   } catch (e: any) {
     snackbar.value = {
@@ -110,7 +112,7 @@ const saveSettings = async () => {
             <VForm @submit.prevent="saveSettings">
               <VRow>
                 <VCol cols="12" md="4" class="d-flex flex-column align-center justify-center border rounded-lg pa-4 mb-4">
-                  <VImg src="/resources/images/logo.png" max-width="150" max-height="150" contain class="mb-4" />
+                  <VImg :src="logoPreviewUrl" max-width="150" max-height="150" contain class="mb-4" />
                   <VFileInput
                     v-model="logoFile"
                     label="Ganti Logo Website"
