@@ -61,8 +61,14 @@ const saveSettings = async () => {
       formData.append(key, String(value))
     }
     
-    if (logoFile.value && logoFile.value.length > 0) {
-      formData.append('logo', logoFile.value[0])
+    if (logoFile.value) {
+      if (Array.isArray(logoFile.value) && logoFile.value.length > 0) {
+        formData.append('logo', logoFile.value[0])
+      } else if (logoFile.value instanceof File) {
+        formData.append('logo', logoFile.value)
+      } else if (logoFile.value[0] instanceof File) {
+        formData.append('logo', logoFile.value[0])
+      }
     }
 
     const res = await axios.post('/api/admin/settings', formData, {
