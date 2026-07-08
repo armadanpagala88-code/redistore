@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('no_telepon', 20)->nullable();
             $table->text('alamat')->nullable();
             $table->string('foto_profil', 255)->nullable();
-            $table->enum('role', ['Admin', 'Owner', 'Pelanggan'])->default('Pelanggan');
+            $table->enum('role', ['Admin', 'Pelanggan'])->default('Pelanggan');
             $table->boolean('is_aktif')->default(true);
             $table->rememberToken();
             $table->timestamps();

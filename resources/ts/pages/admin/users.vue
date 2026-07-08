@@ -118,7 +118,7 @@ const deleteUser = async (id: string) => {
           <VIcon icon="ri-user-settings-line" color="primary" />
           Manajemen User & Role
         </h2>
-        <p class="text-body-2 text-medium-emphasis mb-0 mt-1">Kelola daftar Admin, Owner, dan Pelanggan sistem Anda.</p>
+        <p class="text-body-2 text-medium-emphasis mb-0 mt-1">Kelola daftar Admin dan Pelanggan sistem Anda.</p>
       </div>
       <VBtn color="primary" prepend-icon="ri-user-add-line" @click="openAddModal" class="rounded-lg font-weight-bold">Tambah User</VBtn>
     </div>
@@ -158,7 +158,7 @@ const deleteUser = async (id: string) => {
             </td>
             <td class="text-center">
               <VChip
-                :color="user.role === 'Admin' ? 'error' : (user.role === 'Owner' ? 'warning' : 'success')"
+                :color="user.role === 'Admin' ? 'error' : 'success'"
                 size="small"
                 variant="tonal"
                 class="font-weight-bold"
@@ -210,7 +210,7 @@ const deleteUser = async (id: string) => {
 
             <VSelect
               v-model="form.role"
-              :items="['Admin', 'Owner', 'Pelanggan']"
+              :items="['Admin', 'Pelanggan']"
               label="Role (Hak Akses)"
               variant="outlined"
               density="comfortable"

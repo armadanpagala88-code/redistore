@@ -130,13 +130,13 @@ const getStatusColor = (status: string) => {
                     class="message-bubble rounded-lg pa-4 elevation-1"
                     :class="[
                       isMe(reply.user_id) ? 'bg-primary text-white' : 'bg-white text-high-emphasis',
-                      reply.user?.role === 'Admin' || reply.user?.role === 'Owner' ? 'border-warning border-opacity-100 border-2' : ''
+                      reply.user?.role === 'Admin' ? 'border-warning border-opacity-100 border-2' : ''
                     ]"
                   >
                     <div class="d-flex justify-space-between align-center mb-2 gap-4">
                       <div class="text-caption font-weight-bold opacity-90 d-flex align-center gap-1">
                         {{ isMe(reply.user_id) ? 'Anda' : reply.user?.nama_lengkap }}
-                        <VIcon v-if="reply.user?.role === 'Admin' || reply.user?.role === 'Owner'" icon="ri-verified-badge-fill" color="warning" size="small" />
+                        <VIcon v-if="reply.user?.role === 'Admin'" icon="ri-verified-badge-fill" color="warning" size="small" />
                       </div>
                       <div class="text-caption opacity-70" style="font-size: 0.7rem !important;">
                         {{ new Date(reply.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) }}

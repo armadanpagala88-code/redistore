@@ -26,7 +26,7 @@ class UserController extends Controller
             'nama_lengkap' => 'required|string|max:150',
             'email' => 'required|email|max:150|unique:users',
             'password' => 'required|string|min:6',
-            'role' => ['required', Rule::in(['Admin', 'Owner', 'Pelanggan'])],
+            'role' => ['required', Rule::in(['Admin', 'Pelanggan'])],
             'is_aktif' => 'boolean'
         ]);
 
@@ -58,7 +58,7 @@ class UserController extends Controller
             'nama_lengkap' => 'required|string|max:150',
             'email' => ['required', 'email', 'max:150', Rule::unique('users')->ignore($user->id)],
             'password' => 'nullable|string|min:6',
-            'role' => ['required', Rule::in(['Admin', 'Owner', 'Pelanggan'])],
+            'role' => ['required', Rule::in(['Admin', 'Pelanggan'])],
             'is_aktif' => 'boolean'
         ]);
 

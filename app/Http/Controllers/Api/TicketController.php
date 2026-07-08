@@ -65,7 +65,7 @@ class TicketController extends Controller
         
         $ticket = Ticket::with('replies.user:id,nama_lengkap,role')->findOrFail($id);
 
-        if ($ticket->user_id !== $userId && $request->user()->role !== 'Admin' && $request->user()->role !== 'Owner') {
+        if ($ticket->user_id !== $userId && $request->user()->role !== 'Admin') {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
 
@@ -84,7 +84,7 @@ class TicketController extends Controller
         $userId = $request->user()->id;
         $ticket = Ticket::findOrFail($id);
 
-        if ($ticket->user_id !== $userId && $request->user()->role !== 'Admin' && $request->user()->role !== 'Owner') {
+        if ($ticket->user_id !== $userId && $request->user()->role !== 'Admin') {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
         }
 
@@ -98,7 +98,7 @@ class TicketController extends Controller
         $ticket->touch();
 
         // Auto change status if admin replies
-        if ($request->user()->role === 'Admin' || $request->user()->role === 'Owner') {
+        if ($request->user()->role === 'Admin') {
             if ($ticket->status === 'Open') {
                 $ticket->status = 'In Progress';
                 $ticket->save();

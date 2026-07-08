@@ -15,7 +15,7 @@ class AdminMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if ($request->user() && in_array($request->user()->role, ['Admin', 'Owner'])) {
+        if ($request->user() && in_array($request->user()->role, ['Admin'])) {
             return $next($request);
         }
 

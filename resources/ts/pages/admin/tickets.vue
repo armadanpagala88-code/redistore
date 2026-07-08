@@ -229,18 +229,18 @@ const getPriorityColor = (priority: string) => {
               v-for="reply in selectedTicketDetails.replies" 
               :key="reply.id"
               class="d-flex"
-              :class="reply.user?.role === 'Admin' || reply.user?.role === 'Owner' ? 'justify-end' : 'justify-start'"
+              :class="reply.user?.role === 'Admin' ? 'justify-end' : 'justify-start'"
             >
-              <div class="d-flex gap-3" :class="reply.user?.role === 'Admin' || reply.user?.role === 'Owner' ? 'flex-row-reverse' : 'flex-row'" style="max-width: 80%;">
+              <div class="d-flex gap-3" :class="reply.user?.role === 'Admin' ? 'flex-row-reverse' : 'flex-row'" style="max-width: 80%;">
                 
-                <VAvatar :color="reply.user?.role === 'Admin' || reply.user?.role === 'Owner' ? 'warning' : 'primary'" variant="tonal" size="40">
+                <VAvatar :color="reply.user?.role === 'Admin' ? 'warning' : 'primary'" variant="tonal" size="40">
                   <span class="text-caption font-weight-bold">{{ reply.user?.nama_lengkap.charAt(0) || 'U' }}</span>
                 </VAvatar>
 
                 <div 
                   class="rounded-lg pa-4 elevation-1"
                   :class="[
-                    reply.user?.role === 'Admin' || reply.user?.role === 'Owner' ? 'bg-warning text-white' : 'bg-white text-high-emphasis'
+                    reply.user?.role === 'Admin' ? 'bg-warning text-white' : 'bg-white text-high-emphasis'
                   ]"
                 >
                   <div class="d-flex justify-space-between align-center mb-2 gap-4">

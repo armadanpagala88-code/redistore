@@ -28,17 +28,6 @@ class DatabaseSeeder extends Seeder
                 'is_aktif' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
-            ],
-            [
-                'id' => 2,
-                'username' => 'owner',
-                'password' => bcrypt('password'),
-                'nama_lengkap' => 'Pemilik Toko',
-                'email' => 'owner@redistore.com',
-                'role' => 'Owner',
-                'is_aktif' => true,
-                'created_at' => now(),
-                'updated_at' => now(),
             ]
         ]);
 

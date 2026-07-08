@@ -137,7 +137,6 @@ Pastikan sistem/server Anda telah meng-install:
 
 Setelah menjalankan `php artisan migrate:fresh --seed`, Anda bisa *Login* ke Panel Admin dengan kredensial berikut:
 - **Admin Utama**: `username`: admin | `password`: password
-- **Owner**: `username`: owner | `password`: password
 
 ## 📝 Lisensi & Hak Cipta
 
