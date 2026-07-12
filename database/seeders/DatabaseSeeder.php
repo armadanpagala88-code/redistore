@@ -57,5 +57,9 @@ class DatabaseSeeder extends Seeder
             ['id' => 1, 'transaksi_id' => 'TRX001', 'produk_voucher_id' => 1, 'nama_produk' => '86 Diamonds', 'nama_game' => 'Mobile Legends', 'harga_satuan' => 18000, 'jumlah' => 1, 'subtotal' => 18000],
             ['id' => 2, 'transaksi_id' => 'TRX002', 'produk_voucher_id' => 2, 'nama_produk' => '172 Diamonds', 'nama_game' => 'Mobile Legends', 'harga_satuan' => 35000, 'jumlah' => 1, 'subtotal' => 35000],
         ]);
+
+        $this->call([
+            ExtraDataSeeder::class,
+        ]);
     }
 }
