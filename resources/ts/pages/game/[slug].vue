@@ -13,6 +13,7 @@ definePage({
 const route = useRoute()
 const router = useRouter()
 const category = ref<any>(null)
+const ulasans = ref<any[]>([])
 const loading = ref(true)
 
 const form = ref({
@@ -36,6 +37,12 @@ onMounted(async () => {
     const slug = route.params.slug
     const response = await axios.get(`/api/kategori-game/${slug}`)
     category.value = response.data.data
+    
+    // Fetch Ulasan untuk game ini
+    if (category.value && category.value.id) {
+      const ulasanRes = await axios.get(`/api/public/ulasan/kategori/${category.value.id}`)
+      ulasans.value = ulasanRes.data.data
+    }
   } catch (error) {
     console.error('Error fetching game details:', error)
   } finally {
@@ -381,6 +388,43 @@ const checkout = async () => {
 
           </VCol>
         </VRow>
+        
+        <!-- Section Ulasan Pelanggan -->
+        <VRow v-if="ulasans.length > 0" class="mt-8">
+          <VCol cols="12">
+            <h3 class="text-h5 font-weight-bold d-flex align-center gap-2 mb-4">
+              <VIcon icon="ri-chat-smile-2-fill" color="primary" />
+              Ulasan Pelanggan
+            </h3>
+            
+            <VRow>
+              <VCol v-for="ulasan in ulasans" :key="ulasan.id" cols="12" md="6">
+                <VCard elevation="1" class="rounded-lg pa-4 h-100">
+                  <div class="d-flex align-center mb-3">
+                    <VAvatar color="primary" size="40" class="mr-3 font-weight-bold">
+                      {{ ulasan.user?.nama_lengkap?.charAt(0) || 'A' }}
+                    </VAvatar>
+                    <div>
+                      <div class="font-weight-bold text-subtitle-1">{{ ulasan.user?.nama_lengkap || 'Anonim' }}</div>
+                      <div class="text-caption text-medium-emphasis">{{ new Date(ulasan.created_at).toLocaleDateString('id-ID') }}</div>
+                    </div>
+                    <VSpacer />
+                    <VChip size="small" color="success" variant="elevated" class="font-weight-bold">
+                      <VIcon start icon="ri-star-fill" size="small" /> {{ ulasan.rating }}
+                    </VChip>
+                  </div>
+                  
+                  <VChip size="small" variant="tonal" color="primary" class="mb-2">
+                    Beli: {{ ulasan.produk_voucher?.nama_produk }}
+                  </VChip>
+                  
+                  <p class="text-body-1 mb-0">"{{ ulasan.komentar }}"</p>
+                </VCard>
+              </VCol>
+            </VRow>
+          </VCol>
+        </VRow>
+        
       </VContainer>
     </template>
   </div>

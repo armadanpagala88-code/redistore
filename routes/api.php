@@ -19,6 +19,10 @@ Route::get('/banners', [App\Http\Controllers\Api\BannerController::class, 'index
 Route::get('/akun-games', [App\Http\Controllers\Api\PublicAkunGameController::class, 'index']);
 Route::get('/akun-games/{id}', [App\Http\Controllers\Api\PublicAkunGameController::class, 'show']);
 
+// Public Ulasan & Rekomendasi
+Route::get('/public/rekomendasi', [App\Http\Controllers\Api\PublicRekomendasiController::class, 'index']);
+Route::get('/public/ulasan/kategori/{kategoriId}', [App\Http\Controllers\Api\PublicUlasanController::class, 'getByKategori']);
+
 // Checkout Transaksi
 Route::post('/checkout', [App\Http\Controllers\Api\CheckoutController::class, 'store']);
 Route::get('/checkout/{id}', [App\Http\Controllers\Api\CheckoutController::class, 'show']);

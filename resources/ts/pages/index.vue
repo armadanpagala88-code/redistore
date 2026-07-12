@@ -12,6 +12,7 @@ definePage({
 const akunGames = ref<any[]>([])
 const banners = ref<any[]>([])
 const flashSales = ref<any[]>([])
+const rekomendasis = ref<any[]>([])
 const loading = ref(true)
 const currentTime = ref(new Date().getTime())
 const selectedCategory = ref<string>('Semua')
@@ -23,14 +24,16 @@ onMounted(async () => {
   }, 1000)
 
   try {
-    const [akunRes, bannerRes, fsRes] = await Promise.all([
+    const [akunRes, bannerRes, fsRes, rekRes] = await Promise.all([
       axios.get('/api/akun-games'),
       axios.get('/api/banners'),
-      axios.get('/api/public/flash-sales')
+      axios.get('/api/public/flash-sales'),
+      axios.get('/api/public/rekomendasi')
     ])
     akunGames.value = akunRes.data.data
     banners.value = bannerRes.data.data
     flashSales.value = fsRes.data.data
+    rekomendasis.value = rekRes.data.data
   } catch (error) {
     console.error('Error fetching data:', error)
   } finally {
@@ -197,6 +200,58 @@ const filteredAkunGames = computed(() => {
                   <span class="text-caption font-weight-bold text-error whitespace-nowrap">Sisa {{ item.stok_promo }}</span>
                 </div>
                 <VBtn size="small" color="error" class="w-100 rounded-pill font-weight-bold mt-4" :to="`/produk/${item.produk?.id}`">Beli Sekarang</VBtn>
+              </VCardItem>
+            </VCard>
+          </VCol>
+        </VRow>
+      </div>
+
+      <!-- Rekomendasi Section -->
+      <div v-if="rekomendasis.length > 0" class="mb-12">
+        <h2 class="text-h5 font-weight-bold text-high-emphasis d-flex align-center gap-2 mb-6">
+          <VIcon icon="ri-thumb-up-fill" color="success" size="28" />
+          Rekomendasi Untuk Anda
+        </h2>
+        
+        <VRow dense class="match-unipin-grid">
+          <VCol
+            v-for="rek in rekomendasis"
+            :key="rek.id"
+            cols="6"
+            sm="4"
+            md="3"
+            lg="3"
+          >
+            <VCard elevation="2" class="h-100 d-flex flex-column unipin-card rounded-lg" :to="`/produk/${rek.produk_voucher?.id}`">
+              <VChip 
+                color="success" 
+                size="small" 
+                variant="elevated"
+                class="position-absolute font-weight-bold" 
+                style="top: 10px; right: 10px; z-index: 2;"
+              >
+                <VIcon start icon="ri-star-fill" size="small" /> {{ rek.skor }}
+              </VChip>
+              
+              <div class="text-center pt-6 pb-2 bg-surface">
+                <VImg 
+                  :src="getImageUrl(rek.produk_voucher?.kategori_game?.gambar_logo)" 
+                  height="80" 
+                  class="mx-auto rounded-lg" 
+                  style="max-width: 80px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);" 
+                />
+              </div>
+              
+              <VCardItem class="pa-4 text-left flex-grow-1 d-flex flex-column justify-space-between bg-white">
+                <div>
+                  <VCardTitle class="text-subtitle-1 font-weight-bold text-high-emphasis mb-1 line-clamp-2" style="line-height: 1.3;">
+                    {{ rek.produk_voucher?.nama_produk }}
+                  </VCardTitle>
+                  <p class="text-caption text-medium-emphasis mb-0 mt-1 line-clamp-2">
+                    "{{ rek.alasan }}"
+                  </p>
+                  <div class="text-primary font-weight-black text-subtitle-1 mt-2">{{ formatRupiah(rek.produk_voucher?.harga_jual) }}</div>
+                </div>
               </VCardItem>
             </VCard>
           </VCol>

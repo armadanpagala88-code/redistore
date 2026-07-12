@@ -59,6 +59,8 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $this->call([
+            DummyDataSeeder::class,
+            DummyVoucherSeeder::class,
             ExtraDataSeeder::class,
         ]);
     }
