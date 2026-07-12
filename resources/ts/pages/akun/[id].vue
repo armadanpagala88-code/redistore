@@ -151,30 +151,21 @@ const startChat = async () => {
             <template v-if="akun.gambar_lainnya && akun.gambar_lainnya.length > 0">
               <VCarousel height="400" hide-delimiter-background show-arrows="hover" cycle>
                 <VCarouselItem>
-                  <VImg 
-                    :src="getAkunImage(akun.gambar_utama)" 
-                    height="400" 
-                    class="bg-grey-lighten-4 cursor-pointer" 
-                    @click="openFullScreen(getAkunImage(akun.gambar_utama))" 
-                  />
+                  <div @click="openFullScreen(getAkunImage(akun.gambar_utama))" class="cursor-pointer h-100 w-100">
+                    <VImg :src="getAkunImage(akun.gambar_utama)" height="400" class="bg-grey-lighten-4" />
+                  </div>
                 </VCarouselItem>
                 <VCarouselItem v-for="(img, idx) in akun.gambar_lainnya" :key="idx">
-                  <VImg 
-                    :src="getAkunImage(img)" 
-                    height="400" 
-                    class="bg-grey-lighten-4 cursor-pointer" 
-                    @click="openFullScreen(getAkunImage(img))" 
-                  />
+                  <div @click="openFullScreen(getAkunImage(img))" class="cursor-pointer h-100 w-100">
+                    <VImg :src="getAkunImage(img)" height="400" class="bg-grey-lighten-4" />
+                  </div>
                 </VCarouselItem>
               </VCarousel>
             </template>
             <template v-else>
-              <VImg 
-                :src="akun.gambar_utama ? getAkunImage(akun.gambar_utama) : getImageUrl(akun.kategori?.gambar_logo)" 
-                height="400" 
-                class="bg-grey-lighten-4 cursor-pointer" 
-                @click="openFullScreen(akun.gambar_utama ? getAkunImage(akun.gambar_utama) : getImageUrl(akun.kategori?.gambar_logo))" 
-              />
+              <div @click="openFullScreen(akun.gambar_utama ? getAkunImage(akun.gambar_utama) : getImageUrl(akun.kategori?.gambar_logo))" class="cursor-pointer h-100 w-100">
+                <VImg :src="akun.gambar_utama ? getAkunImage(akun.gambar_utama) : getImageUrl(akun.kategori?.gambar_logo)" height="400" class="bg-grey-lighten-4" />
+              </div>
             </template>
           </VCard>
 
