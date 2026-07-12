@@ -288,14 +288,14 @@ const startChat = async () => {
         </VCol>
       </VRow>
       <!-- Full Screen Image Dialog -->
-      <VDialog v-model="isImageDialogVisible" max-width="90vw">
+      <VDialog v-model="isImageDialogVisible" max-width="90vw" content-class="z-index-highest">
         <VCard class="bg-black" style="overflow: hidden;">
           <VBtn 
             icon="ri-close-line" 
             variant="text" 
             color="white" 
             class="position-absolute" 
-            style="top: 10px; right: 10px; z-index: 10;" 
+            style="top: 10px; right: 10px; z-index: 100;" 
             @click="isImageDialogVisible = false" 
           />
           <VImg :src="fullScreenImage" max-height="90vh" class="ma-auto" />
@@ -306,6 +306,9 @@ const startChat = async () => {
 </template>
 
 <style scoped>
+.z-index-highest {
+  z-index: 9999 !important;
+}
 .border-t-primary {
   border-top: 4px solid rgb(var(--v-theme-primary)) !important;
 }
