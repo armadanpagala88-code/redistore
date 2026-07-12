@@ -50,7 +50,7 @@ const form = ref({
   password_akun: '',
   catatan_akun: ''
 })
-const fileInput = ref<any>(null)
+const fileInput = ref<File[]>([])
 const isSubmitting = ref(false)
 
 const openAddModal = () => {
@@ -65,7 +65,7 @@ const openAddModal = () => {
     password_akun: '',
     catatan_akun: ''
   }
-  fileInput.value = null
+  fileInput.value = []
   isDialogVisible.value = true
 }
 
@@ -81,18 +81,25 @@ const editItem = (item: any) => {
     password_akun: item.password_akun,
     catatan_akun: item.catatan_akun || ''
   }
-  fileInput.value = null
+  fileInput.value = []
   isDialogVisible.value = true
 }
 
 const handleFile = (e: any) => {
-  if (e.target.files && e.target.files[0]) {
-    fileInput.value = e.target.files[0]
+  if (e.target.files) {
+    const files = Array.from(e.target.files) as File[]
+    if (files.length > 3) {
+      alert('Maksimal 3 foto yang diizinkan!')
+      e.target.value = ''
+      fileInput.value = []
+    } else {
+      fileInput.value = files
+    }
   }
 }
 
 const saveItem = async () => {
-  if (!editId.value && !fileInput.value) {
+  if (!editId.value && (!fileInput.value || fileInput.value.length === 0)) {
     alert('Gambar utama wajib diupload!')
     return
   }
@@ -108,8 +115,10 @@ const saveItem = async () => {
   formData.append('password_akun', form.value.password_akun)
   formData.append('catatan_akun', form.value.catatan_akun)
   
-  if (fileInput.value) {
-    formData.append('gambar_utama', fileInput.value)
+  if (fileInput.value && fileInput.value.length > 0) {
+    fileInput.value.forEach((file: File) => {
+      formData.append('gambar_utama[]', file)
+    })
   }
 
   try {
@@ -339,8 +348,9 @@ const statusColor = (status: string) => {
             />
             
             <VFileInput 
-              :label="editId ? 'Ubah Screenshot Akun (Kosongkan jika tidak diubah)' : 'Screenshot Akun / Profil Game'" 
+              :label="editId ? 'Ubah Screenshot Akun (Kosongkan jika tidak diubah, Max 3 Foto)' : 'Screenshot Akun / Profil Game (Max 3 Foto)'" 
               accept="image/*" 
+              multiple
               variant="outlined" 
               density="comfortable" 
               prepend-inner-icon="ri-image-add-line" 

@@ -138,8 +138,20 @@ const startChat = async () => {
       <VRow>
         <!-- Left Column: Image & Details -->
         <VCol cols="12" md="7">
-          <VCard elevation="5" class="rounded-lg overflow-hidden mb-6">
-            <VImg :src="akun.gambar_utama ? getAkunImage(akun.gambar_utama) : getImageUrl(akun.kategori?.gambar_logo)" height="400" cover class="bg-grey-lighten-4" />
+          <VCard elevation="5" class="rounded-lg overflow-hidden mb-6 bg-grey-lighten-4">
+            <template v-if="akun.gambar_lainnya && akun.gambar_lainnya.length > 0">
+              <VCarousel height="400" hide-delimiter-background show-arrows="hover">
+                <VCarouselItem>
+                  <VImg :src="getAkunImage(akun.gambar_utama)" height="400" class="bg-grey-lighten-4" />
+                </VCarouselItem>
+                <VCarouselItem v-for="(img, idx) in akun.gambar_lainnya" :key="idx">
+                  <VImg :src="getAkunImage(img)" height="400" class="bg-grey-lighten-4" />
+                </VCarouselItem>
+              </VCarousel>
+            </template>
+            <template v-else>
+              <VImg :src="akun.gambar_utama ? getAkunImage(akun.gambar_utama) : getImageUrl(akun.kategori?.gambar_logo)" height="400" class="bg-grey-lighten-4" />
+            </template>
           </VCard>
 
           <VCard elevation="3" class="rounded-lg border-t-primary mb-6">

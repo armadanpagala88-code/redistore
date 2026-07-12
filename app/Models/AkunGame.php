@@ -17,7 +17,12 @@ class AkunGame extends Model
         'password_akun',
         'catatan_akun',
         'gambar_utama',
+        'gambar_lainnya',
         'status',
+    ];
+
+    protected $casts = [
+        'gambar_lainnya' => 'array',
     ];
 
     public function kategori()

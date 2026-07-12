@@ -33,7 +33,8 @@ class AkunGameController extends Controller
             'email_akun' => 'required|string',
             'password_akun' => 'required|string',
             'catatan_akun' => 'nullable|string',
-            'gambar_utama' => 'required|image|max:2048'
+            'gambar_utama' => 'required',
+            'gambar_utama.*' => 'image|max:2048'
         ]);
 
         $data = $request->except('gambar_utama');
@@ -41,10 +42,22 @@ class AkunGameController extends Controller
         $data['status'] = 'Pending';
 
         if ($request->hasFile('gambar_utama')) {
-            $file = $request->file('gambar_utama');
-            $filename = time() . '_' . $file->getClientOriginalName();
-            $file->move(public_path('images/akun'), $filename);
-            $data['gambar_utama'] = $filename;
+            $files = $request->file('gambar_utama');
+            if (!is_array($files)) {
+                $files = [$files];
+            }
+            
+            $filenames = [];
+            foreach (array_slice($files, 0, 3) as $file) {
+                $filename = time() . '_' . uniqid() . '_' . $file->getClientOriginalName();
+                $file->move(public_path('images/akun'), $filename);
+                $filenames[] = $filename;
+            }
+            
+            $data['gambar_utama'] = $filenames[0];
+            if (count($filenames) > 1) {
+                $data['gambar_lainnya'] = array_slice($filenames, 1);
+            }
         }
 
         $akun = AkunGame::create($data);
@@ -85,21 +98,43 @@ class AkunGameController extends Controller
             'email_akun' => 'required|string',
             'password_akun' => 'required|string',
             'catatan_akun' => 'nullable|string',
-            'gambar_utama' => 'nullable|image|max:2048'
+            'gambar_utama' => 'nullable',
+            'gambar_utama.*' => 'image|max:2048'
         ]);
 
         $data = $request->except(['gambar_utama', '_method']);
 
         if ($request->hasFile('gambar_utama')) {
-            $file = $request->file('gambar_utama');
-            $filename = time() . '_' . $file->getClientOriginalName();
-            $file->move(public_path('images/akun'), $filename);
+            $files = $request->file('gambar_utama');
+            if (!is_array($files)) {
+                $files = [$files];
+            }
             
-            // Delete old image if exists
+            $filenames = [];
+            foreach (array_slice($files, 0, 3) as $file) {
+                $filename = time() . '_' . uniqid() . '_' . $file->getClientOriginalName();
+                $file->move(public_path('images/akun'), $filename);
+                $filenames[] = $filename;
+            }
+            
+            // Delete old images if exist
             if ($akun->gambar_utama && file_exists(public_path('images/akun/' . $akun->gambar_utama))) {
                 @unlink(public_path('images/akun/' . $akun->gambar_utama));
             }
-            $data['gambar_utama'] = $filename;
+            if ($akun->gambar_lainnya) {
+                foreach ($akun->gambar_lainnya as $oldGambar) {
+                    if (file_exists(public_path('images/akun/' . $oldGambar))) {
+                        @unlink(public_path('images/akun/' . $oldGambar));
+                    }
+                }
+            }
+            
+            $data['gambar_utama'] = $filenames[0];
+            if (count($filenames) > 1) {
+                $data['gambar_lainnya'] = array_slice($filenames, 1);
+            } else {
+                $data['gambar_lainnya'] = null;
+            }
         }
 
         $akun->update($data);
