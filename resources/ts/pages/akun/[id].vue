@@ -17,6 +17,15 @@ const akunId = route.params.id as string
 const akun = ref<any>(null)
 const loading = ref(true)
 
+const isImageDialogVisible = ref(false)
+const fullScreenImage = ref('')
+
+const openFullScreen = (imageUrl: string) => {
+  if (!imageUrl) return
+  fullScreenImage.value = imageUrl
+  isImageDialogVisible.value = true
+}
+
 // Checkout form state
 const form = ref({
   tipe_transaksi: 'BeliAkun',
@@ -140,17 +149,32 @@ const startChat = async () => {
         <VCol cols="12" md="7">
           <VCard elevation="5" class="rounded-lg overflow-hidden mb-6 bg-grey-lighten-4">
             <template v-if="akun.gambar_lainnya && akun.gambar_lainnya.length > 0">
-              <VCarousel height="400" hide-delimiter-background show-arrows="hover">
+              <VCarousel height="400" hide-delimiter-background show-arrows="hover" cycle>
                 <VCarouselItem>
-                  <VImg :src="getAkunImage(akun.gambar_utama)" height="400" class="bg-grey-lighten-4" />
+                  <VImg 
+                    :src="getAkunImage(akun.gambar_utama)" 
+                    height="400" 
+                    class="bg-grey-lighten-4 cursor-pointer" 
+                    @click="openFullScreen(getAkunImage(akun.gambar_utama))" 
+                  />
                 </VCarouselItem>
                 <VCarouselItem v-for="(img, idx) in akun.gambar_lainnya" :key="idx">
-                  <VImg :src="getAkunImage(img)" height="400" class="bg-grey-lighten-4" />
+                  <VImg 
+                    :src="getAkunImage(img)" 
+                    height="400" 
+                    class="bg-grey-lighten-4 cursor-pointer" 
+                    @click="openFullScreen(getAkunImage(img))" 
+                  />
                 </VCarouselItem>
               </VCarousel>
             </template>
             <template v-else>
-              <VImg :src="akun.gambar_utama ? getAkunImage(akun.gambar_utama) : getImageUrl(akun.kategori?.gambar_logo)" height="400" class="bg-grey-lighten-4" />
+              <VImg 
+                :src="akun.gambar_utama ? getAkunImage(akun.gambar_utama) : getImageUrl(akun.kategori?.gambar_logo)" 
+                height="400" 
+                class="bg-grey-lighten-4 cursor-pointer" 
+                @click="openFullScreen(akun.gambar_utama ? getAkunImage(akun.gambar_utama) : getImageUrl(akun.kategori?.gambar_logo))" 
+              />
             </template>
           </VCard>
 
@@ -272,15 +296,35 @@ const startChat = async () => {
           </VCard>
         </VCol>
       </VRow>
+      <!-- Full Screen Image Dialog -->
+      <VDialog v-model="isImageDialogVisible" max-width="90vw">
+        <VCard class="bg-black" style="overflow: hidden;">
+          <VBtn 
+            icon="ri-close-line" 
+            variant="text" 
+            color="white" 
+            class="position-absolute" 
+            style="top: 10px; right: 10px; z-index: 10;" 
+            @click="isImageDialogVisible = false" 
+          />
+          <VImg :src="fullScreenImage" max-height="90vh" class="ma-auto" />
+        </VCard>
+      </VDialog>
     </template>
   </VContainer>
 </template>
 
 <style scoped>
 .border-t-primary {
-  border-top: 5px solid rgb(var(--v-theme-primary)) !important;
+  border-top: 4px solid rgb(var(--v-theme-primary)) !important;
 }
-
+.cursor-pointer {
+  cursor: pointer;
+}
+.cursor-pointer:hover {
+  opacity: 0.9;
+  transition: opacity 0.2s ease;
+}
 .checkout-card {
   border: 1px solid rgba(var(--v-theme-primary), 0.1);
 }
