@@ -77,10 +77,12 @@ const statusColor = (status: string) => {
 
 <template>
   <div>
-    <h2 class="text-h4 font-weight-bold mb-6 d-flex align-center gap-2">
-      <VIcon icon="ri-bank-card-line" color="primary" />
-      Kelola Penarikan Dana (Withdrawals)
-    </h2>
+    <div class="d-flex align-center mb-6">
+      <VIcon icon="ri-bank-card-line" size="36" color="primary" class="mr-4" />
+      <h1 class="text-h4 font-weight-bold text-high-emphasis m-0">
+        Kelola Penarikan Dana
+      </h1>
+    </div>
 
     <VCard elevation="4" class="rounded-lg">
       <VCardText v-if="loading" class="text-center pa-10">
