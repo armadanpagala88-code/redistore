@@ -235,7 +235,7 @@ const filteredAkunGames = computed(() => {
               
               <div class="text-center pt-6 pb-2 bg-surface">
                 <VImg 
-                  :src="getImageUrl(rek.produk_voucher?.kategori_game?.gambar_logo)" 
+                  :src="getImageUrl(rek.produk_voucher?.kategori?.gambar_logo)" 
                   height="80" 
                   class="mx-auto rounded-lg" 
                   style="max-width: 80px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);" 

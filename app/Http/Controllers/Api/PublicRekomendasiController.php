@@ -10,7 +10,7 @@ class PublicRekomendasiController extends Controller
 {
     public function index()
     {
-        $rekomendasi = Rekomendasi::with(['produkVoucher.kategoriGame', 'user'])
+        $rekomendasi = Rekomendasi::with(['produkVoucher.kategori', 'user'])
             ->orderBy('skor', 'desc')
             ->take(10)
             ->get();
