@@ -48,6 +48,8 @@ COPY docker/nginx.conf /etc/nginx/sites-available/default
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
+RUN mkdir -p /var/www/public/images/akun /var/www/public/images/banners /var/www/public/uploads/artikel /var/www/public/uploads/bukti /var/www/public/uploads/profil
+RUN chmod -R 777 /var/www/public/images /var/www/public/uploads
 
 # Copy entrypoint script
 COPY docker/entrypoint.sh /usr/local/bin/

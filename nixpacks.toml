@@ -1,2 +1,9 @@
 [variables]
 NODE_ENV = 'development'
+
+[phases.build]
+cmds = [
+    "npm run build",
+    "mkdir -p public/images/akun public/images/banners public/uploads/artikel public/uploads/bukti public/uploads/profil",
+    "chmod -R 777 public/images public/uploads"
+]
