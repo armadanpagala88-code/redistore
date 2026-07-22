@@ -104,9 +104,13 @@ const saveItem = async () => {
   formData.append('catatan_akun', form.value.catatan_akun)
   
   if (fileInput.value && fileInput.value.length > 0) {
-    fileInput.value.forEach((fileArray) => {
-      if (fileArray && fileArray.length > 0) {
-        formData.append('gambar_utama[]', fileArray[0])
+    fileInput.value.forEach((fileVal) => {
+      if (fileVal) {
+        if (Array.isArray(fileVal) && fileVal.length > 0) {
+          formData.append('gambar_utama[]', fileVal[0])
+        } else if (fileVal instanceof File) {
+          formData.append('gambar_utama[]', fileVal)
+        }
       }
     })
   }

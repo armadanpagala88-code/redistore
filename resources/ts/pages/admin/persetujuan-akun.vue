@@ -123,9 +123,13 @@ const submitEdit = async () => {
   formData.append('harga', editForm.value.harga.toString())
   
   if (newCoverImage.value && newCoverImage.value.length > 0) {
-    newCoverImage.value.forEach((fileArray) => {
-      if (fileArray && fileArray.length > 0) {
-        formData.append('gambar_utama[]', fileArray[0])
+    newCoverImage.value.forEach((fileVal) => {
+      if (fileVal) {
+        if (Array.isArray(fileVal) && fileVal.length > 0) {
+          formData.append('gambar_utama[]', fileVal[0])
+        } else if (fileVal instanceof File) {
+          formData.append('gambar_utama[]', fileVal)
+        }
       }
     })
   }
