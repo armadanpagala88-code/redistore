@@ -26,6 +26,17 @@ const openFullScreen = (imageUrl: string) => {
   isImageDialogVisible.value = true
 }
 
+const activeImageIndex = ref(0)
+const allImages = computed(() => {
+  if (!akun.value) return []
+  const imgs = []
+  if (akun.value.gambar_utama) imgs.push(akun.value.gambar_utama)
+  if (akun.value.gambar_lainnya && akun.value.gambar_lainnya.length > 0) {
+    imgs.push(...akun.value.gambar_lainnya)
+  }
+  return imgs
+})
+
 // Checkout form state
 const form = ref({
   tipe_transaksi: 'BeliAkun',
@@ -147,15 +158,10 @@ const startChat = async () => {
       <VRow>
         <!-- Left Column: Image & Details -->
         <VCol cols="12" md="7">
-          <VCard elevation="5" class="rounded-lg overflow-hidden mb-6 bg-grey-lighten-4">
-            <template v-if="akun.gambar_lainnya && akun.gambar_lainnya.length > 0">
-              <VCarousel height="400" hide-delimiter-background show-arrows="hover" cycle>
-                <VCarouselItem>
-                  <div @click="openFullScreen(getAkunImage(akun.gambar_utama))" class="cursor-pointer h-100 w-100">
-                    <VImg :src="getAkunImage(akun.gambar_utama)" height="400" class="bg-grey-lighten-4" />
-                  </div>
-                </VCarouselItem>
-                <VCarouselItem v-for="(img, idx) in akun.gambar_lainnya" :key="idx">
+          <VCard elevation="5" class="rounded-lg overflow-hidden mb-4 bg-grey-lighten-4">
+            <template v-if="allImages.length > 0">
+              <VCarousel v-model="activeImageIndex" height="400" hide-delimiters show-arrows="hover">
+                <VCarouselItem v-for="(img, idx) in allImages" :key="idx">
                   <div @click="openFullScreen(getAkunImage(img))" class="cursor-pointer h-100 w-100">
                     <VImg :src="getAkunImage(img)" height="400" class="bg-grey-lighten-4" />
                   </div>
@@ -163,11 +169,25 @@ const startChat = async () => {
               </VCarousel>
             </template>
             <template v-else>
-              <div @click="openFullScreen(akun.gambar_utama ? getAkunImage(akun.gambar_utama) : getImageUrl(akun.kategori?.gambar_logo))" class="cursor-pointer h-100 w-100">
-                <VImg :src="akun.gambar_utama ? getAkunImage(akun.gambar_utama) : getImageUrl(akun.kategori?.gambar_logo)" height="400" class="bg-grey-lighten-4" />
+              <div @click="openFullScreen(getImageUrl(akun.kategori?.gambar_logo))" class="cursor-pointer h-100 w-100">
+                <VImg :src="getImageUrl(akun.kategori?.gambar_logo)" height="400" class="bg-grey-lighten-4" />
               </div>
             </template>
           </VCard>
+
+          <!-- Thumbnails Row -->
+          <VRow dense v-if="allImages.length > 1" class="mb-6">
+            <VCol v-for="(img, idx) in allImages" :key="'thumb-'+idx" cols="3">
+              <VCard 
+                @click="activeImageIndex = idx" 
+                :elevation="activeImageIndex === idx ? 4 : 1"
+                :class="['cursor-pointer rounded-lg overflow-hidden', activeImageIndex === idx ? 'border-primary' : '']"
+                style="height: 80px;"
+              >
+                <VImg :src="getAkunImage(img)" height="100%" cover class="bg-grey-lighten-4" :style="activeImageIndex !== idx ? 'opacity: 0.6;' : ''" />
+              </VCard>
+            </VCol>
+          </VRow>
 
           <VCard elevation="3" class="rounded-lg border-t-primary mb-6">
             <VCardText class="pa-6">
@@ -321,6 +341,10 @@ const startChat = async () => {
 }
 .checkout-card {
   border: 1px solid rgba(var(--v-theme-primary), 0.1);
+}
+
+.border-primary {
+  border: 2px solid rgb(var(--v-theme-primary)) !important;
 }
 
 .checkout-btn {

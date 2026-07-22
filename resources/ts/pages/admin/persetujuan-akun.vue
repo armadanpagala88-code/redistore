@@ -14,7 +14,7 @@ const editForm = ref({
   login_via: '',
   harga: 0
 })
-const newCoverImage = ref<File | null>(null)
+const newCoverImage = ref<File[]>([])
 const isSubmittingEdit = ref(false)
 const searchQuery = ref('')
 let searchTimeout: any = null
@@ -109,7 +109,7 @@ const openEditDialog = (item: any) => {
     login_via: item.login_via,
     harga: item.harga
   }
-  newCoverImage.value = null
+  newCoverImage.value = []
   isEditDialogVisible.value = true
 }
 
@@ -122,8 +122,10 @@ const submitEdit = async () => {
   formData.append('login_via', editForm.value.login_via)
   formData.append('harga', editForm.value.harga.toString())
   
-  if (newCoverImage.value) {
-    formData.append('gambar_utama', newCoverImage.value)
+  if (newCoverImage.value && newCoverImage.value.length > 0) {
+    newCoverImage.value.forEach((file: File) => {
+      formData.append('gambar_utama[]', file)
+    })
   }
   
   try {
@@ -284,12 +286,20 @@ const submitEdit = async () => {
 
             <VFileInput 
               v-model="newCoverImage"
-              label="Ganti Cover Gambar (Kosongkan jika tidak ingin ganti)"
+              label="Ganti Cover Gambar (Kosongkan jika tidak ingin ganti, Max 3 Foto)"
               accept="image/*"
+              multiple
               variant="outlined"
               class="mb-6"
               prepend-icon=""
               prepend-inner-icon="ri-image-add-line"
+              @change="(e) => {
+                if (e.target.files && e.target.files.length > 3) {
+                  alert('Maksimal 3 foto yang diizinkan!');
+                  e.target.value = '';
+                  newCoverImage = [];
+                }
+              }"
             />
             
             <VBtn 
