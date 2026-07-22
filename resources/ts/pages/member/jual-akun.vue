@@ -206,7 +206,7 @@ const statusColor = (status: string) => {
             <td class="py-3">
               <div class="d-flex align-center gap-3">
                 <VAvatar rounded="lg" size="48" color="surface-variant" variant="tonal" class="elevation-1">
-                  <VImg :src="`/images/akun/${item.gambar_utama}`" cover />
+                  <VImg :src="`/img/akun/${item.gambar_utama}`" cover />
                 </VAvatar>
                 <div>
                   <div class="font-weight-bold text-high-emphasis">{{ item.judul_akun }}</div>

@@ -94,17 +94,21 @@ class AkunGameController extends Controller
             $filenames = [];
             foreach (array_slice($files, 0, 3) as $file) {
                 $filename = time() . '_' . uniqid() . '_' . $file->getClientOriginalName();
-                $file->move(public_path('images/akun'), $filename);
+                $file->move(storage_path('app/public/akun'), $filename);
                 $filenames[] = $filename;
             }
             
             // Delete old images if exist
-            if ($akun->gambar_utama && file_exists(public_path('images/akun/' . $akun->gambar_utama))) {
+            if ($akun->gambar_utama && file_exists(storage_path('app/public/akun/' . $akun->gambar_utama))) {
+                @unlink(storage_path('app/public/akun/' . $akun->gambar_utama));
+            } else if ($akun->gambar_utama && file_exists(public_path('images/akun/' . $akun->gambar_utama))) {
                 @unlink(public_path('images/akun/' . $akun->gambar_utama));
             }
             if ($akun->gambar_lainnya) {
                 foreach ($akun->gambar_lainnya as $oldGambar) {
-                    if (file_exists(public_path('images/akun/' . $oldGambar))) {
+                    if (file_exists(storage_path('app/public/akun/' . $oldGambar))) {
+                        @unlink(storage_path('app/public/akun/' . $oldGambar));
+                    } else if (file_exists(public_path('images/akun/' . $oldGambar))) {
                         @unlink(public_path('images/akun/' . $oldGambar));
                     }
                 }

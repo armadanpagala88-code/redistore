@@ -1,9 +1,14 @@
 [variables]
 NODE_ENV = 'development'
 
-[phases.build]
+[phases.setup]
+nixPkgs = ['...', 'php82']
 cmds = [
-    "npm run build",
     "mkdir -p public/images/akun public/images/banners public/uploads/artikel public/uploads/bukti public/uploads/profil",
     "chmod -R 777 public/images public/uploads"
+]
+
+[phases.build]
+cmds = [
+    "npm run build"
 ]

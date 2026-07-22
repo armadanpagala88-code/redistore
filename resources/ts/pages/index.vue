@@ -48,7 +48,7 @@ const getImageUrl = (path: string) => {
 
 const getAkunImage = (path: string) => {
   if (!path) return 'https://placehold.co/400x400/f1f5f9/94a3b8.png?text=Image'
-  return `/images/akun/${path}`
+  return `/img/akun/${path}`
 }
 
 const formatRupiah = (angka: number) => {

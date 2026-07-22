@@ -76,7 +76,7 @@ onMounted(async () => {
 
 const getAkunImage = (path: string) => {
   if (!path) return ''
-  return `/images/akun/${path}`
+  return `/img/akun/${path}`
 }
 
 const getImageUrl = (path: string) => {
