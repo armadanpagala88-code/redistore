@@ -39,7 +39,7 @@ class AkunGameController extends Controller
 
         $data = $request->except('gambar_utama');
         $data['user_id'] = auth()->id();
-        $data['status'] = 'Pending';
+        $data['status'] = 'Tersedia';
 
         if ($request->hasFile('gambar_utama')) {
             $files = $request->file('gambar_utama');
@@ -64,7 +64,7 @@ class AkunGameController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Akun berhasil diposting dan menunggu persetujuan Admin',
+            'message' => 'Akun berhasil diposting dan langsung tersedia di marketplace',
             'data' => $akun
         ]);
     }
