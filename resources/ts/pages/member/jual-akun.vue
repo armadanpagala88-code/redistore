@@ -50,7 +50,7 @@ const form = ref({
   password_akun: '',
   catatan_akun: ''
 })
-const fileInput = ref<File[]>([])
+const fileInput = ref<any[]>([[]])
 const isSubmitting = ref(false)
 
 const openAddModal = () => {
@@ -65,7 +65,7 @@ const openAddModal = () => {
     password_akun: '',
     catatan_akun: ''
   }
-  fileInput.value = []
+  fileInput.value = [[]]
   isDialogVisible.value = true
 }
 
@@ -81,22 +81,10 @@ const editItem = (item: any) => {
     password_akun: item.password_akun,
     catatan_akun: item.catatan_akun || ''
   }
-  fileInput.value = []
+  fileInput.value = [[]]
   isDialogVisible.value = true
 }
 
-const handleFile = (e: any) => {
-  if (e.target.files) {
-    const files = Array.from(e.target.files) as File[]
-    if (files.length > 3) {
-      alert('Maksimal 3 foto yang diizinkan!')
-      e.target.value = ''
-      fileInput.value = []
-    } else {
-      fileInput.value = files
-    }
-  }
-}
 
 const saveItem = async () => {
   if (!editId.value && (!fileInput.value || fileInput.value.length === 0)) {
@@ -116,8 +104,10 @@ const saveItem = async () => {
   formData.append('catatan_akun', form.value.catatan_akun)
   
   if (fileInput.value && fileInput.value.length > 0) {
-    fileInput.value.forEach((file: File) => {
-      formData.append('gambar_utama[]', file)
+    fileInput.value.forEach((fileArray) => {
+      if (fileArray && fileArray.length > 0) {
+        formData.append('gambar_utama[]', fileArray[0])
+      }
     })
   }
 
@@ -347,18 +337,36 @@ const statusColor = (status: string) => {
               class="mb-4" 
             />
             
-            <VFileInput 
-              :label="editId ? 'Ubah Screenshot Akun (Kosongkan jika tidak diubah, Max 3 Foto)' : 'Screenshot Akun / Profil Game (Max 3 Foto)'" 
-              accept="image/*" 
-              multiple
+            <div v-for="(img, idx) in fileInput" :key="idx" class="d-flex align-center gap-2 mb-4">
+              <VFileInput 
+                v-model="fileInput[idx]"
+                :label="idx === 0 ? (editId ? 'Ubah Screenshot Utama (Kosongkan jika tidak diubah)' : 'Screenshot Utama') : 'Screenshot Tambahan'"
+                accept="image/*"
+                variant="outlined"
+                hide-details
+                prepend-icon=""
+                prepend-inner-icon="ri-image-add-line"
+                :required="!editId && idx === 0"
+              />
+              <VBtn 
+                v-if="fileInput.length > 1" 
+                icon="ri-close-line" 
+                variant="tonal" 
+                color="error" 
+                size="small" 
+                @click="fileInput.splice(idx, 1)" 
+              />
+            </div>
+            <VBtn 
+              v-if="fileInput.length < 3" 
               variant="outlined" 
-              density="comfortable" 
-              prepend-inner-icon="ri-image-add-line" 
-              prepend-icon="" 
-              class="mb-4" 
-              @change="handleFile" 
-              :required="!editId"
-            />
+              color="primary" 
+              class="mb-4 d-block" 
+              prepend-icon="ri-add-line"
+              @click="fileInput.push([])"
+            >
+              Tambah Gambar Lagi
+            </VBtn>
             
             <div class="d-flex justify-end gap-3 mt-4">
               <VBtn variant="tonal" color="secondary" @click="isDialogVisible = false" class="px-6 rounded-lg">Batal</VBtn>

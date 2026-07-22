@@ -14,7 +14,7 @@ const editForm = ref({
   login_via: '',
   harga: 0
 })
-const newCoverImage = ref<File[]>([])
+const newCoverImage = ref<any[]>([[]])
 const isSubmittingEdit = ref(false)
 const searchQuery = ref('')
 let searchTimeout: any = null
@@ -109,7 +109,7 @@ const openEditDialog = (item: any) => {
     login_via: item.login_via,
     harga: item.harga
   }
-  newCoverImage.value = []
+  newCoverImage.value = [[]]
   isEditDialogVisible.value = true
 }
 
@@ -123,8 +123,10 @@ const submitEdit = async () => {
   formData.append('harga', editForm.value.harga.toString())
   
   if (newCoverImage.value && newCoverImage.value.length > 0) {
-    newCoverImage.value.forEach((file: File) => {
-      formData.append('gambar_utama[]', file)
+    newCoverImage.value.forEach((fileArray) => {
+      if (fileArray && fileArray.length > 0) {
+        formData.append('gambar_utama[]', fileArray[0])
+      }
     })
   }
   
@@ -284,23 +286,35 @@ const submitEdit = async () => {
               required 
             />
 
-            <VFileInput 
-              v-model="newCoverImage"
-              label="Ganti Cover Gambar (Kosongkan jika tidak ingin ganti, Max 3 Foto)"
-              accept="image/*"
-              multiple
-              variant="outlined"
-              class="mb-6"
-              prepend-icon=""
-              prepend-inner-icon="ri-image-add-line"
-              @change="(e) => {
-                if (e.target.files && e.target.files.length > 3) {
-                  alert('Maksimal 3 foto yang diizinkan!');
-                  e.target.value = '';
-                  newCoverImage = [];
-                }
-              }"
-            />
+            <div v-for="(img, idx) in newCoverImage" :key="idx" class="d-flex align-center gap-2 mb-4">
+              <VFileInput 
+                v-model="newCoverImage[idx]"
+                :label="idx === 0 ? 'Ganti Cover Gambar' : 'Gambar Tambahan'"
+                accept="image/*"
+                variant="outlined"
+                hide-details
+                prepend-icon=""
+                prepend-inner-icon="ri-image-add-line"
+              />
+              <VBtn 
+                v-if="newCoverImage.length > 1" 
+                icon="ri-close-line" 
+                variant="tonal" 
+                color="error" 
+                size="small" 
+                @click="newCoverImage.splice(idx, 1)" 
+              />
+            </div>
+            <VBtn 
+              v-if="newCoverImage.length < 3" 
+              variant="outlined" 
+              color="primary" 
+              class="mb-6 d-block" 
+              prepend-icon="ri-add-line"
+              @click="newCoverImage.push([])"
+            >
+              Tambah Gambar Lagi
+            </VBtn>
             
             <VBtn 
               type="submit" 
