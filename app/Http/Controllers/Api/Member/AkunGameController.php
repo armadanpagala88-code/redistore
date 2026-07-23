@@ -141,11 +141,15 @@ class AkunGameController extends Controller
             }
         }
 
+        // Set status to Pending and clear alasan_ditolak when user edits their post
+        $data['status'] = 'Pending';
+        $data['alasan_ditolak'] = null;
+
         $akun->update($data);
 
         return response()->json([
             'success' => true,
-            'message' => 'Akun berhasil diperbarui',
+            'message' => 'Akun berhasil diperbarui dan sedang menunggu verifikasi admin',
             'data' => $akun
         ]);
     }

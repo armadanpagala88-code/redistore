@@ -27,6 +27,11 @@ const isSubmittingEdit = ref(false)
 const searchQuery = ref('')
 let searchTimeout: any = null
 
+const isRejectDialogVisible = ref(false)
+const rejectingId = ref('')
+const rejectReason = ref('')
+const isSubmittingReject = ref(false)
+
 const fetchItems = async () => {
   loading.value = true
   try {
@@ -57,6 +62,13 @@ const onSearch = () => {
 }
 
 const updateStatus = async (id: string, status: string) => {
+  if (status === 'Ditolak') {
+    rejectingId.value = id
+    rejectReason.value = ''
+    isRejectDialogVisible.value = true
+    return
+  }
+
   if (!confirm(`Yakin ingin mengubah status akun ini menjadi ${status}?`)) return
   try {
     const res = await axios.put(`/api/admin/akun-game/${id}/status`, { status })
@@ -68,6 +80,32 @@ const updateStatus = async (id: string, status: string) => {
     } else {
       alert('Gagal mengubah status')
     }
+  }
+}
+
+const submitReject = async () => {
+  if (!rejectReason.value.trim()) {
+    alert('Alasan penolakan harus diisi')
+    return
+  }
+  
+  isSubmittingReject.value = true
+  try {
+    const res = await axios.put(`/api/admin/akun-game/${rejectingId.value}/status`, { 
+      status: 'Ditolak',
+      alasan_ditolak: rejectReason.value
+    })
+    alert(res.data.message)
+    isRejectDialogVisible.value = false
+    fetchItems()
+  } catch (error: any) {
+    if (error.response && error.response.data && error.response.data.message) {
+      alert(error.response.data.message)
+    } else {
+      alert('Gagal mengubah status')
+    }
+  } finally {
+    isSubmittingReject.value = false
   }
 }
 
@@ -237,6 +275,9 @@ const submitEdit = async () => {
               <VChip :color="statusColor(item.status)" size="small" variant="elevated" class="font-weight-bold">
                 {{ item.status }}
               </VChip>
+              <div v-if="item.status === 'Ditolak' && item.alasan_ditolak" class="text-caption text-error mt-1" style="max-width: 150px; line-height: 1.2;">
+                Alasan: {{ item.alasan_ditolak }}
+              </div>
             </td>
             <td class="text-center">
               <div class="d-flex justify-center gap-2">
@@ -373,6 +414,36 @@ const submitEdit = async () => {
         <VBtn variant="text" icon="ri-close-line" @click="snackbar.show = false" />
       </template>
     </VSnackbar>
+    <!-- Tolak Dialog -->
+    <VDialog v-model="isRejectDialogVisible" max-width="500">
+      <VCard>
+        <VCardTitle class="d-flex justify-space-between align-center pa-4 bg-error text-white">
+          <span class="text-h6 font-weight-bold">Tolak Postingan</span>
+          <VBtn icon="ri-close-line" variant="text" @click="isRejectDialogVisible = false" color="white" />
+        </VCardTitle>
+        <VCardText class="pt-6">
+          <div class="mb-4">Berikan alasan penolakan agar penjual dapat memperbaikinya.</div>
+          <VTextarea
+            v-model="rejectReason"
+            label="Alasan Penolakan"
+            placeholder="Contoh: Gambar kurang jelas, harga tidak sesuai..."
+            variant="outlined"
+            rows="3"
+            color="error"
+          />
+        </VCardText>
+        <VCardActions class="pa-4 pt-0">
+          <VSpacer />
+          <VBtn variant="tonal" color="secondary" @click="isRejectDialogVisible = false">
+            Batal
+          </VBtn>
+          <VBtn variant="elevated" color="error" @click="submitReject" :loading="isSubmittingReject" class="px-6 font-weight-bold">
+            Tolak Postingan
+          </VBtn>
+        </VCardActions>
+      </VCard>
+    </VDialog>
+
   </div>
 </template>
 

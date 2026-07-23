@@ -49,6 +49,7 @@ class AkunGameController extends Controller
     {
         $request->validate([
             'status' => 'required|in:Pending,Tersedia,Ditolak',
+            'alasan_ditolak' => 'nullable|string'
         ]);
 
         $akun = AkunGame::findOrFail($id);
@@ -58,6 +59,13 @@ class AkunGameController extends Controller
         }
 
         $akun->status = $request->status;
+        
+        if ($request->status === 'Ditolak') {
+            $akun->alasan_ditolak = $request->alasan_ditolak;
+        } else {
+            $akun->alasan_ditolak = null;
+        }
+        
         $akun->save();
 
         return response()->json([

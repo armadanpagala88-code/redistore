@@ -19,6 +19,7 @@ class AkunGame extends Model
         'gambar_utama',
         'gambar_lainnya',
         'status',
+        'alasan_ditolak',
     ];
 
     protected $casts = [

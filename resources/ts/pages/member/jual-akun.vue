@@ -242,6 +242,9 @@ const statusColor = (status: string) => {
               <VChip :color="statusColor(item.status)" size="small" variant="elevated" class="font-weight-bold">
                 {{ item.status }}
               </VChip>
+              <div v-if="item.status === 'Ditolak' && item.alasan_ditolak" class="text-caption text-error mt-1" style="max-width: 150px; margin: 0 auto; line-height: 1.2;">
+                Alasan: {{ item.alasan_ditolak }}
+              </div>
             </td>
             <td class="text-center">
               <div class="d-flex justify-center gap-2">
@@ -272,6 +275,10 @@ const statusColor = (status: string) => {
         </VCardTitle>
         <VDivider />
         <VCardText class="px-6 pb-6 pt-4" style="max-height: 70vh;">
+          <VAlert v-if="editId && editingItemData?.status === 'Ditolak'" type="error" variant="tonal" class="mb-4 text-caption">
+            <strong>Akun Ditolak:</strong> {{ editingItemData.alasan_ditolak }}<br/>
+            Silakan perbaiki data di bawah ini. Setelah disimpan, akun akan diajukan ulang untuk direview oleh Admin.
+          </VAlert>
           <VAlert type="info" variant="tonal" class="mb-4 text-body-2">
             Akun yang Anda posting akan di-review terlebih dahulu oleh Admin sebelum muncul di katalog publik. Pastikan Anda memasukkan data yang valid!
           </VAlert>
