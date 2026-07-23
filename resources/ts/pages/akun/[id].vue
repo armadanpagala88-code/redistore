@@ -156,21 +156,32 @@ const startChat = async () => {
       </VBtn>
 
       <VRow>
-        <!-- Left Column: Image & Details -->
         <VCol cols="12" md="7">
           <VCard elevation="5" class="rounded-lg overflow-hidden mb-4 bg-grey-lighten-4">
             <template v-if="allImages.length > 0">
               <VCarousel v-model="activeImageIndex" height="400" hide-delimiters show-arrows="hover">
                 <VCarouselItem v-for="(img, idx) in allImages" :key="idx">
-                  <div @click="openFullScreen(getAkunImage(img))" class="cursor-pointer h-100 w-100">
-                    <VImg :src="getAkunImage(img)" height="400" class="bg-grey-lighten-4" />
+                  <div @click="openFullScreen(getAkunImage(img))" class="cursor-pointer h-100 w-100 position-relative">
+                    <VImg :src="getAkunImage(img)" height="400" class="bg-grey-lighten-4">
+                      <template #placeholder>
+                        <div class="d-flex align-center justify-center h-100 w-100">
+                          <VProgressCircular indeterminate color="primary" />
+                        </div>
+                      </template>
+                    </VImg>
                   </div>
                 </VCarouselItem>
               </VCarousel>
             </template>
             <template v-else>
-              <div @click="openFullScreen(getImageUrl(akun.kategori?.gambar_logo))" class="cursor-pointer h-100 w-100">
-                <VImg :src="getImageUrl(akun.kategori?.gambar_logo)" height="400" class="bg-grey-lighten-4" />
+              <div @click="openFullScreen(getImageUrl(akun.kategori?.gambar_logo))" class="cursor-pointer h-100 w-100 position-relative">
+                <VImg :src="getImageUrl(akun.kategori?.gambar_logo)" height="400" class="bg-grey-lighten-4">
+                  <template #placeholder>
+                    <div class="d-flex align-center justify-center h-100 w-100">
+                      <VProgressCircular indeterminate color="primary" />
+                    </div>
+                  </template>
+                </VImg>
               </div>
             </template>
           </VCard>
@@ -308,17 +319,17 @@ const startChat = async () => {
         </VCol>
       </VRow>
       <!-- Full Screen Image Dialog -->
-      <VDialog v-model="isImageDialogVisible" max-width="90vw" content-class="z-index-highest">
-        <VCard class="bg-black" style="overflow: hidden;">
+      <VDialog v-model="isImageDialogVisible" max-width="90vw">
+        <VCard color="transparent" class="elevation-0 d-flex justify-center align-center position-relative">
           <VBtn 
             icon="ri-close-line" 
-            variant="text" 
-            color="white" 
+            variant="flat" 
+            color="error" 
             class="position-absolute" 
-            style="top: 10px; right: 10px; z-index: 100;" 
+            style="top: 0; right: 0; z-index: 100;" 
             @click="isImageDialogVisible = false" 
           />
-          <VImg :src="fullScreenImage" max-height="90vh" class="ma-auto" />
+          <img :src="fullScreenImage" style="max-width: 100%; max-height: 90vh; object-fit: contain; border-radius: 8px;" />
         </VCard>
       </VDialog>
     </template>

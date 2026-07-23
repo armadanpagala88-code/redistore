@@ -9,6 +9,12 @@ const loading = ref(true)
 const page = ref(1)
 const totalPages = ref(1)
 
+const snackbar = ref({
+  show: false,
+  message: '',
+  color: 'success'
+})
+
 const isEditDialogVisible = ref(false)
 const editingItem = ref<any>(null)
 const editForm = ref({
@@ -153,11 +159,11 @@ const submitEdit = async () => {
         'Content-Type': 'multipart/form-data'
       }
     })
-    alert(`Files appended: ${fileCount}\nBackend has_file: ${res.data.debug_has_file}\nMessage: ${res.data.message}`)
+    snackbar.value = { show: true, message: res.data.message || 'Berhasil memperbarui data', color: 'success' }
     isEditDialogVisible.value = false
     fetchItems()
   } catch (error: any) {
-    alert(error.response?.data?.message || 'Gagal menyimpan perubahan')
+    snackbar.value = { show: true, message: error.response?.data?.message || 'Gagal menyimpan perubahan', color: 'error' }
   } finally {
     isSubmittingEdit.value = false
   }
@@ -360,6 +366,13 @@ const submitEdit = async () => {
         </VCardText>
       </VCard>
     </VDialog>
+
+    <VSnackbar v-model="snackbar.show" :color="snackbar.color" :timeout="3000" location="top right">
+      {{ snackbar.message }}
+      <template v-slot:actions>
+        <VBtn variant="text" icon="ri-close-line" @click="snackbar.show = false" />
+      </template>
+    </VSnackbar>
   </div>
 </template>
 

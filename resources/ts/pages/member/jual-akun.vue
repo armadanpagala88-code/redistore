@@ -55,6 +55,12 @@ const form = ref({
 const fileInput = ref<any[]>([[]])
 const isSubmitting = ref(false)
 
+const snackbar = ref({
+  show: false,
+  message: '',
+  color: 'success'
+})
+
 const openAddModal = () => {
   editId.value = null
   editingItemData.value = null
@@ -134,16 +140,19 @@ const saveItem = async () => {
 
   try {
     const url = editId.value ? `/api/member/akun-game/${editId.value}` : '/api/member/akun-game'
-    const res = await axios.post(url, formData)
-    
-    alert(res.data.message)
+    const res = await axios.post(url, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+    snackbar.value = { show: true, message: res.data.message || 'Akun berhasil disimpan', color: 'success' }
     isDialogVisible.value = false
     fetchItems()
   } catch (e: any) {
     if (e.response && e.response.data && e.response.data.message) {
-      alert(e.response.data.message)
+      snackbar.value = { show: true, message: e.response.data.message, color: 'error' }
     } else {
-      alert('Gagal memposting akun')
+      snackbar.value = { show: true, message: 'Gagal memposting akun', color: 'error' }
     }
   } finally {
     isSubmitting.value = false
@@ -412,6 +421,13 @@ const statusColor = (status: string) => {
         </VCardText>
       </VCard>
     </VDialog>
+
+    <VSnackbar v-model="snackbar.show" :color="snackbar.color" :timeout="3000" location="top right">
+      {{ snackbar.message }}
+      <template v-slot:actions>
+        <VBtn variant="text" icon="ri-close-line" @click="snackbar.show = false" />
+      </template>
+    </VSnackbar>
   </VContainer>
 </template>
 
