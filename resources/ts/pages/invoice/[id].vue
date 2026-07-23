@@ -122,33 +122,15 @@ onMounted(async () => {
               </VCol>
             </VRow>
 
+            <div class="text-h6 font-weight-bold mb-2">Informasi Pengiriman</div>
+            <VRow>
+              <VCol cols="12">
+                <VAlert type="info" variant="tonal" class="mb-0 text-body-2" icon="ri-whatsapp-line">
+                  Data login akun akan dikirimkan dengan aman ke nomor WhatsApp Anda: <strong>{{ invoice.no_whatsapp }}</strong>
+                </VAlert>
+              </VCol>
+            </VRow>
             <VDivider class="my-4" />
-
-            <template v-if="invoice.tipe_transaksi === 'TopUp'">
-              <div class="text-h6 font-weight-bold mb-2">Detail Top Up</div>
-              <VRow>
-                <VCol cols="6">
-                  <div class="text-body-2 text-medium-emphasis">User ID Game</div>
-                  <div class="text-body-1 font-weight-bold">{{ invoice.user_id_game || '-' }}</div>
-                </VCol>
-                <VCol cols="6">
-                  <div class="text-body-2 text-medium-emphasis">Zone ID / Server</div>
-                  <div class="text-body-1 font-weight-bold">{{ invoice.zone_id || '-' }}</div>
-                </VCol>
-              </VRow>
-              <VDivider class="my-4" />
-            </template>
-            <template v-else-if="invoice.tipe_transaksi === 'BeliAkun'">
-              <div class="text-h6 font-weight-bold mb-2">Informasi Pengiriman</div>
-              <VRow>
-                <VCol cols="12">
-                  <VAlert type="info" variant="tonal" class="mb-0 text-body-2" icon="ri-whatsapp-line">
-                    Data login akun akan dikirimkan dengan aman ke nomor WhatsApp Anda: <strong>{{ invoice.no_whatsapp }}</strong>
-                  </VAlert>
-                </VCol>
-              </VRow>
-              <VDivider class="my-4" />
-            </template>
 
             <div class="text-h6 font-weight-bold mb-2">Rincian Pembelian</div>
             <VTable>
