@@ -222,35 +222,42 @@ const filteredAkunGames = computed(() => {
             md="3"
             lg="3"
           >
-            <VCard elevation="2" class="h-100 d-flex flex-column unipin-card rounded-lg" :to="`/produk/${rek.produk_voucher?.id}`">
+            <VCard elevation="2" class="h-100 d-flex flex-column unipin-card rounded-lg" :to="`/akun/${rek.id}`">
               <VChip 
-                color="success" 
+                color="warning" 
                 size="small" 
                 variant="elevated"
                 class="position-absolute font-weight-bold" 
                 style="top: 10px; right: 10px; z-index: 2;"
               >
-                <VIcon start icon="ri-star-fill" size="small" /> {{ rek.skor }}
+                <VIcon start icon="ri-thumb-up-fill" size="small" /> Pilihan
               </VChip>
-              
-              <div class="text-center pt-6 pb-2 bg-surface">
-                <VImg 
-                  :src="getImageUrl(rek.produk_voucher?.kategori?.gambar_logo)" 
-                  height="80" 
-                  class="mx-auto rounded-lg" 
-                  style="max-width: 80px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);" 
+              <div class="img-wrapper bg-surface" style="position: relative;">
+                <VImg
+                  :src="rek.gambar_utama ? getAkunImage(rek.gambar_utama) : getImageUrl(rek.kategori?.gambar_logo)"
+                  height="180"
+                  cover
+                  class="game-img"
                 />
+                <VChip 
+                  :color="getGameColor(rek.kategori?.nama_game)" 
+                  size="small" 
+                  variant="elevated"
+                  class="font-weight-bold position-absolute" 
+                  style="bottom: 8px; left: 8px; z-index: 2;"
+                >
+                  {{ rek.kategori?.nama_game }}
+                </VChip>
               </div>
               
-              <VCardItem class="pa-4 text-left flex-grow-1 d-flex flex-column justify-space-between bg-white">
+              <VCardItem class="pa-4 text-left card-content flex-grow-1 d-flex flex-column justify-space-between">
                 <div>
-                  <VCardTitle class="text-subtitle-1 font-weight-bold text-high-emphasis mb-1 line-clamp-2" style="line-height: 1.3;">
-                    {{ rek.produk_voucher?.nama_produk }}
-                  </VCardTitle>
-                  <p class="text-caption text-medium-emphasis mb-0 mt-1 line-clamp-2">
-                    "{{ rek.alasan }}"
-                  </p>
-                  <div class="text-primary font-weight-black text-subtitle-1 mt-2">{{ formatRupiah(rek.produk_voucher?.harga_jual) }}</div>
+                  <VCardTitle class="text-subtitle-1 font-weight-bold text-high-emphasis mb-1 line-clamp-2" style="line-height: 1.3;">{{ rek.judul_akun }}</VCardTitle>
+                  <div class="text-success font-weight-black text-h6 mt-2">{{ formatRupiah(rek.harga) }}</div>
+                </div>
+                <div class="d-flex justify-space-between align-center mt-4">
+                  <span class="text-caption text-medium-emphasis">Via: {{ rek.login_via }}</span>
+                  <VBtn size="small" color="primary" variant="tonal" class="rounded-pill font-weight-bold px-4">Beli</VBtn>
                 </div>
               </VCardItem>
             </VCard>

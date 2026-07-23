@@ -3,16 +3,18 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Rekomendasi;
+use App\Models\AkunGame;
 use Illuminate\Http\Request;
 
 class PublicRekomendasiController extends Controller
 {
     public function index()
     {
-        $rekomendasi = Rekomendasi::with(['produkVoucher.kategori', 'user'])
-            ->orderBy('skor', 'desc')
-            ->take(10)
+        // Option A: Automatically recommend available AkunGame randomly
+        $rekomendasi = AkunGame::with(['kategori', 'penjual'])
+            ->where('status', 'Tersedia')
+            ->inRandomOrder()
+            ->take(4) // 4 items for a nice row
             ->get();
             
         return response()->json([
