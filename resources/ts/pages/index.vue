@@ -24,7 +24,7 @@ onMounted(async () => {
 
   try {
     const [akunRes, bannerRes, fsRes] = await Promise.all([
-      axios.get('/api/akun-games'),
+      axios.get('/api/akun-games?limit=12'),
       axios.get('/api/banners'),
       axios.get('/api/public/flash-sales')
     ])
@@ -244,6 +244,8 @@ const filteredAkunGames = computed(() => {
             <div class="img-wrapper bg-surface" style="position: relative;">
               <VImg
                 :src="akun.gambar_utama ? getAkunImage(akun.gambar_utama) : getImageUrl(akun.kategori?.gambar_logo)"
+                :lazy-src="akun.gambar_utama ? getAkunImage(akun.gambar_utama) : getImageUrl(akun.kategori?.gambar_logo)"
+                loading="lazy"
                 height="180"
                 cover
                 class="game-img"

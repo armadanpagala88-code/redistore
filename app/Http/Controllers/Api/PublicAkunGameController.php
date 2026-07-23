@@ -19,7 +19,13 @@ class PublicAkunGameController extends Controller
             });
         }
 
-        $akuns = $query->latest()->get();
+        if ($request->has('limit')) {
+            $limit = (int) $request->limit;
+            $akuns = $query->latest()->limit($limit)->get();
+        } else {
+            // Jika dipanggil tanpa parameter limit (misal dari halaman Katalog), gunakan pagination
+            $akuns = $query->latest()->paginate(16);
+        }
 
         return response()->json([
             'success' => true,
