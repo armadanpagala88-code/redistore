@@ -239,8 +239,8 @@ class CheckoutController extends Controller
             $file = $request->file('bukti_pembayaran');
             $filename = time() . '_' . $file->getClientOriginalName();
             
-            // Ensure directory exists
-            $dir = public_path('uploads/bukti');
+            // Ensure directory exists in storage
+            $dir = storage_path('app/public/bukti');
             if (!file_exists($dir)) {
                 @mkdir($dir, 0777, true);
             }

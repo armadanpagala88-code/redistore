@@ -140,7 +140,7 @@ const getStatusColor = (status: string) => {
                 variant="outlined" 
                 size="small" 
                 class="font-weight-bold rounded-lg mr-2" 
-                :href="`/uploads/bukti/${trx.bukti_pembayaran}`"
+                :href="`/storage/bukti/${trx.bukti_pembayaran}`"
                 target="_blank"
               >
                 Bukti TF
