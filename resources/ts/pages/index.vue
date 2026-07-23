@@ -205,7 +205,7 @@ const filteredAkunGames = computed(() => {
 
 
       <!-- Section Title ala UniPin -->
-      <div class="d-flex flex-column flex-md-row align-md-center mb-6 justify-space-between mt-8 gap-4">
+      <div id="marketplace" class="d-flex flex-column flex-md-row align-md-center mb-6 justify-space-between mt-8 gap-4">
         <h2 class="text-h5 font-weight-bold text-high-emphasis d-flex align-center gap-2">
           <VIcon icon="ri-store-2-fill" color="primary" size="28" />
           Marketplace Akun Game
