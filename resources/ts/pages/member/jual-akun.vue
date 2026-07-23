@@ -55,6 +55,7 @@ const isSubmitting = ref(false)
 
 const openAddModal = () => {
   editId.value = null
+  editingItemData.value = null
   form.value = { 
     kategori_game_id: null,
     judul_akun: '',
@@ -69,7 +70,10 @@ const openAddModal = () => {
   isDialogVisible.value = true
 }
 
+const editingItemData = ref<any>(null)
+
 const editItem = (item: any) => {
+  editingItemData.value = item
   editId.value = item.id
   form.value = {
     kategori_game_id: item.kategori_game_id,
@@ -94,14 +98,14 @@ const saveItem = async () => {
 
   isSubmitting.value = true
   const formData = new FormData()
-  formData.append('kategori_game_id', form.value.kategori_game_id as any)
-  formData.append('judul_akun', form.value.judul_akun)
-  formData.append('deskripsi_akun', form.value.deskripsi_akun)
-  formData.append('harga', form.value.harga.toString())
-  formData.append('login_via', form.value.login_via)
-  formData.append('email_akun', form.value.email_akun)
-  formData.append('password_akun', form.value.password_akun)
-  formData.append('catatan_akun', form.value.catatan_akun)
+  formData.append('kategori_game_id', form.value.kategori_game_id || '')
+  formData.append('judul_akun', form.value.judul_akun || '')
+  formData.append('deskripsi_akun', form.value.deskripsi_akun || '')
+  formData.append('harga', form.value.harga ? form.value.harga.toString() : '')
+  formData.append('login_via', form.value.login_via || '')
+  formData.append('email_akun', form.value.email_akun || '')
+  formData.append('password_akun', form.value.password_akun || '')
+  formData.append('catatan_akun', form.value.catatan_akun || '')
   
   if (fileInput.value && fileInput.value.length > 0) {
     fileInput.value.forEach((fileVal) => {
@@ -344,6 +348,19 @@ const statusColor = (status: string) => {
               density="comfortable" 
               class="mb-4" 
             />
+
+            <div v-if="editingItemData && (editingItemData.gambar_utama || editingItemData.gambar_lainnya?.length)" class="mb-4">
+              <div class="text-caption text-medium-emphasis mb-2">Gambar Saat Ini:</div>
+              <div class="d-flex gap-2 flex-wrap">
+                <VCard v-if="editingItemData.gambar_utama" rounded="lg" class="elevation-1 overflow-hidden" width="80" height="80">
+                  <VImg :src="`/img/akun/${editingItemData.gambar_utama}`" cover height="100%" />
+                </VCard>
+                <VCard v-for="(img, idx) in editingItemData.gambar_lainnya" :key="idx" rounded="lg" class="elevation-1 overflow-hidden" width="80" height="80">
+                  <VImg :src="`/img/akun/${img}`" cover height="100%" />
+                </VCard>
+              </div>
+              <div class="text-caption text-error mt-1">*Jika Anda mengupload gambar baru, gambar lama akan dihapus.</div>
+            </div>
             
             <div v-for="(img, idx) in fileInput" :key="idx" class="d-flex align-center gap-2 mb-4">
               <VFileInput 

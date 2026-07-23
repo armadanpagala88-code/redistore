@@ -118,9 +118,9 @@ const submitEdit = async () => {
   isSubmittingEdit.value = true
   
   const formData = new FormData()
-  formData.append('judul_akun', editForm.value.judul_akun)
-  formData.append('login_via', editForm.value.login_via)
-  formData.append('harga', editForm.value.harga.toString())
+  formData.append('judul_akun', editForm.value.judul_akun || '')
+  formData.append('login_via', editForm.value.login_via || '')
+  formData.append('harga', editForm.value.harga ? editForm.value.harga.toString() : '')
   
   if (newCoverImage.value && newCoverImage.value.length > 0) {
     newCoverImage.value.forEach((fileVal) => {
@@ -293,6 +293,19 @@ const submitEdit = async () => {
               class="mb-4"
               required 
             />
+
+            <div v-if="editingItem && (editingItem.gambar_utama || editingItem.gambar_lainnya?.length)" class="mb-4">
+              <div class="text-caption text-medium-emphasis mb-2">Gambar Saat Ini:</div>
+              <div class="d-flex gap-2 flex-wrap">
+                <VCard v-if="editingItem.gambar_utama" rounded="lg" class="elevation-1 overflow-hidden" width="80" height="80">
+                  <VImg :src="`/img/akun/${editingItem.gambar_utama}`" cover height="100%" />
+                </VCard>
+                <VCard v-for="(img, idx) in editingItem.gambar_lainnya" :key="idx" rounded="lg" class="elevation-1 overflow-hidden" width="80" height="80">
+                  <VImg :src="`/img/akun/${img}`" cover height="100%" />
+                </VCard>
+              </div>
+              <div class="text-caption text-error mt-1">*Jika Anda mengupload gambar baru, gambar lama akan dihapus.</div>
+            </div>
 
             <div v-for="(img, idx) in newCoverImage" :key="idx" class="d-flex align-center gap-2 mb-4">
               <VFileInput 
