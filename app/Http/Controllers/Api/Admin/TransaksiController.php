@@ -31,8 +31,16 @@ class TransaksiController extends Controller
 
         // Kirim Notifikasi jika Success atau Failed
         if ($request->status === 'Success') {
-            $msg = "Horee! Pembayaran pesanan *$id* telah *BERHASIL* diverifikasi.\n\nPesanan top up game Anda telah kami kirim. Terima kasih telah berbelanja di Redistore!";
-            FonnteService::sendMessage($transaksi->no_whatsapp, $msg);
+            if ($transaksi->tipe_transaksi === 'BeliAkun' && $transaksi->akun_game_id) {
+                $akun = \App\Models\AkunGame::find($transaksi->akun_game_id);
+                if ($akun) {
+                    $msg = "Horee! Pembayaran pesanan *$id* telah *BERHASIL* diverifikasi.\n\nBerikut adalah data login akun game Anda:\n\nEmail/Username: *" . $akun->email_akun . "*\nPassword: *" . $akun->password_akun . "*\nLogin Via: *" . $akun->login_via . "*\n\nCatatan Penjual: " . ($akun->catatan_akun ? $akun->catatan_akun : "-") . "\n\nTerima kasih telah berbelanja di Redistore! Harap segera amankan akun Anda.";
+                    FonnteService::sendMessage($transaksi->no_whatsapp, $msg);
+                }
+            } else {
+                $msg = "Horee! Pembayaran pesanan *$id* telah *BERHASIL* diverifikasi.\n\nPesanan top up game Anda telah kami kirim. Terima kasih telah berbelanja di Redistore!";
+                FonnteService::sendMessage($transaksi->no_whatsapp, $msg);
+            }
         } else if ($request->status === 'Failed') {
             $msg = "Mohon maaf, pembayaran untuk pesanan *$id* *GAGAL* diverifikasi.\n\nSilakan periksa kembali bukti pembayaran Anda atau hubungi Admin kami.";
             FonnteService::sendMessage($transaksi->no_whatsapp, $msg);

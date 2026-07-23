@@ -140,7 +140,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div>
+  <div class="invoice-container py-8 px-4">
     <VRow v-if="loading">
       <VCol cols="12" class="text-center mt-12">
         <VProgressCircular indeterminate color="primary" size="64" />
@@ -148,186 +148,236 @@ onMounted(async () => {
     </VRow>
 
     <VRow v-else-if="invoice" justify="center">
-      <VCol cols="12" md="8">
-        <VCard elevation="4" class="mb-6">
-          <VCardItem class="bg-primary text-white">
-            <VCardTitle class="text-h5 font-weight-bold">
-              Invoice Pemesanan
-            </VCardTitle>
-            <VCardSubtitle class="text-white">ID Transaksi: {{ invoice.id }}</VCardSubtitle>
-          </VCardItem>
-
-          <VCardText class="pt-6">
-            <VRow>
-              <VCol cols="12" sm="6">
-                <div class="text-subtitle-2 text-medium-emphasis">Status Pesanan</div>
-                <VChip
-                  :color="invoice.status_transaksi === 'Success' ? 'success' : (invoice.status_transaksi === 'Unpaid' ? 'error' : 'warning')"
-                  class="mt-1 font-weight-bold text-uppercase"
-                >
+      <VCol cols="12" md="9" lg="8">
+        
+        <!-- Header & Branding -->
+        <VCard elevation="6" class="rounded-xl overflow-hidden mb-6 border-t-primary border-t-8">
+          <VCardText class="pa-sm-10 pa-6">
+            <div class="d-flex flex-column flex-sm-row justify-space-between align-sm-start gap-4 mb-8">
+              <div>
+                <div class="d-flex align-center gap-3 mb-2">
+                  <VIcon icon="ri-store-2-fill" color="primary" size="36" />
+                  <span class="text-h4 font-weight-black text-primary text-uppercase tracking-wide">Redistore</span>
+                </div>
+                <div class="text-body-1 text-medium-emphasis mt-2">Solusi Top Up & Jual Beli Akun Terpercaya</div>
+              </div>
+              <div class="text-sm-right">
+                <h1 class="text-h4 font-weight-bold text-high-emphasis mb-1">INVOICE</h1>
+                <VChip size="small" :color="invoice.status_transaksi === 'Success' ? 'success' : (invoice.status_transaksi === 'Unpaid' ? 'error' : 'warning')" class="font-weight-bold text-uppercase px-4 mb-2">
                   {{ invoice.status_transaksi }}
                 </VChip>
+                <div class="text-body-2 text-medium-emphasis">ID: <span class="font-weight-medium text-high-emphasis">{{ invoice.id }}</span></div>
+              </div>
+            </div>
+
+            <VDivider class="mb-8" />
+
+            <!-- Bill To & Payment Info -->
+            <VRow class="mb-8">
+              <VCol cols="12" sm="6">
+                <h6 class="text-subtitle-2 text-primary font-weight-bold mb-3 text-uppercase">Ditagihkan Kepada:</h6>
+                <div class="text-h6 font-weight-bold mb-1">{{ invoice.user ? invoice.user.nama_lengkap : 'Pelanggan' }}</div>
+                <div class="text-body-2 text-medium-emphasis mb-1 d-flex align-center gap-2">
+                  <VIcon icon="ri-whatsapp-line" size="16"/> {{ invoice.no_whatsapp }}
+                </div>
               </VCol>
               <VCol cols="12" sm="6" class="text-sm-right">
-                <div class="text-subtitle-2 text-medium-emphasis">Total Pembayaran</div>
-                <div class="text-h5 font-weight-bold text-primary">Rp {{ Number(invoice.total_bayar).toLocaleString('id-ID') }}</div>
+                <h6 class="text-subtitle-2 text-primary font-weight-bold mb-3 text-uppercase">Detail Pembayaran:</h6>
+                <div class="text-h3 font-weight-black text-primary mb-2">Rp {{ Number(invoice.total_bayar).toLocaleString('id-ID') }}</div>
+                <div class="text-body-2 text-medium-emphasis">Tanggal: <span class="font-weight-medium text-high-emphasis">{{ new Date(invoice.created_at).toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'}) }}</span></div>
               </VCol>
             </VRow>
 
-            <div class="text-h6 font-weight-bold mb-2">Informasi Pengiriman / Data Login</div>
-            <VRow>
-              <VCol cols="12">
-                <template v-if="invoice.akun_game_login">
-                  <VCard variant="tonal" color="success" class="mb-4">
-                    <VCardText>
-                      <div class="d-flex align-center gap-2 mb-3">
-                        <VIcon icon="ri-shield-check-line" color="success" size="24" />
-                        <span class="text-h6 font-weight-bold text-success">Data Login Akun Anda</span>
-                      </div>
-                      
-                      <VRow>
-                        <VCol cols="12" sm="6" class="mb-2">
-                          <div class="text-caption text-medium-emphasis">Email / Username / Nomor HP</div>
-                          <div class="text-body-1 font-weight-bold">{{ invoice.akun_game_login.email_akun }}</div>
-                        </VCol>
-                        <VCol cols="12" sm="6" class="mb-2">
-                          <div class="text-caption text-medium-emphasis">Password</div>
-                          <div class="text-body-1 font-weight-bold">{{ invoice.akun_game_login.password_akun }}</div>
-                        </VCol>
-                        <VCol cols="12" sm="6" class="mb-2">
-                          <div class="text-caption text-medium-emphasis">Login Via</div>
-                          <div class="text-body-1 font-weight-bold">{{ invoice.akun_game_login.login_via }}</div>
-                        </VCol>
-                      </VRow>
-                      
-                      <div v-if="invoice.akun_game_login.catatan_akun" class="mt-4">
-                        <div class="text-caption text-medium-emphasis">Catatan dari Penjual:</div>
-                        <VAlert type="warning" variant="tonal" class="mt-1 mb-0 py-2 text-body-2">
-                          {{ invoice.akun_game_login.catatan_akun }}
-                        </VAlert>
-                      </div>
-                    </VCardText>
-                  </VCard>
-                </template>
-                <template v-else>
-                  <VAlert type="info" variant="tonal" class="mb-0 text-body-2" icon="ri-whatsapp-line">
-                    Jika pesanan telah sukses dan data login tidak muncul di sini, penjual akan mengirimkannya secara manual ke nomor WhatsApp Anda: <strong>{{ invoice.no_whatsapp }}</strong>
-                  </VAlert>
-                </template>
-              </VCol>
-            </VRow>
-            <VDivider class="my-4" />
+            <!-- Data Login Section -->
+            <template v-if="invoice.akun_game_login">
+              <VCard variant="flat" class="bg-success-lighten-5 border-success mb-8 rounded-lg" style="border: 1px solid rgb(var(--v-theme-success))">
+                <VCardText class="pa-5">
+                  <div class="d-flex align-center gap-3 mb-4">
+                    <VAvatar color="success" variant="tonal" rounded size="40">
+                      <VIcon icon="ri-shield-keyhole-line" size="24" />
+                    </VAvatar>
+                    <h3 class="text-h6 font-weight-bold text-success mb-0">Informasi Data Login Akun</h3>
+                  </div>
+                  <VRow>
+                    <VCol cols="12" sm="4">
+                      <div class="text-caption text-success font-weight-medium text-uppercase mb-1">Email / Username</div>
+                      <div class="text-body-1 font-weight-bold text-high-emphasis">{{ invoice.akun_game_login.email_akun }}</div>
+                    </VCol>
+                    <VCol cols="12" sm="4">
+                      <div class="text-caption text-success font-weight-medium text-uppercase mb-1">Password</div>
+                      <div class="text-body-1 font-weight-bold text-high-emphasis">{{ invoice.akun_game_login.password_akun }}</div>
+                    </VCol>
+                    <VCol cols="12" sm="4">
+                      <div class="text-caption text-success font-weight-medium text-uppercase mb-1">Login Via</div>
+                      <div class="text-body-1 font-weight-bold text-high-emphasis">{{ invoice.akun_game_login.login_via }}</div>
+                    </VCol>
+                  </VRow>
+                  
+                  <div v-if="invoice.akun_game_login.catatan_akun" class="mt-4 pt-4 border-t">
+                    <div class="text-caption text-warning font-weight-bold text-uppercase mb-1 d-flex align-center gap-1">
+                      <VIcon icon="ri-alert-line" size="14"/> Catatan Khusus
+                    </div>
+                    <div class="text-body-2 font-weight-medium text-high-emphasis">
+                      {{ invoice.akun_game_login.catatan_akun }}
+                    </div>
+                  </div>
+                </VCardText>
+              </VCard>
+            </template>
+            <template v-else-if="invoice.tipe_transaksi === 'BeliAkun'">
+              <VAlert type="info" variant="tonal" class="mb-8 font-weight-medium border" style="border: 1px solid rgb(var(--v-theme-info))" icon="ri-whatsapp-line">
+                Data login akun akan otomatis dikirim ke nomor WhatsApp <strong>{{ invoice.no_whatsapp }}</strong> setelah pembayaran diverifikasi oleh Admin.
+              </VAlert>
+            </template>
 
-            <div class="text-h6 font-weight-bold mb-2">Rincian Pembelian</div>
-            <VTable>
-              <thead>
+            <!-- Table -->
+            <VTable class="invoice-table border rounded-lg overflow-hidden mb-6">
+              <thead class="bg-grey-lighten-4">
                 <tr>
-                  <th>Produk</th>
-                  <th class="text-right">Harga</th>
+                  <th class="text-uppercase text-caption font-weight-bold py-3 pl-4">Deskripsi Produk</th>
+                  <th class="text-uppercase text-caption font-weight-bold py-3 text-right pr-4">Total Harga</th>
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="item in invoice.details" :key="item.id">
-                  <td>
-                    <div class="font-weight-bold">{{ item.nama_produk }}</div>
-                    <div class="text-caption text-medium-emphasis">{{ item.nama_game }}</div>
+                <tr v-for="item in invoice.details" :key="item.id" class="border-b">
+                  <td class="py-4 pl-4">
+                    <div class="text-subtitle-1 font-weight-bold text-high-emphasis mb-1">{{ item.nama_produk }}</div>
+                    <div class="text-body-2 text-medium-emphasis d-flex align-center gap-1">
+                      <VIcon icon="ri-gamepad-line" size="14"/> {{ item.nama_game }}
+                    </div>
                   </td>
-                  <td class="text-right">Rp {{ Number(item.subtotal).toLocaleString('id-ID') }}</td>
+                  <td class="text-right py-4 pr-4 text-subtitle-1 font-weight-bold">
+                    Rp {{ Number(item.subtotal).toLocaleString('id-ID') }}
+                  </td>
                 </tr>
               </tbody>
             </VTable>
 
-            <div v-if="invoice.nominal_diskon > 0" class="d-flex justify-space-between mt-4 text-success">
-              <span class="text-subtitle-1">Diskon Promo</span>
-              <span class="text-subtitle-1 font-weight-bold">- Rp {{ Number(invoice.nominal_diskon).toLocaleString('id-ID') }}</span>
+            <!-- Diskon & Footer -->
+            <div class="d-flex justify-end mb-8" v-if="invoice.nominal_diskon > 0">
+               <div style="width: 300px">
+                 <div class="d-flex justify-space-between text-success font-weight-bold border-b pb-2 mb-2">
+                   <span>Diskon Promo:</span>
+                   <span>- Rp {{ Number(invoice.nominal_diskon).toLocaleString('id-ID') }}</span>
+                 </div>
+               </div>
+            </div>
+
+            <!-- Pesan -->
+            <div class="text-center pt-6 border-t">
+              <p class="text-body-2 text-medium-emphasis mb-0">
+                Terima kasih telah berbelanja di Redistore. Kami harap Anda puas dengan layanan kami!
+              </p>
             </div>
           </VCardText>
         </VCard>
 
-        <VCard elevation="4" v-if="invoice.status_transaksi === 'Pending'" class="mb-6">
-          <VCardItem class="bg-warning text-white">
-            <VCardTitle class="text-h6 font-weight-bold d-flex align-center gap-2">
-              <VIcon icon="ri-time-line" /> Menunggu Verifikasi Admin
-            </VCardTitle>
-          </VCardItem>
-          <VCardText class="pt-4">
-            <p class="mb-0">
-              Terima kasih! Bukti transfer Anda sedang kami proses. Mohon bersabar menunggu admin untuk memverifikasi pembayaran Anda.
+        <!-- Payment Actions -->
+        <VCard elevation="6" class="rounded-xl overflow-hidden mb-6 border-t-warning border-t-8" v-if="invoice.status_transaksi === 'Pending'">
+          <VCardText class="pa-6 text-center">
+            <VAvatar color="warning" variant="tonal" size="64" class="mb-4">
+              <VIcon icon="ri-time-line" size="32" />
+            </VAvatar>
+            <h3 class="text-h5 font-weight-bold text-high-emphasis mb-2">Menunggu Verifikasi</h3>
+            <p class="text-body-1 text-medium-emphasis mb-0">
+              Bukti pembayaran Anda sedang kami periksa. Kami akan segera memproses pesanan Anda dalam waktu maksimal 1x24 jam.
             </p>
           </VCardText>
         </VCard>
 
-        <VCard elevation="4" v-if="invoice.status_transaksi === 'Unpaid'">
-          <VCardItem>
-            <VCardTitle class="text-h6 font-weight-bold">Selesaikan Pembayaran</VCardTitle>
-          </VCardItem>
-          <VCardText>
-            <VAlert type="info" variant="tonal" class="mb-4">
-              Total tagihan Anda adalah <strong>Rp {{ Number(invoice.total_bayar).toLocaleString('id-ID') }}</strong>.
-            </VAlert>
-            
-            <VRow>
-              <VCol cols="12" md="6" v-if="bankAccounts.length > 0">
-                <VCard variant="outlined" color="primary" class="h-100">
-                  <VCardText>
-                    <div class="d-flex align-center gap-2 mb-3">
-                      <VIcon icon="ri-bank-line" color="primary" size="24" />
-                      <span class="font-weight-bold">Transfer Manual</span>
-                    </div>
-                    <div class="mb-2">Silakan transfer tepat sejumlah total tagihan ke salah satu rekening berikut:</div>
-                    
-                    <div v-for="(bank, index) in bankAccounts" :key="index" class="bg-grey-lighten-4 pa-3 rounded text-center mb-3">
-                      <div class="text-subtitle-2">{{ bank.bank_name }}</div>
-                      <div class="text-h5 font-weight-bold text-primary">{{ bank.bank_account_number }}</div>
-                      <div class="text-caption">A/N {{ bank.bank_account_name }}</div>
-                    </div>
-                    
-                    <VBtn
-                      color="primary"
-                      variant="tonal"
-                      block
-                      prepend-icon="ri-upload-cloud-2-line"
-                      @click="fileInput.click()"
-                      :loading="uploadLoading"
-                    >
-                      Upload Bukti Transfer
-                    </VBtn>
-                    <input 
-                      type="file" 
-                      ref="fileInput" 
-                      accept="image/*" 
-                      style="display: none" 
-                      @change="uploadBukti"
-                    >
-                  </VCardText>
-                </VCard>
-              </VCol>
-              
-              <VCol cols="12" :md="bankAccounts.length > 0 ? 6 : 12">
-                <VCard variant="outlined" color="success" class="h-100">
-                  <VCardText class="d-flex flex-column justify-center h-100">
-                    <div class="d-flex align-center gap-2 mb-3">
-                      <VIcon icon="ri-qr-code-line" color="success" size="24" />
-                      <span class="font-weight-bold">Pembayaran Otomatis</span>
-                    </div>
-                    <div class="mb-4">Bayar lebih mudah menggunakan QRIS, e-Wallet, atau Virtual Account. Verifikasi instan.</div>
-                    <VBtn
-                      color="success"
-                      size="large"
-                      block
-                      @click="payWithMidtrans"
-                      prepend-icon="ri-secure-payment-line"
-                      class="mt-auto"
-                    >
-                      Bayar Sekarang
-                    </VBtn>
-                  </VCardText>
-                </VCard>
-              </VCol>
-            </VRow>
-          </VCardText>
-        </VCard>
+        <VRow v-if="invoice.status_transaksi === 'Unpaid'">
+          <VCol cols="12" md="6" v-if="bankAccounts.length > 0">
+            <VCard elevation="6" class="h-100 rounded-xl overflow-hidden border-t-primary border-t-8">
+              <VCardText class="pa-6 d-flex flex-column h-100">
+                <div class="d-flex align-center gap-3 mb-6">
+                  <VAvatar color="primary" variant="tonal" rounded size="48">
+                    <VIcon icon="ri-bank-card-line" size="24" />
+                  </VAvatar>
+                  <div>
+                    <h3 class="text-h6 font-weight-bold mb-0">Transfer Manual</h3>
+                    <div class="text-caption text-medium-emphasis">Upload bukti transfer bank</div>
+                  </div>
+                </div>
+
+                <div v-for="(bank, index) in bankAccounts" :key="index" class="bg-grey-lighten-4 pa-4 rounded-lg mb-4 text-center border">
+                  <div class="text-subtitle-2 text-uppercase font-weight-bold text-medium-emphasis mb-1">{{ bank.bank_name }}</div>
+                  <div class="text-h5 font-weight-black text-primary mb-1 tracking-wide">{{ bank.bank_account_number }}</div>
+                  <div class="text-body-2 font-weight-medium">A/N {{ bank.bank_account_name }}</div>
+                </div>
+
+                <VBtn
+                  color="primary"
+                  size="large"
+                  block
+                  class="font-weight-bold rounded-lg mt-auto"
+                  prepend-icon="ri-upload-cloud-2-line"
+                  @click="fileInput.click()"
+                  :loading="uploadLoading"
+                  elevation="2"
+                >
+                  Upload Bukti Transfer
+                </VBtn>
+                <input type="file" ref="fileInput" accept="image/*" style="display: none" @change="uploadBukti">
+              </VCardText>
+            </VCard>
+          </VCol>
+          
+          <VCol cols="12" :md="bankAccounts.length > 0 ? 6 : 12">
+            <VCard elevation="6" class="h-100 rounded-xl overflow-hidden border-t-success border-t-8">
+              <VCardText class="pa-6 d-flex flex-column h-100">
+                <div class="d-flex align-center gap-3 mb-6">
+                  <VAvatar color="success" variant="tonal" rounded size="48">
+                    <VIcon icon="ri-qr-code-line" size="24" />
+                  </VAvatar>
+                  <div>
+                    <h3 class="text-h6 font-weight-bold mb-0">Pembayaran Otomatis</h3>
+                    <div class="text-caption text-medium-emphasis">QRIS, e-Wallet, Virtual Account</div>
+                  </div>
+                </div>
+                
+                <div class="text-body-1 text-medium-emphasis mb-6 flex-grow-1 text-center d-flex align-center justify-center">
+                  Nikmati kemudahan pembayaran instan tanpa perlu upload bukti transfer. Pesanan otomatis diproses dalam hitungan detik!
+                </div>
+
+                <VBtn
+                  color="success"
+                  size="large"
+                  block
+                  class="font-weight-bold rounded-lg mt-auto"
+                  @click="payWithMidtrans"
+                  prepend-icon="ri-secure-payment-line"
+                  elevation="2"
+                >
+                  Bayar Instan Sekarang
+                </VBtn>
+              </VCardText>
+            </VCard>
+          </VCol>
+        </VRow>
+
       </VCol>
     </VRow>
   </div>
 </template>
+
+<style scoped>
+.border-t-8 {
+  border-top-width: 8px !important;
+  border-top-style: solid !important;
+}
+.border-t-primary {
+  border-top-color: rgb(var(--v-theme-primary)) !important;
+}
+.border-t-success {
+  border-top-color: rgb(var(--v-theme-success)) !important;
+}
+.border-t-warning {
+  border-top-color: rgb(var(--v-theme-warning)) !important;
+}
+.bg-success-lighten-5 {
+  background-color: rgba(var(--v-theme-success), 0.05) !important;
+}
+.tracking-wide {
+  letter-spacing: 0.05em !important;
+}
+</style>
