@@ -40,9 +40,23 @@ class SettingController extends Controller
         $data = $request->all();
 
         if ($request->hasFile('logo')) {
-            $file = $request->file('logo');
-            $file->move(public_path('images'), 'logo.png');
-            @copy(public_path('images/logo.png'), resource_path('images/logo.png'));
+            try {
+                $file = $request->file('logo');
+                
+                // Ensure directory exists
+                if (!file_exists(public_path('images'))) {
+                    @mkdir(public_path('images'), 0755, true);
+                }
+                if (!file_exists(resource_path('images'))) {
+                    @mkdir(resource_path('images'), 0755, true);
+                }
+
+                $file->move(public_path('images'), 'logo.png');
+                @copy(public_path('images/logo.png'), resource_path('images/logo.png'));
+            } catch (\Exception $e) {
+                \Log::error('Gagal upload logo: ' . $e->getMessage());
+                // Lanjut menyimpan pengaturan lain meskipun logo gagal
+            }
         }
 
         foreach ($data as $key => $value) {
