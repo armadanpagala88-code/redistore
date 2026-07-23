@@ -45,6 +45,8 @@ const form = ref({
   email_pembeli: ''
 })
 
+const isLoggedIn = computed(() => !!userData.value)
+
 const isCheckingOut = ref(false)
 const isStartingChat = ref(false)
 const userData = ref<any>(null)
@@ -92,9 +94,22 @@ const isWhatsAppValid = computed(() => {
   return form.value.no_whatsapp && form.value.no_whatsapp.length >= 10
 })
 
+const goToLogin = () => {
+  router.push(`/login?redirect=${encodeURIComponent(route.fullPath)}`)
+}
+
+const goToRegister = () => {
+  router.push(`/register?redirect=${encodeURIComponent(route.fullPath)}`)
+}
+
 const submitCheckout = async () => {
-  if (!isWhatsAppValid.value) {
-    alert('Nomor WhatsApp tidak valid')
+  if (!isLoggedIn.value) {
+    goToLogin()
+    return
+  }
+  if (!form.value.no_whatsapp || form.value.no_whatsapp.length < 10) {
+    alert('Nomor WhatsApp tidak valid. Silakan lengkapi profil Anda.')
+    router.push('/member/profil')
     return
   }
 
@@ -267,53 +282,95 @@ const startChat = async () => {
                 <strong>Transaksi Aman 100%!</strong> Dana Anda ditahan oleh sistem dan baru diteruskan ke penjual setelah akun game berhasil dikirim dan diverifikasi.
               </VAlert>
 
-              <VForm @submit.prevent="submitCheckout">
-                <div class="mb-4">
-                  <label class="text-subtitle-2 font-weight-bold text-high-emphasis mb-2 d-block">No. WhatsApp <span class="text-error">*</span></label>
-                  <VTextField
-                    v-model="form.no_whatsapp"
-                    placeholder="Contoh: 08123456789"
-                    variant="outlined"
-                    density="comfortable"
+              <!-- GUEST: Login Required Block -->
+              <template v-if="!isLoggedIn">
+                <div class="text-center py-4">
+                  <VIcon icon="ri-lock-2-line" size="56" color="primary" class="mb-3 d-block mx-auto" />
+                  <h3 class="text-h6 font-weight-bold text-high-emphasis mb-2">Login Diperlukan</h3>
+                  <p class="text-body-2 text-medium-emphasis mb-6">
+                    Anda harus <strong>Login</strong> atau <strong>Daftar</strong> terlebih dahulu untuk dapat melakukan transaksi pembelian.
+                  </p>
+                  <VBtn
                     color="primary"
-                    prepend-inner-icon="ri-whatsapp-line"
-                    hint="Penting! Detail pesanan & login akun akan dikirim ke WA ini"
-                    persistent-hint
-                    :rules="[v => !!v || 'WhatsApp wajib diisi']"
-                  />
+                    size="x-large"
+                    block
+                    class="rounded-pill font-weight-bold checkout-btn text-h6 mb-3"
+                    elevation="4"
+                    prepend-icon="ri-login-box-line"
+                    @click="goToLogin"
+                  >
+                    Login Sekarang
+                  </VBtn>
+                  <VBtn
+                    color="secondary"
+                    size="large"
+                    block
+                    variant="tonal"
+                    class="rounded-pill font-weight-bold"
+                    prepend-icon="ri-user-add-line"
+                    @click="goToRegister"
+                  >
+                    Belum Punya Akun? Daftar
+                  </VBtn>
+                  <p class="text-center text-caption text-medium-emphasis mt-4 mb-0">
+                    Daftar gratis &amp; mulai jual beli akun game dengan aman!
+                  </p>
                 </div>
+              </template>
 
-                <div class="mb-6">
-                  <label class="text-subtitle-2 font-weight-bold text-high-emphasis mb-2 d-block">Alamat Email (Opsional)</label>
-                  <VTextField
-                    v-model="form.email_pembeli"
-                    type="email"
-                    placeholder="Untuk struk pembayaran"
-                    variant="outlined"
-                    density="comfortable"
+              <!-- LOGGED IN: One-click Checkout -->
+              <template v-else>
+                <VForm @submit.prevent="submitCheckout">
+                  <!-- User Info Summary -->
+                  <VCard variant="tonal" color="success" class="mb-5 rounded-lg">
+                    <VCardText class="pa-4">
+                      <div class="d-flex align-center gap-3">
+                        <VAvatar color="primary" size="40">
+                          <VIcon icon="ri-user-3-line" color="white" />
+                        </VAvatar>
+                        <div>
+                          <div class="font-weight-bold text-high-emphasis">{{ userData?.username || userData?.name }}</div>
+                          <div class="text-caption text-medium-emphasis d-flex align-center gap-1">
+                            <VIcon icon="ri-whatsapp-line" size="14" />
+                            {{ form.no_whatsapp || 'WA belum diisi di profil' }}
+                          </div>
+                        </div>
+                        <VChip color="success" size="small" class="ml-auto" variant="elevated">
+                          <VIcon start icon="ri-checkbox-circle-line" size="14" /> Terverifikasi
+                        </VChip>
+                      </div>
+                    </VCardText>
+                  </VCard>
+
+                  <VAlert
+                    v-if="!form.no_whatsapp"
+                    type="warning"
+                    variant="tonal"
+                    class="mb-4 text-body-2"
+                    icon="ri-alert-line"
+                  >
+                    Nomor WhatsApp Anda belum diisi. Silakan lengkapi <strong>profil Anda</strong> agar pesanan bisa dikirimkan.
+                  </VAlert>
+
+                  <VBtn
+                    type="submit"
                     color="primary"
-                    prepend-inner-icon="ri-mail-line"
-                  />
-                </div>
+                    size="x-large"
+                    block
+                    class="rounded-pill font-weight-bold checkout-btn text-h6"
+                    :loading="isCheckingOut"
+                    :disabled="!form.no_whatsapp"
+                    elevation="4"
+                  >
+                    <VIcon icon="ri-shopping-cart-2-line" class="mr-2" />
+                    Beli Sekarang
+                  </VBtn>
 
-                <VBtn
-                  type="submit"
-                  color="primary"
-                  size="x-large"
-                  block
-                  class="rounded-pill font-weight-bold checkout-btn text-h6"
-                  :loading="isCheckingOut"
-                  :disabled="!isWhatsAppValid"
-                  elevation="4"
-                >
-                  <VIcon icon="ri-shopping-cart-2-line" class="mr-2" />
-                  Beli Sekarang
-                </VBtn>
-                
-                <p class="text-center text-caption text-medium-emphasis mt-4 mb-0">
-                  Dengan mengklik Beli Sekarang, Anda menyetujui syarat & ketentuan layanan.
-                </p>
-              </VForm>
+                  <p class="text-center text-caption text-medium-emphasis mt-4 mb-0">
+                    Dengan mengklik Beli Sekarang, Anda menyetujui syarat &amp; ketentuan layanan.
+                  </p>
+                </VForm>
+              </template>
             </VCardText>
           </VCard>
         </VCol>

@@ -10,7 +10,7 @@ import authV2LoginMaskLight from '@images/pages/auth-v2-login-mask-light.png'
 import { VNodeRenderer } from '@layouts/components/VNodeRenderer'
 import { themeConfig } from '@themeConfig'
 
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import axios from 'axios'
 
 definePage({
@@ -21,6 +21,9 @@ definePage({
 })
 
 const router = useRouter()
+const route = useRoute()
+const redirectPath = computed(() => (route.query.redirect as string) || null)
+
 const form = ref({
   username: '',
   password: '',
@@ -46,7 +49,10 @@ const handleLogin = async () => {
       localStorage.setItem('user_data', JSON.stringify(res.data.data.user))
       
       // Redirect sesuai role
-      if (res.data.data.user.role === 'Pelanggan') {
+      if (redirectPath.value) {
+        // Jika ada redirect param (misal dari halaman produk), balik ke sana
+        router.push(decodeURIComponent(redirectPath.value))
+      } else if (res.data.data.user.role === 'Pelanggan') {
         router.push('/')
       } else {
         router.push('/admin/dashboard')
