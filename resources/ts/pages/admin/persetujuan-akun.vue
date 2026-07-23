@@ -122,21 +122,26 @@ const submitEdit = async () => {
   formData.append('login_via', editForm.value.login_via || '')
   formData.append('harga', editForm.value.harga ? editForm.value.harga.toString() : '')
   
+  let fileCount = 0
   if (newCoverImage.value && newCoverImage.value.length > 0) {
     newCoverImage.value.forEach((fileVal) => {
       if (fileVal) {
         if (Array.isArray(fileVal)) {
           fileVal.forEach(f => {
-            if (f instanceof File) {
+            if (f && typeof f === 'object' && f.size !== undefined) {
               formData.append('gambar_utama[]', f)
+              fileCount++
             }
           })
-        } else if (fileVal instanceof File) {
+        } else if (typeof fileVal === 'object' && fileVal.size !== undefined) {
           formData.append('gambar_utama[]', fileVal)
+          fileCount++
         }
       }
     })
   }
+  
+  formData.append('debug_file_count', fileCount.toString())
   
   try {
     const res = await axios.post(`/api/admin/akun-game/${editingItem.value.id}`, formData, {
@@ -144,7 +149,7 @@ const submitEdit = async () => {
         'Content-Type': 'multipart/form-data'
       }
     })
-    alert(JSON.stringify(res.data))
+    alert(`Files appended: ${fileCount}\nBackend has_file: ${res.data.debug_has_file}\nMessage: ${res.data.message}`)
     isEditDialogVisible.value = false
     fetchItems()
   } catch (error: any) {

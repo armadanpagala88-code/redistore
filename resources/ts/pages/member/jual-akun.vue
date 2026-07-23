@@ -107,21 +107,26 @@ const saveItem = async () => {
   formData.append('password_akun', form.value.password_akun || '')
   formData.append('catatan_akun', form.value.catatan_akun || '')
   
+  let fileCount = 0
   if (fileInput.value && fileInput.value.length > 0) {
     fileInput.value.forEach((fileVal) => {
       if (fileVal) {
         if (Array.isArray(fileVal)) {
           fileVal.forEach(f => {
-            if (f instanceof File) {
+            if (f && typeof f === 'object' && f.size !== undefined) {
               formData.append('gambar_utama[]', f)
+              fileCount++
             }
           })
-        } else if (fileVal instanceof File) {
+        } else if (typeof fileVal === 'object' && fileVal.size !== undefined) {
           formData.append('gambar_utama[]', fileVal)
+          fileCount++
         }
       }
     })
   }
+  
+  formData.append('debug_file_count', fileCount.toString())
 
   try {
     const url = editId.value ? `/api/member/akun-game/${editId.value}` : '/api/member/akun-game'
