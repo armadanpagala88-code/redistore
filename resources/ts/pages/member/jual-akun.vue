@@ -106,8 +106,12 @@ const saveItem = async () => {
   if (fileInput.value && fileInput.value.length > 0) {
     fileInput.value.forEach((fileVal) => {
       if (fileVal) {
-        if (Array.isArray(fileVal) && fileVal.length > 0) {
-          formData.append('gambar_utama[]', fileVal[0])
+        if (Array.isArray(fileVal)) {
+          fileVal.forEach(f => {
+            if (f instanceof File) {
+              formData.append('gambar_utama[]', f)
+            }
+          })
         } else if (fileVal instanceof File) {
           formData.append('gambar_utama[]', fileVal)
         }

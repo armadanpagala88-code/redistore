@@ -125,8 +125,12 @@ const submitEdit = async () => {
   if (newCoverImage.value && newCoverImage.value.length > 0) {
     newCoverImage.value.forEach((fileVal) => {
       if (fileVal) {
-        if (Array.isArray(fileVal) && fileVal.length > 0) {
-          formData.append('gambar_utama[]', fileVal[0])
+        if (Array.isArray(fileVal)) {
+          fileVal.forEach(f => {
+            if (f instanceof File) {
+              formData.append('gambar_utama[]', f)
+            }
+          })
         } else if (fileVal instanceof File) {
           formData.append('gambar_utama[]', fileVal)
         }
@@ -140,7 +144,7 @@ const submitEdit = async () => {
         'Content-Type': 'multipart/form-data'
       }
     })
-    alert(res.data.message)
+    alert(JSON.stringify(res.data))
     isEditDialogVisible.value = false
     fetchItems()
   } catch (error: any) {

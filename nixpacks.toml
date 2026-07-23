@@ -4,8 +4,8 @@ NODE_ENV = 'development'
 [phases.setup]
 nixPkgs = ['...', 'php82']
 cmds = [
-    "mkdir -p public/images/akun public/images/banners public/uploads/artikel public/uploads/bukti public/uploads/profil",
-    "chmod -R 777 public/images public/uploads"
+    "mkdir -p public/images/akun public/images/banners public/uploads/artikel public/uploads/bukti public/uploads/profil storage/app/public/akun",
+    "chmod -R 777 public/images public/uploads storage"
 ]
 
 [phases.build]

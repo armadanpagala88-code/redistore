@@ -127,7 +127,9 @@ class AkunGameController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Detail akun berhasil diperbarui oleh Admin',
-            'data' => $akun
+            'data' => $akun,
+            'debug_has_file' => $request->hasFile('gambar_utama'),
+            'debug_files' => $request->file('gambar_utama')
         ]);
     }
 
