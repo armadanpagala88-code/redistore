@@ -132,7 +132,7 @@ const deleteItem = async (id: string) => {
           <tr v-for="item in items" :key="item.id" class="transition-swing">
             <td class="py-3">
               <VCard elevation="2" class="rounded-lg overflow-hidden" max-width="180">
-                <VImg :src="item.gambar_banner ? `/images/${item.gambar_banner}` : 'https://placehold.co/400x200'" height="80" cover />
+                <VImg :src="item.gambar_banner ? `/img/${item.gambar_banner}` : 'https://placehold.co/400x200'" height="80" cover />
               </VCard>
             </td>
             <td>

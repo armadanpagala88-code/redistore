@@ -20,7 +20,6 @@ Route::get('/akun-games', [App\Http\Controllers\Api\PublicAkunGameController::cl
 Route::get('/akun-games/{id}', [App\Http\Controllers\Api\PublicAkunGameController::class, 'show']);
 
 // Public Ulasan & Rekomendasi
-Route::get('/public/rekomendasi', [App\Http\Controllers\Api\PublicRekomendasiController::class, 'index']);
 Route::get('/public/ulasan/kategori/{kategoriId}', [App\Http\Controllers\Api\PublicUlasanController::class, 'getByKategori']);
 
 // Checkout Transaksi

@@ -12,7 +12,6 @@ definePage({
 const akunGames = ref<any[]>([])
 const banners = ref<any[]>([])
 const flashSales = ref<any[]>([])
-const rekomendasis = ref<any[]>([])
 const loading = ref(true)
 const currentTime = ref(new Date().getTime())
 const selectedCategory = ref<string>('Semua')
@@ -24,16 +23,14 @@ onMounted(async () => {
   }, 1000)
 
   try {
-    const [akunRes, bannerRes, fsRes, rekRes] = await Promise.all([
+    const [akunRes, bannerRes, fsRes] = await Promise.all([
       axios.get('/api/akun-games'),
       axios.get('/api/banners'),
-      axios.get('/api/public/flash-sales'),
-      axios.get('/api/public/rekomendasi')
+      axios.get('/api/public/flash-sales')
     ])
     akunGames.value = akunRes.data.data
     banners.value = bannerRes.data.data
     flashSales.value = fsRes.data.data
-    rekomendasis.value = rekRes.data.data
   } catch (error) {
     console.error('Error fetching data:', error)
   } finally {
@@ -43,7 +40,7 @@ onMounted(async () => {
 
 const getImageUrl = (path: string) => {
   if (!path) return 'https://placehold.co/400x400/f1f5f9/94a3b8.png?text=Icon'
-  return path.startsWith('http') ? path : `/images/${path}`
+  return path.startsWith('http') ? path : `/img/${path}`
 }
 
 const getAkunImage = (path: string) => {
@@ -206,64 +203,6 @@ const filteredAkunGames = computed(() => {
         </VRow>
       </div>
 
-      <!-- Rekomendasi Section -->
-      <div v-if="rekomendasis.length > 0" class="mb-12">
-        <h2 class="text-h5 font-weight-bold text-high-emphasis d-flex align-center gap-2 mb-6">
-          <VIcon icon="ri-thumb-up-fill" color="success" size="28" />
-          Rekomendasi Untuk Anda
-        </h2>
-        
-        <VRow dense class="match-unipin-grid">
-          <VCol
-            v-for="rek in rekomendasis"
-            :key="rek.id"
-            cols="6"
-            sm="4"
-            md="3"
-            lg="3"
-          >
-            <VCard elevation="2" class="h-100 d-flex flex-column unipin-card rounded-lg" :to="`/akun/${rek.id}`">
-              <VChip 
-                color="warning" 
-                size="small" 
-                variant="elevated"
-                class="position-absolute font-weight-bold" 
-                style="top: 10px; right: 10px; z-index: 2;"
-              >
-                <VIcon start icon="ri-thumb-up-fill" size="small" /> Pilihan
-              </VChip>
-              <div class="img-wrapper bg-surface" style="position: relative;">
-                <VImg
-                  :src="rek.gambar_utama ? getAkunImage(rek.gambar_utama) : getImageUrl(rek.kategori?.gambar_logo)"
-                  height="180"
-                  cover
-                  class="game-img"
-                />
-                <VChip 
-                  :color="getGameColor(rek.kategori?.nama_game)" 
-                  size="small" 
-                  variant="elevated"
-                  class="font-weight-bold position-absolute" 
-                  style="bottom: 8px; left: 8px; z-index: 2;"
-                >
-                  {{ rek.kategori?.nama_game }}
-                </VChip>
-              </div>
-              
-              <VCardItem class="pa-4 text-left card-content flex-grow-1 d-flex flex-column justify-space-between">
-                <div>
-                  <VCardTitle class="text-subtitle-1 font-weight-bold text-high-emphasis mb-1 line-clamp-2" style="line-height: 1.3;">{{ rek.judul_akun }}</VCardTitle>
-                  <div class="text-success font-weight-black text-h6 mt-2">{{ formatRupiah(rek.harga) }}</div>
-                </div>
-                <div class="d-flex justify-space-between align-center mt-4">
-                  <span class="text-caption text-medium-emphasis">Via: {{ rek.login_via }}</span>
-                  <VBtn size="small" color="primary" variant="tonal" class="rounded-pill font-weight-bold px-4">Beli</VBtn>
-                </div>
-              </VCardItem>
-            </VCard>
-          </VCol>
-        </VRow>
-      </div>
 
       <!-- Section Title ala UniPin -->
       <div class="d-flex flex-column flex-md-row align-md-center mb-6 justify-space-between mt-8 gap-4">

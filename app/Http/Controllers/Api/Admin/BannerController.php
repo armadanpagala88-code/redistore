@@ -35,7 +35,7 @@ class BannerController extends Controller
         }
 
         $imageName = time() . '_' . Str::slug($request->judul) . '.' . $request->gambar_banner->extension();
-        $request->gambar_banner->move(public_path('images/banners'), $imageName);
+        $request->gambar_banner->move(storage_path('app/public/banners'), $imageName);
 
         $banner = Banner::create([
             'judul' => $request->judul,
@@ -73,13 +73,14 @@ class BannerController extends Controller
         $imagePath = $banner->gambar_banner;
 
         if ($request->hasFile('gambar_banner')) {
-            // Hapus gambar lama
-            if ($imagePath && File::exists(public_path('images/' . $imagePath))) {
-                File::delete(public_path('images/' . $imagePath));
+            if ($imagePath && file_exists(storage_path('app/public/' . $imagePath))) {
+                @unlink(storage_path('app/public/' . $imagePath));
+            } else if ($imagePath && file_exists(public_path('images/' . $imagePath))) {
+                @unlink(public_path('images/' . $imagePath));
             }
 
             $imageName = time() . '_' . Str::slug($request->judul) . '.' . $request->gambar_banner->extension();
-            $request->gambar_banner->move(public_path('images/banners'), $imageName);
+            $request->gambar_banner->move(storage_path('app/public/banners'), $imageName);
             $imagePath = 'banners/' . $imageName;
         }
 
