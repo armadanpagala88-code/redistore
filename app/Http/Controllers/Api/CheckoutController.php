@@ -238,7 +238,14 @@ class CheckoutController extends Controller
         if ($request->hasFile('bukti_pembayaran')) {
             $file = $request->file('bukti_pembayaran');
             $filename = time() . '_' . $file->getClientOriginalName();
-            $file->move(public_path('uploads/bukti'), $filename);
+            
+            // Ensure directory exists
+            $dir = public_path('uploads/bukti');
+            if (!file_exists($dir)) {
+                @mkdir($dir, 0777, true);
+            }
+            
+            $file->move($dir, $filename);
             
             $transaksi->bukti_pembayaran = $filename;
             $transaksi->status_transaksi = 'Pending'; // After upload, waiting for admin approval
