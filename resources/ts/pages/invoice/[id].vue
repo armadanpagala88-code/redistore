@@ -122,12 +122,46 @@ onMounted(async () => {
               </VCol>
             </VRow>
 
-            <div class="text-h6 font-weight-bold mb-2">Informasi Pengiriman</div>
+            <div class="text-h6 font-weight-bold mb-2">Informasi Pengiriman / Data Login</div>
             <VRow>
               <VCol cols="12">
-                <VAlert type="info" variant="tonal" class="mb-0 text-body-2" icon="ri-whatsapp-line">
-                  Data login akun akan dikirimkan dengan aman ke nomor WhatsApp Anda: <strong>{{ invoice.no_whatsapp }}</strong>
-                </VAlert>
+                <template v-if="invoice.akun_game_login">
+                  <VCard variant="tonal" color="success" class="mb-4">
+                    <VCardText>
+                      <div class="d-flex align-center gap-2 mb-3">
+                        <VIcon icon="ri-shield-check-line" color="success" size="24" />
+                        <span class="text-h6 font-weight-bold text-success">Data Login Akun Anda</span>
+                      </div>
+                      
+                      <VRow>
+                        <VCol cols="12" sm="6" class="mb-2">
+                          <div class="text-caption text-medium-emphasis">Email / Username / Nomor HP</div>
+                          <div class="text-body-1 font-weight-bold">{{ invoice.akun_game_login.email_akun }}</div>
+                        </VCol>
+                        <VCol cols="12" sm="6" class="mb-2">
+                          <div class="text-caption text-medium-emphasis">Password</div>
+                          <div class="text-body-1 font-weight-bold">{{ invoice.akun_game_login.password_akun }}</div>
+                        </VCol>
+                        <VCol cols="12" sm="6" class="mb-2">
+                          <div class="text-caption text-medium-emphasis">Login Via</div>
+                          <div class="text-body-1 font-weight-bold">{{ invoice.akun_game_login.login_via }}</div>
+                        </VCol>
+                      </VRow>
+                      
+                      <div v-if="invoice.akun_game_login.catatan_akun" class="mt-4">
+                        <div class="text-caption text-medium-emphasis">Catatan dari Penjual:</div>
+                        <VAlert type="warning" variant="tonal" class="mt-1 mb-0 py-2 text-body-2">
+                          {{ invoice.akun_game_login.catatan_akun }}
+                        </VAlert>
+                      </div>
+                    </VCardText>
+                  </VCard>
+                </template>
+                <template v-else>
+                  <VAlert type="info" variant="tonal" class="mb-0 text-body-2" icon="ri-whatsapp-line">
+                    Jika pesanan telah sukses dan data login tidak muncul di sini, penjual akan mengirimkannya secara manual ke nomor WhatsApp Anda: <strong>{{ invoice.no_whatsapp }}</strong>
+                  </VAlert>
+                </template>
               </VCol>
             </VRow>
             <VDivider class="my-4" />

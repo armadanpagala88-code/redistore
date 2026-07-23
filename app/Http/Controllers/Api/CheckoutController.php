@@ -203,10 +203,27 @@ class CheckoutController extends Controller
 
     public function show($id)
     {
-        $transaksi = Transaksi::with('details')->findOrFail($id);
+        $transaksi = Transaksi::with(['details'])->findOrFail($id);
+        
+        $data = $transaksi->toArray();
+        $data['akun_game_login'] = null;
+
+        // If transaction is successful and user is the owner, include the game account login details
+        if ($transaksi->status_transaksi === 'Success' && $transaksi->user_id == auth('sanctum')->id()) {
+            $akunGame = \App\Models\AkunGame::find($transaksi->akun_game_id);
+            if ($akunGame) {
+                $data['akun_game_login'] = [
+                    'email_akun' => $akunGame->email_akun,
+                    'password_akun' => $akunGame->password_akun,
+                    'login_via' => $akunGame->login_via,
+                    'catatan_akun' => $akunGame->catatan_akun,
+                ];
+            }
+        }
+
         return response()->json([
             'success' => true,
-            'data' => $transaksi
+            'data' => $data
         ]);
     }
 
