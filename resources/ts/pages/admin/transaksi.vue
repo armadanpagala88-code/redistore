@@ -134,6 +134,17 @@ const getStatusColor = (status: string) => {
               </VChip>
             </td>
             <td class="text-center">
+              <VBtn 
+                v-if="trx.bukti_pembayaran"
+                color="info" 
+                variant="outlined" 
+                size="small" 
+                class="font-weight-bold rounded-lg mr-2" 
+                :href="`/uploads/bukti/${trx.bukti_pembayaran}`"
+                target="_blank"
+              >
+                Bukti TF
+              </VBtn>
               <VBtn color="primary" variant="outlined" size="small" class="font-weight-bold rounded-lg" @click="openDialog(trx)">
                 Ubah Status
               </VBtn>

@@ -16,6 +16,9 @@ const loading = ref(true)
 const fileInput = ref<any>(null)
 const uploadLoading = ref(false)
 const paymentLink = ref('')
+const bankName = ref('')
+const bankAccountNumber = ref('')
+const bankAccountName = ref('')
 
 const fetchInvoice = async () => {
   try {
@@ -61,6 +64,39 @@ const payWithMidtrans = () => {
   }
 }
 
+const uploadBukti = async (e: Event) => {
+  const target = e.target as HTMLInputElement
+  if (!target.files || target.files.length === 0) return
+  
+  const file = target.files[0]
+  if (file.size > 2 * 1024 * 1024) {
+    alert("Ukuran file maksimal 2MB")
+    return
+  }
+
+  uploadLoading.value = true
+  try {
+    const formData = new FormData()
+    formData.append('bukti_pembayaran', file)
+    
+    const res = await axios.post(`/api/checkout/${invoice.value.id}/upload-bukti`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+    
+    if (res.data.success) {
+      alert("Bukti pembayaran berhasil diunggah! Mohon tunggu konfirmasi admin.")
+      fetchInvoice()
+    }
+  } catch (err: any) {
+    alert(err.response?.data?.message || "Gagal mengunggah bukti pembayaran")
+  } finally {
+    uploadLoading.value = false
+    if (fileInput.value) fileInput.value.value = ''
+  }
+}
+
 onMounted(async () => {
   fetchInvoice();
   
@@ -73,6 +109,9 @@ onMounted(async () => {
       if (res.data.data.midtrans_is_production === '1') isProd = true;
       if (res.data.data.midtrans_client_key) clientKey = res.data.data.midtrans_client_key;
       if (res.data.data.midtrans_payment_link) paymentLink.value = res.data.data.midtrans_payment_link;
+      if (res.data.data.bank_name) bankName.value = res.data.data.bank_name;
+      if (res.data.data.bank_account_number) bankAccountNumber.value = res.data.data.bank_account_number;
+      if (res.data.data.bank_account_name) bankAccountName.value = res.data.data.bank_account_name;
     }
 
     // Load Midtrans Snap Script
@@ -192,25 +231,86 @@ onMounted(async () => {
           </VCardText>
         </VCard>
 
+        <VCard elevation="4" v-if="invoice.status_transaksi === 'Pending'" class="mb-6">
+          <VCardItem class="bg-warning text-white">
+            <VCardTitle class="text-h6 font-weight-bold d-flex align-center gap-2">
+              <VIcon icon="ri-time-line" /> Menunggu Verifikasi Admin
+            </VCardTitle>
+          </VCardItem>
+          <VCardText class="pt-4">
+            <p class="mb-0">
+              Terima kasih! Bukti transfer Anda sedang kami proses. Mohon bersabar menunggu admin untuk memverifikasi pembayaran Anda.
+            </p>
+          </VCardText>
+        </VCard>
+
         <VCard elevation="4" v-if="invoice.status_transaksi === 'Unpaid'">
           <VCardItem>
             <VCardTitle class="text-h6 font-weight-bold">Selesaikan Pembayaran</VCardTitle>
           </VCardItem>
           <VCardText>
             <VAlert type="info" variant="tonal" class="mb-4">
-              Total tagihan Anda adalah <strong>Rp {{ Number(invoice.total_bayar).toLocaleString('id-ID') }}</strong>. Klik tombol di bawah ini untuk memilih metode pembayaran (QRIS, e-Wallet, Virtual Account, dll).
+              Total tagihan Anda adalah <strong>Rp {{ Number(invoice.total_bayar).toLocaleString('id-ID') }}</strong>.
             </VAlert>
             
-            <VBtn
-              color="primary"
-              size="large"
-              block
-              class="mt-4"
-              @click="payWithMidtrans"
-              prepend-icon="ri-secure-payment-line"
-            >
-              Bayar Sekarang
-            </VBtn>
+            <VRow>
+              <VCol cols="12" md="6" v-if="bankAccountNumber">
+                <VCard variant="outlined" color="primary" class="h-100">
+                  <VCardText>
+                    <div class="d-flex align-center gap-2 mb-3">
+                      <VIcon icon="ri-bank-line" color="primary" size="24" />
+                      <span class="font-weight-bold">Transfer Manual</span>
+                    </div>
+                    <div class="mb-2">Silakan transfer tepat sejumlah total tagihan ke rekening berikut:</div>
+                    <div class="bg-grey-lighten-4 pa-3 rounded text-center mb-4">
+                      <div class="text-subtitle-2">{{ bankName }}</div>
+                      <div class="text-h5 font-weight-bold text-primary">{{ bankAccountNumber }}</div>
+                      <div class="text-caption">A/N {{ bankAccountName }}</div>
+                    </div>
+                    
+                    <VBtn
+                      color="primary"
+                      variant="tonal"
+                      block
+                      prepend-icon="ri-upload-cloud-2-line"
+                      @click="fileInput.click()"
+                      :loading="uploadLoading"
+                    >
+                      Upload Bukti Transfer
+                    </VBtn>
+                    <input 
+                      type="file" 
+                      ref="fileInput" 
+                      accept="image/*" 
+                      style="display: none" 
+                      @change="uploadBukti"
+                    >
+                  </VCardText>
+                </VCard>
+              </VCol>
+              
+              <VCol cols="12" :md="bankAccountNumber ? 6 : 12">
+                <VCard variant="outlined" color="success" class="h-100">
+                  <VCardText class="d-flex flex-column justify-center h-100">
+                    <div class="d-flex align-center gap-2 mb-3">
+                      <VIcon icon="ri-qr-code-line" color="success" size="24" />
+                      <span class="font-weight-bold">Pembayaran Otomatis</span>
+                    </div>
+                    <div class="mb-4">Bayar lebih mudah menggunakan QRIS, e-Wallet, atau Virtual Account. Verifikasi instan.</div>
+                    <VBtn
+                      color="success"
+                      size="large"
+                      block
+                      @click="payWithMidtrans"
+                      prepend-icon="ri-secure-payment-line"
+                      class="mt-auto"
+                    >
+                      Bayar Sekarang
+                    </VBtn>
+                  </VCardText>
+                </VCard>
+              </VCol>
+            </VRow>
           </VCardText>
         </VCard>
       </VCol>

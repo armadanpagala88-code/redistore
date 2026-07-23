@@ -15,6 +15,9 @@ const form = ref({
   midtrans_client_key: '',
   midtrans_is_production: '0',
   midtrans_payment_link: '',
+  bank_name: '',
+  bank_account_number: '',
+  bank_account_name: '',
 })
 const logoFile = ref<File[]>([])
 const logoPreviewUrl = ref('/images/logo.png?t=' + new Date().getTime())
@@ -45,6 +48,9 @@ onMounted(async () => {
       if (res.data.data.midtrans_client_key) form.value.midtrans_client_key = res.data.data.midtrans_client_key
       if (res.data.data.midtrans_is_production !== undefined) form.value.midtrans_is_production = String(res.data.data.midtrans_is_production)
       if (res.data.data.midtrans_payment_link) form.value.midtrans_payment_link = res.data.data.midtrans_payment_link
+      if (res.data.data.bank_name) form.value.bank_name = res.data.data.bank_name
+      if (res.data.data.bank_account_number) form.value.bank_account_number = res.data.data.bank_account_number
+      if (res.data.data.bank_account_name) form.value.bank_account_name = res.data.data.bank_account_name
     }
   } catch (e) {
     console.error('Error fetching settings', e)
@@ -277,6 +283,50 @@ const saveSettings = async () => {
                     prepend-inner-icon="ri-global-line"
                     hint="Gunakan Sandbox saat masa percobaan/development."
                     persistent-hint
+                  />
+                </VCol>
+
+                <VCol cols="12">
+                  <VDivider class="my-4" />
+                  <div class="text-subtitle-1 font-weight-bold mb-4 d-flex align-center gap-2">
+                    <VIcon icon="ri-bank-line" color="primary" />
+                    Pengaturan Rekening Pembayaran Manual
+                  </div>
+                </VCol>
+
+                <VCol cols="12" md="4">
+                  <VTextField
+                    v-model="form.bank_name"
+                    label="Nama Bank / e-Wallet"
+                    placeholder="Contoh: BCA / DANA"
+                    variant="outlined"
+                    density="comfortable"
+                    color="primary"
+                    prepend-inner-icon="ri-bank-line"
+                  />
+                </VCol>
+                
+                <VCol cols="12" md="4">
+                  <VTextField
+                    v-model="form.bank_account_number"
+                    label="Nomor Rekening"
+                    placeholder="Contoh: 1234567890"
+                    variant="outlined"
+                    density="comfortable"
+                    color="primary"
+                    prepend-inner-icon="ri-number-1"
+                  />
+                </VCol>
+                
+                <VCol cols="12" md="4">
+                  <VTextField
+                    v-model="form.bank_account_name"
+                    label="Atas Nama"
+                    placeholder="Contoh: Budi Santoso"
+                    variant="outlined"
+                    density="comfortable"
+                    color="primary"
+                    prepend-inner-icon="ri-user-line"
                   />
                 </VCol>
 
