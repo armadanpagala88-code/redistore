@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
+import { formatRupiah } from '@/utils/formatRupiah'
+import { compressImage } from '@/utils/imageCompressor'
 
 const items = ref<any[]>([])
 const loading = ref(true)
@@ -124,21 +126,23 @@ const submitEdit = async () => {
   
   let fileCount = 0
   if (newCoverImage.value && newCoverImage.value.length > 0) {
-    newCoverImage.value.forEach((fileVal) => {
+    for (const fileVal of newCoverImage.value) {
       if (fileVal) {
         if (Array.isArray(fileVal)) {
-          fileVal.forEach(f => {
+          for (const f of fileVal) {
             if (f && typeof f === 'object' && f.size !== undefined) {
-              formData.append('gambar_utama[]', f)
+              const compressed = await compressImage(f as File)
+              formData.append('gambar_utama[]', compressed)
               fileCount++
             }
-          })
+          }
         } else if (typeof fileVal === 'object' && fileVal.size !== undefined) {
-          formData.append('gambar_utama[]', fileVal)
+          const compressed = await compressImage(fileVal as File)
+          formData.append('gambar_utama[]', compressed)
           fileCount++
         }
       }
-    })
+    }
   }
   
   formData.append('debug_file_count', fileCount.toString())

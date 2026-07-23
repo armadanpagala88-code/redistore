@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { themeConfig } from '@themeConfig'
+import { compressImage } from '@/utils/imageCompressor'
 import axios from 'axios'
 
 definePage({
@@ -109,21 +111,23 @@ const saveItem = async () => {
   
   let fileCount = 0
   if (fileInput.value && fileInput.value.length > 0) {
-    fileInput.value.forEach((fileVal) => {
+    for (const fileVal of fileInput.value) {
       if (fileVal) {
         if (Array.isArray(fileVal)) {
-          fileVal.forEach(f => {
+          for (const f of fileVal) {
             if (f && typeof f === 'object' && f.size !== undefined) {
-              formData.append('gambar_utama[]', f)
+              const compressed = await compressImage(f as File)
+              formData.append('gambar_utama[]', compressed)
               fileCount++
             }
-          })
+          }
         } else if (typeof fileVal === 'object' && fileVal.size !== undefined) {
-          formData.append('gambar_utama[]', fileVal)
+          const compressed = await compressImage(fileVal as File)
+          formData.append('gambar_utama[]', compressed)
           fileCount++
         }
       }
-    })
+    }
   }
   
   formData.append('debug_file_count', fileCount.toString())
