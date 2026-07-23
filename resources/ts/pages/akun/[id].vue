@@ -251,7 +251,7 @@ const startChat = async () => {
               <h3 class="text-h6 font-weight-bold mb-3 d-flex align-center gap-2">
                 <VIcon icon="ri-file-text-line" color="primary" /> Deskripsi Akun
               </h3>
-              <div class="text-body-1 text-high-emphasis" style="line-height: 1.8; white-space: pre-wrap;">
+              <div class="text-body-1 text-high-emphasis" style="line-height: 1.8; white-space: pre-wrap; word-break: break-word; overflow-wrap: break-word;">
                 {{ akun.deskripsi_akun }}
               </div>
 

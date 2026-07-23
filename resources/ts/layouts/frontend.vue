@@ -9,6 +9,7 @@ injectSkinClasses()
 
 const isFallbackStateActive = ref(false)
 const refLoadingIndicator = ref<any>(null)
+const isMobileDrawerOpen = ref(false)
 
 const webSettings = ref({
   app_name: themeConfig.app.title,
@@ -104,11 +105,39 @@ watch([isFallbackStateActive, refLoadingIndicator], () => {
             </VBtn>
           </template>
         </div>
-        
         <!-- Mobile Menu Icon -->
-        <VBtn icon="ri-user-settings-line" variant="tonal" color="primary" class="d-md-none" to="/login" />
+        <div class="d-md-none d-flex align-center gap-2">
+          <VBtn v-if="!userData" variant="flat" color="primary" size="small" to="/login" class="rounded-pill font-weight-bold mr-2">Login</VBtn>
+          <VBtn icon="ri-menu-line" variant="tonal" color="primary" @click="isMobileDrawerOpen = !isMobileDrawerOpen" />
+        </div>
       </VContainer>
     </VAppBar>
+
+    <!-- Mobile Drawer -->
+    <VNavigationDrawer v-model="isMobileDrawerOpen" location="right" temporary class="d-md-none">
+      <div class="pa-4 d-flex justify-space-between align-center border-b border-opacity-10">
+        <span class="text-h6 font-weight-bold text-primary">{{ webSettings.app_name }}</span>
+        <VBtn icon="ri-close-line" variant="text" size="small" @click="isMobileDrawerOpen = false" />
+      </div>
+      
+      <VList class="pa-2">
+        <VListItem to="/" prepend-icon="ri-store-2-line" title="Marketplace" rounded="lg" class="mb-1" @click="isMobileDrawerOpen = false" />
+        <VListItem to="/blog" prepend-icon="ri-article-line" title="Kabar Game" rounded="lg" class="mb-1" @click="isMobileDrawerOpen = false" />
+        
+        <template v-if="userData">
+          <VDivider class="my-2" />
+          <VListItem to="/member/jual-akun" prepend-icon="ri-store-2-line" title="Jual Akun" rounded="lg" class="mb-1" @click="isMobileDrawerOpen = false" />
+          <VListItem to="/member/dashboard" prepend-icon="ri-dashboard-line" title="Dashboard Saya" rounded="lg" class="mb-1" @click="isMobileDrawerOpen = false" />
+          <VListItem @click="handleLogout" prepend-icon="ri-logout-box-r-line" title="Logout" base-color="error" rounded="lg" class="mb-1 mt-4 text-error font-weight-bold" />
+        </template>
+        
+        <template v-else>
+          <VDivider class="my-2" />
+          <VListItem to="/register" prepend-icon="ri-user-add-line" title="Daftar" rounded="lg" class="mb-1" @click="isMobileDrawerOpen = false" />
+          <VListItem to="/login" prepend-icon="ri-login-box-line" title="Login" rounded="lg" class="mb-1 text-primary font-weight-bold" @click="isMobileDrawerOpen = false" />
+        </template>
+      </VList>
+    </VNavigationDrawer>
 
     <!-- Main Content Area -->
     <VMain class="main-content-area">
