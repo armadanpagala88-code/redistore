@@ -226,7 +226,7 @@ const statusColor = (status: string) => {
             <td class="py-3">
               <div class="d-flex align-center gap-3">
                 <VAvatar rounded="lg" size="48" color="surface-variant" variant="tonal" class="elevation-1">
-                  <VImg :src="`/images/akun/${item.gambar_utama}`" cover />
+                  <VImg :src="`/img/akun/${item.gambar_utama}`" cover />
                 </VAvatar>
                 <div>
                   <div class="font-weight-bold text-high-emphasis">{{ item.judul_akun }}</div>
@@ -371,10 +371,10 @@ const statusColor = (status: string) => {
               <div class="text-caption text-medium-emphasis mb-2">Gambar Saat Ini:</div>
               <div class="d-flex gap-2 flex-wrap">
                 <VCard v-if="editingItemData.gambar_utama" rounded="lg" class="elevation-1 overflow-hidden" width="80" height="80">
-                  <VImg :src="`/images/akun/${editingItemData.gambar_utama}`" cover height="100%" />
+                  <VImg :src="`/img/akun/${editingItemData.gambar_utama}`" cover height="100%" />
                 </VCard>
                 <VCard v-for="(img, idx) in editingItemData.gambar_lainnya" :key="idx" rounded="lg" class="elevation-1 overflow-hidden" width="80" height="80">
-                  <VImg :src="`/images/akun/${img}`" cover height="100%" />
+                  <VImg :src="`/img/akun/${img}`" cover height="100%" />
                 </VCard>
               </div>
               <div class="text-caption text-error mt-1">*Jika Anda mengupload gambar baru, gambar lama akan dihapus.</div>
