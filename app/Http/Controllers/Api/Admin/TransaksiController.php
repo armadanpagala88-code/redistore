@@ -44,4 +44,18 @@ class TransaksiController extends Controller
             'data' => $transaksi
         ]);
     }
+
+    public function showBukti($filename)
+    {
+        $path = storage_path('app/public/bukti/' . $filename);
+        if (!file_exists($path)) {
+            // Check old path fallback just in case
+            $oldPath = public_path('uploads/bukti/' . $filename);
+            if (file_exists($oldPath)) {
+                return response()->file($oldPath);
+            }
+            return response()->json(['message' => 'File not found.'], 404);
+        }
+        return response()->file($path);
+    }
 }

@@ -11,6 +11,9 @@ const loadingUpdate = ref(false)
 const snackbar = ref(false)
 const snackbarText = ref('')
 
+const buktiDialog = ref(false)
+const selectedBukti = ref('')
+
 const statusOptions = ['Unpaid', 'Pending', 'Success', 'Failed', 'Cancel', 'Refund']
 
 const fetchTransaksi = async () => {
@@ -37,6 +40,11 @@ const openDialog = (trx: any) => {
   selectedTrx.value = trx
   selectedStatus.value = trx.status_transaksi
   dialog.value = true
+}
+
+const openBukti = (filename: string) => {
+  selectedBukti.value = `/api/admin/transaksi/bukti/${filename}`
+  buktiDialog.value = true
 }
 
 const updateStatus = async () => {
@@ -140,8 +148,7 @@ const getStatusColor = (status: string) => {
                 variant="outlined" 
                 size="small" 
                 class="font-weight-bold rounded-lg mr-2" 
-                :href="`/storage/bukti/${trx.bukti_pembayaran}`"
-                target="_blank"
+                @click="openBukti(trx.bukti_pembayaran)"
               >
                 Bukti TF
               </VBtn>
@@ -195,6 +202,19 @@ const getStatusColor = (status: string) => {
           <VBtn color="secondary" variant="text" class="px-4 font-weight-bold" @click="dialog = false">Batal</VBtn>
           <VBtn color="primary" variant="elevated" class="px-6 font-weight-bold rounded-lg" :loading="loadingUpdate" @click="updateStatus">Simpan Status</VBtn>
         </VCardActions>
+      </VCard>
+    </VDialog>
+
+    <!-- Dialog Bukti Pembayaran -->
+    <VDialog v-model="buktiDialog" max-width="600">
+      <VCard class="rounded-lg overflow-hidden">
+        <VCardTitle class="bg-info text-white pa-4 d-flex justify-space-between align-center">
+          <span class="text-h6 font-weight-bold">Bukti Pembayaran</span>
+          <VBtn icon="ri-close-line" variant="text" color="white" @click="buktiDialog = false" />
+        </VCardTitle>
+        <VCardText class="pa-0">
+          <VImg :src="selectedBukti" class="w-100" contain max-height="700" />
+        </VCardText>
       </VCard>
     </VDialog>
 

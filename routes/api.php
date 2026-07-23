@@ -104,6 +104,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
         // Transaksi
         Route::get('/admin/transaksi', [App\Http\Controllers\Api\Admin\TransaksiController::class, 'index']);
+        Route::get('/admin/transaksi/bukti/{filename}', [App\Http\Controllers\Api\Admin\TransaksiController::class, 'showBukti']);
         Route::put('/admin/transaksi/{id}/status', [App\Http\Controllers\Api\Admin\TransaksiController::class, 'updateStatus']);
         
         // Kategori Game
