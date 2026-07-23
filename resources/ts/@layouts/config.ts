@@ -4,7 +4,7 @@ import type { LayoutConfig } from '@layouts/types'
 export const layoutConfig: LayoutConfig = {
   app: {
     title: 'my-layout',
-    logo: h('img', { src: '/images/logo.png', style: 'height: 32px;' }),
+    logo: h('img', { src: '/uploads/logo.png', style: 'height: 32px;' }),
     contentWidth: ContentWidth.Boxed,
     contentLayoutNav: AppContentLayoutNav.Vertical,
     overlayNavFromBreakpoint: 1279,

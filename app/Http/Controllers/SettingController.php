@@ -43,16 +43,12 @@ class SettingController extends Controller
             try {
                 $file = $request->file('logo');
                 
-                // Ensure directory exists
-                if (!file_exists(public_path('images'))) {
-                    @mkdir(public_path('images'), 0755, true);
-                }
-                if (!file_exists(resource_path('images'))) {
-                    @mkdir(resource_path('images'), 0755, true);
+                // Ensure directory exists in uploads (which is a persistent volume)
+                if (!file_exists(public_path('uploads'))) {
+                    @mkdir(public_path('uploads'), 0755, true);
                 }
 
-                $file->move(public_path('images'), 'logo.png');
-                @copy(public_path('images/logo.png'), resource_path('images/logo.png'));
+                $file->move(public_path('uploads'), 'logo.png');
             } catch (\Exception $e) {
                 \Log::error('Gagal upload logo: ' . $e->getMessage());
                 // Lanjut menyimpan pengaturan lain meskipun logo gagal

@@ -18,7 +18,7 @@ const bankAccountsList = ref<{bank_name: string, bank_account_number: string, ba
   { bank_name: '', bank_account_number: '', bank_account_name: '' }
 ])
 const logoFile = ref<File[]>([])
-const logoPreviewUrl = ref('/images/logo.png?t=' + new Date().getTime())
+const logoPreviewUrl = ref('/uploads/logo.png?t=' + new Date().getTime())
 
 const loading = ref(true)
 const saving = ref(false)
@@ -109,7 +109,7 @@ const saveSettings = async () => {
         message: 'Pengaturan berhasil disimpan!',
         color: 'success'
       }
-      logoPreviewUrl.value = '/images/logo.png?t=' + new Date().getTime()
+      logoPreviewUrl.value = '/uploads/logo.png?t=' + new Date().getTime()
     }
   } catch (e: any) {
     snackbar.value = {
