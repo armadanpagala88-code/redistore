@@ -12,13 +12,11 @@ const form = ref({
   biaya_admin_persen: 5,
   fonnte_token: '',
   midtrans_server_key: '',
-  midtrans_client_key: '',
-  midtrans_is_production: '0',
-  midtrans_payment_link: '',
-  bank_name: '',
-  bank_account_number: '',
-  bank_account_name: '',
+  bank_accounts: '[]',
 })
+const bankAccountsList = ref<{bank_name: string, bank_account_number: string, bank_account_name: string}[]>([
+  { bank_name: '', bank_account_number: '', bank_account_name: '' }
+])
 const logoFile = ref<File[]>([])
 const logoPreviewUrl = ref('/images/logo.png?t=' + new Date().getTime())
 
@@ -48,9 +46,23 @@ onMounted(async () => {
       if (res.data.data.midtrans_client_key) form.value.midtrans_client_key = res.data.data.midtrans_client_key
       if (res.data.data.midtrans_is_production !== undefined) form.value.midtrans_is_production = String(res.data.data.midtrans_is_production)
       if (res.data.data.midtrans_payment_link) form.value.midtrans_payment_link = res.data.data.midtrans_payment_link
-      if (res.data.data.bank_name) form.value.bank_name = res.data.data.bank_name
-      if (res.data.data.bank_account_number) form.value.bank_account_number = res.data.data.bank_account_number
-      if (res.data.data.bank_account_name) form.value.bank_account_name = res.data.data.bank_account_name
+      if (res.data.data.bank_accounts) {
+        try {
+          const parsed = JSON.parse(res.data.data.bank_accounts)
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            bankAccountsList.value = parsed
+          }
+        } catch(e) {}
+      } else {
+        // Fallback to legacy single bank account if exists
+        if (res.data.data.bank_name || res.data.data.bank_account_number) {
+          bankAccountsList.value = [{
+            bank_name: res.data.data.bank_name || '',
+            bank_account_number: res.data.data.bank_account_number || '',
+            bank_account_name: res.data.data.bank_account_name || ''
+          }]
+        }
+      }
     }
   } catch (e) {
     console.error('Error fetching settings', e)
@@ -59,8 +71,19 @@ onMounted(async () => {
   }
 })
 
+const addBankAccount = () => {
+  bankAccountsList.value.push({ bank_name: '', bank_account_number: '', bank_account_name: '' })
+}
+
+const removeBankAccount = (index: number) => {
+  bankAccountsList.value.splice(index, 1)
+}
+
 const saveSettings = async () => {
   saving.value = true
+  // Sync bank accounts to form
+  form.value.bank_accounts = JSON.stringify(bankAccountsList.value)
+  
   try {
     const formData = new FormData()
     for (const [key, value] of Object.entries(form.value)) {
@@ -288,47 +311,67 @@ const saveSettings = async () => {
 
                 <VCol cols="12">
                   <VDivider class="my-4" />
-                  <div class="text-subtitle-1 font-weight-bold mb-4 d-flex align-center gap-2">
-                    <VIcon icon="ri-bank-line" color="primary" />
-                    Pengaturan Rekening Pembayaran Manual
+                  <div class="d-flex align-center justify-space-between mb-4">
+                    <div class="text-subtitle-1 font-weight-bold d-flex align-center gap-2">
+                      <VIcon icon="ri-bank-line" color="primary" />
+                      Pengaturan Rekening Pembayaran Manual
+                    </div>
+                    <VBtn color="primary" variant="tonal" size="small" @click="addBankAccount" prepend-icon="ri-add-line">
+                      Tambah Rekening
+                    </VBtn>
                   </div>
                 </VCol>
 
-                <VCol cols="12" md="4">
-                  <VTextField
-                    v-model="form.bank_name"
-                    label="Nama Bank / e-Wallet"
-                    placeholder="Contoh: BCA / DANA"
-                    variant="outlined"
-                    density="comfortable"
-                    color="primary"
-                    prepend-inner-icon="ri-bank-line"
-                  />
-                </VCol>
-                
-                <VCol cols="12" md="4">
-                  <VTextField
-                    v-model="form.bank_account_number"
-                    label="Nomor Rekening"
-                    placeholder="Contoh: 1234567890"
-                    variant="outlined"
-                    density="comfortable"
-                    color="primary"
-                    prepend-inner-icon="ri-number-1"
-                  />
-                </VCol>
-                
-                <VCol cols="12" md="4">
-                  <VTextField
-                    v-model="form.bank_account_name"
-                    label="Atas Nama"
-                    placeholder="Contoh: Budi Santoso"
-                    variant="outlined"
-                    density="comfortable"
-                    color="primary"
-                    prepend-inner-icon="ri-user-line"
-                  />
-                </VCol>
+                <template v-for="(bank, index) in bankAccountsList" :key="index">
+                  <VCol cols="12">
+                    <div class="d-flex align-center justify-space-between bg-grey-lighten-4 pa-2 rounded">
+                      <span class="font-weight-medium text-caption">Rekening #{{ index + 1 }}</span>
+                      <VBtn 
+                        v-if="bankAccountsList.length > 1" 
+                        color="error" 
+                        variant="text" 
+                        size="small" 
+                        icon="ri-delete-bin-line"
+                        @click="removeBankAccount(index)"
+                      />
+                    </div>
+                  </VCol>
+                  <VCol cols="12" md="4">
+                    <VTextField
+                      v-model="bank.bank_name"
+                      label="Nama Bank / e-Wallet"
+                      placeholder="Contoh: BCA / DANA"
+                      variant="outlined"
+                      density="comfortable"
+                      color="primary"
+                      prepend-inner-icon="ri-bank-line"
+                    />
+                  </VCol>
+                  
+                  <VCol cols="12" md="4">
+                    <VTextField
+                      v-model="bank.bank_account_number"
+                      label="Nomor Rekening"
+                      placeholder="Contoh: 1234567890"
+                      variant="outlined"
+                      density="comfortable"
+                      color="primary"
+                      prepend-inner-icon="ri-number-1"
+                    />
+                  </VCol>
+                  
+                  <VCol cols="12" md="4">
+                    <VTextField
+                      v-model="bank.bank_account_name"
+                      label="Atas Nama"
+                      placeholder="Contoh: Budi Santoso"
+                      variant="outlined"
+                      density="comfortable"
+                      color="primary"
+                      prepend-inner-icon="ri-user-line"
+                    />
+                  </VCol>
+                </template>
 
                 <VCol cols="12" class="mt-2 d-flex justify-end">
                   <VBtn

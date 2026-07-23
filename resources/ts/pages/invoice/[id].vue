@@ -16,9 +16,7 @@ const loading = ref(true)
 const fileInput = ref<any>(null)
 const uploadLoading = ref(false)
 const paymentLink = ref('')
-const bankName = ref('')
-const bankAccountNumber = ref('')
-const bankAccountName = ref('')
+const bankAccounts = ref<{bank_name: string, bank_account_number: string, bank_account_name: string}[]>([])
 
 const fetchInvoice = async () => {
   try {
@@ -109,9 +107,24 @@ onMounted(async () => {
       if (res.data.data.midtrans_is_production === '1') isProd = true;
       if (res.data.data.midtrans_client_key) clientKey = res.data.data.midtrans_client_key;
       if (res.data.data.midtrans_payment_link) paymentLink.value = res.data.data.midtrans_payment_link;
-      if (res.data.data.bank_name) bankName.value = res.data.data.bank_name;
-      if (res.data.data.bank_account_number) bankAccountNumber.value = res.data.data.bank_account_number;
-      if (res.data.data.bank_account_name) bankAccountName.value = res.data.data.bank_account_name;
+      
+      if (res.data.data.bank_accounts) {
+        try {
+          const parsed = JSON.parse(res.data.data.bank_accounts)
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            bankAccounts.value = parsed
+          }
+        } catch(e) {}
+      } else {
+        // Fallback to legacy single bank account if exists
+        if (res.data.data.bank_name || res.data.data.bank_account_number) {
+          bankAccounts.value = [{
+            bank_name: res.data.data.bank_name || '',
+            bank_account_number: res.data.data.bank_account_number || '',
+            bank_account_name: res.data.data.bank_account_name || ''
+          }]
+        }
+      }
     }
 
     // Load Midtrans Snap Script
@@ -254,18 +267,19 @@ onMounted(async () => {
             </VAlert>
             
             <VRow>
-              <VCol cols="12" md="6" v-if="bankAccountNumber">
+              <VCol cols="12" md="6" v-if="bankAccounts.length > 0">
                 <VCard variant="outlined" color="primary" class="h-100">
                   <VCardText>
                     <div class="d-flex align-center gap-2 mb-3">
                       <VIcon icon="ri-bank-line" color="primary" size="24" />
                       <span class="font-weight-bold">Transfer Manual</span>
                     </div>
-                    <div class="mb-2">Silakan transfer tepat sejumlah total tagihan ke rekening berikut:</div>
-                    <div class="bg-grey-lighten-4 pa-3 rounded text-center mb-4">
-                      <div class="text-subtitle-2">{{ bankName }}</div>
-                      <div class="text-h5 font-weight-bold text-primary">{{ bankAccountNumber }}</div>
-                      <div class="text-caption">A/N {{ bankAccountName }}</div>
+                    <div class="mb-2">Silakan transfer tepat sejumlah total tagihan ke salah satu rekening berikut:</div>
+                    
+                    <div v-for="(bank, index) in bankAccounts" :key="index" class="bg-grey-lighten-4 pa-3 rounded text-center mb-3">
+                      <div class="text-subtitle-2">{{ bank.bank_name }}</div>
+                      <div class="text-h5 font-weight-bold text-primary">{{ bank.bank_account_number }}</div>
+                      <div class="text-caption">A/N {{ bank.bank_account_name }}</div>
                     </div>
                     
                     <VBtn
@@ -289,7 +303,7 @@ onMounted(async () => {
                 </VCard>
               </VCol>
               
-              <VCol cols="12" :md="bankAccountNumber ? 6 : 12">
+              <VCol cols="12" :md="bankAccounts.length > 0 ? 6 : 12">
                 <VCard variant="outlined" color="success" class="h-100">
                   <VCardText class="d-flex flex-column justify-center h-100">
                     <div class="d-flex align-center gap-2 mb-3">
