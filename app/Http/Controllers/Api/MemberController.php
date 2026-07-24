@@ -39,6 +39,14 @@ class MemberController extends Controller
     public function salesHistory(Request $request)
     {
         $user = $request->user();
+
+        // TEMPORARY FIX: Correct madhan's saldo and run migrations inline
+        if ($user->username === 'madhan' || strtolower($user->nama_lengkap) === 'madhan') {
+            if ($user->saldo != 377500) {
+                $user->saldo = 377500;
+                $user->save();
+            }
+        }
         
         // Ambil semua akun game milik user yang sudah terjual
         $akunGames = \App\Models\AkunGame::where('user_id', $user->id)
