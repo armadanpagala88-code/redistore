@@ -61,6 +61,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/member/akun-game/{id}', [\App\Http\Controllers\Api\Member\AkunGameController::class, 'show']);
     Route::post('/member/akun-game/{id}', [\App\Http\Controllers\Api\Member\AkunGameController::class, 'update']);
     Route::delete('/member/akun-game/{id}', [\App\Http\Controllers\Api\Member\AkunGameController::class, 'destroy']);
+    
+    // Member Sales History
+    Route::get('/member/sales-history', [App\Http\Controllers\Api\MemberController::class, 'salesHistory']);
 
     // Chat / Messages
     Route::get('/chat/conversations', [\App\Http\Controllers\Api\ChatController::class, 'getConversations']);

@@ -60,11 +60,22 @@ const fetchUser = async () => {
   }
 }
 
+const salesHistory = ref<any[]>([])
+const fetchSalesHistory = async () => {
+  try {
+    const res = await axios.get('/api/member/sales-history')
+    salesHistory.value = res.data.data
+  } catch (error) {
+    console.error(error)
+  }
+}
+
 onMounted(() => {
   fetchItems()
   fetchKategori()
   fetchSettings()
   fetchUser()
+  fetchSalesHistory()
 })
 
 const isDialogVisible = ref(false)
@@ -205,6 +216,11 @@ const formatRupiah = (value: number) => {
   return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(value)
 }
 
+const formatDate = (dateString: string) => {
+  const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute:'2-digit' }
+  return new Date(dateString).toLocaleDateString('id-ID', options)
+}
+
 const statusColor = (status: string) => {
   switch (status) {
     case 'Pending': return 'warning'
@@ -262,6 +278,62 @@ const statusColor = (status: string) => {
         </VCard>
       </VCol>
     </VRow>
+
+    <VCard elevation="10" class="border-t-primary rounded-lg overflow-hidden mb-8">
+      <VCardTitle class="px-6 pt-6 pb-2 text-h6 font-weight-bold d-flex align-center gap-2">
+        <VIcon icon="ri-history-line" color="primary" />
+        Riwayat Penjualan Akun Game
+        <VChip v-if="salesHistory.length > 0" color="primary" size="x-small" class="ms-1">{{ salesHistory.length }}</VChip>
+      </VCardTitle>
+      <VCardText v-if="salesHistory.length === 0" class="text-center py-10">
+        <VIcon icon="ri-inbox-line" size="60" color="grey-lighten-1" class="mb-4" />
+        <div class="text-h6 text-medium-emphasis mb-1">Belum ada penjualan</div>
+        <p class="text-body-2 text-disabled mb-0">Akun game yang sudah terjual akan muncul di sini beserta detail pendapatannya.</p>
+      </VCardText>
+      <VTable v-else hover class="custom-table text-no-wrap">
+        <thead class="bg-grey-lighten-4">
+          <tr>
+            <th class="text-uppercase text-caption font-weight-bold">Waktu</th>
+            <th class="text-uppercase text-caption font-weight-bold">Akun Game</th>
+            <th class="text-uppercase text-caption font-weight-bold">Pembeli</th>
+            <th class="text-uppercase text-caption font-weight-bold text-right">Harga Jual</th>
+            <th class="text-uppercase text-caption font-weight-bold text-right text-error">Potongan Admin</th>
+            <th class="text-uppercase text-caption font-weight-bold text-right text-success">Penerimaan Bersih</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="sale in salesHistory" :key="sale.id" class="transition-swing">
+            <td class="text-body-2 text-medium-emphasis">{{ formatDate(sale.created_at) }}</td>
+            <td class="font-weight-medium">{{ sale.akun_game }}</td>
+            <td>
+              <VChip size="small" color="primary" variant="tonal">{{ sale.pembeli }}</VChip>
+            </td>
+            <td class="text-right font-weight-bold">{{ formatRupiah(sale.harga_jual) }}</td>
+            <td class="text-right">
+              <VTooltip location="top">
+                <template #activator="{ props }">
+                  <span v-bind="props" class="text-error font-weight-medium cursor-help">
+                    -{{ formatRupiah(sale.potongan_admin) }}
+                    <VChip size="x-small" color="error" variant="tonal" class="ms-1">{{ sale.fee_persen }}%</VChip>
+                  </span>
+                </template>
+                <span>Biaya platform {{ sale.fee_persen }}% dari harga jual Rp {{ sale.harga_jual.toLocaleString('id-ID') }}</span>
+              </VTooltip>
+            </td>
+            <td class="text-right font-weight-bold text-success">{{ formatRupiah(sale.saldo_diterima) }}</td>
+          </tr>
+        </tbody>
+        <tfoot class="bg-grey-lighten-5">
+          <tr>
+            <td colspan="3" class="text-right text-caption font-weight-bold py-3 px-4">TOTAL</td>
+            <td class="text-right font-weight-bold py-3">{{ formatRupiah(salesHistory.reduce((s, r) => s + r.harga_jual, 0)) }}</td>
+            <td class="text-right text-error font-weight-bold py-3">-{{ formatRupiah(salesHistory.reduce((s, r) => s + r.potongan_admin, 0)) }}</td>
+            <td class="text-right text-success font-weight-bold py-3">{{ formatRupiah(salesHistory.reduce((s, r) => s + r.saldo_diterima, 0)) }}</td>
+          </tr>
+        </tfoot>
+      </VTable>
+    </VCard>
+
     <div class="d-flex flex-column flex-md-row justify-space-between align-md-center mb-6 gap-4">
       <div>
         <h2 class="text-h4 font-weight-bold d-flex align-center gap-2">
@@ -323,7 +395,14 @@ const statusColor = (status: string) => {
                   <VBtn icon="ri-pencil-line" variant="tonal" size="small" color="primary" @click="editItem(item)" />
                   <VBtn icon="ri-delete-bin-line" variant="tonal" size="small" color="error" @click="deleteItem(item.id)" />
                 </template>
-                <span v-else class="text-caption text-medium-emphasis">Terkunci</span>
+                <VTooltip v-else location="top">
+                  <template #activator="{ props }">
+                    <VChip v-bind="props" color="info" size="small" variant="tonal" class="font-weight-bold cursor-pointer">
+                      🔒 Sudah Terjual
+                    </VChip>
+                  </template>
+                  <span>Akun ini sudah terjual. Data dikunci untuk menjaga bukti transaksi pembeli.</span>
+                </VTooltip>
               </div>
             </td>
           </tr>

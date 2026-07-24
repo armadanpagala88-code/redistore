@@ -36,6 +36,84 @@ class MemberController extends Controller
         ]);
     }
 
+    public function salesHistory(Request $request)
+    {
+        $user = $request->user();
+        
+        // Ambil semua akun game milik user yang sudah terjual
+        $akunGames = \App\Models\AkunGame::where('user_id', $user->id)
+            ->where('status', 'Terjual')
+            ->with('kategori')
+            ->get();
+
+        if ($akunGames->isEmpty()) {
+            return response()->json(['success' => true, 'data' => []]);
+        }
+
+        $akunGameIds = $akunGames->pluck('id');
+
+        // Ambil transaksi yang berkaitan dengan akun game yang sudah terjual
+        $transaksis = Transaksi::with(['details', 'user'])
+            ->whereIn('akun_game_id', $akunGameIds)
+            ->whereIn('status_transaksi', ['Success', 'success'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        // Fetch setting biaya admin
+        $setting = \App\Models\Setting::where('key', 'biaya_admin_persen')->first();
+        $feePercent = $setting ? (float)$setting->value : 5.0;
+
+        // Ambil mutasi saldo untuk cross-check nominal penerimaan
+        $mutasiSaldos = MutasiSaldo::where('user_id', $user->id)
+            ->where('jenis', 'Masuk')
+            ->where('keterangan', 'like', 'Hasil Penjualan Akun Game%')
+            ->get();
+
+        // Jika ada transaksi yang terekam
+        if ($transaksis->isNotEmpty()) {
+            $salesData = $transaksis->map(function ($sale) use ($mutasiSaldos, $feePercent) {
+                $mutasi = $mutasiSaldos->first(fn($m) => str_contains($m->keterangan, $sale->id));
+                $feeAmount = round($feePercent / 100 * $sale->total_bayar);
+                $saldoDiterima = $mutasi ? $mutasi->nominal : ($sale->total_bayar - $feeAmount);
+
+                return [
+                    'id'             => $sale->id,
+                    'created_at'     => $sale->created_at,
+                    'akun_game'      => optional($sale->details->first())->nama_produk ?? 'Akun Game',
+                    'pembeli'        => $sale->user ? ($sale->user->name ?? $sale->user->username) : $sale->nama_pembeli ?? 'Guest',
+                    'harga_jual'     => $sale->total_bayar,
+                    'potongan_admin' => $mutasi ? ($sale->total_bayar - $mutasi->nominal) : $feeAmount,
+                    'saldo_diterima' => $saldoDiterima,
+                    'fee_persen'     => $feePercent,
+                ];
+            });
+
+            return response()->json(['success' => true, 'data' => $salesData]);
+        }
+
+        // Fallback: kalau transaksi tidak ditemukan, tampilkan dari AkunGame yang Terjual
+        // dengan kalkulasi berdasarkan setting
+        $salesData = $akunGames->map(function ($akun) use ($feePercent, $mutasiSaldos) {
+            $mutasi = $mutasiSaldos->first(fn($m) => str_contains($m->keterangan, $akun->id));
+            $feeAmount = round($feePercent / 100 * $akun->harga);
+            $saldoDiterima = $mutasi ? $mutasi->nominal : ($akun->harga - $feeAmount);
+
+            return [
+                'id'             => $akun->id,
+                'created_at'     => $akun->updated_at,
+                'akun_game'      => $akun->judul_akun,
+                'pembeli'        => 'Pembeli',
+                'harga_jual'     => $akun->harga,
+                'potongan_admin' => $mutasi ? ($akun->harga - $mutasi->nominal) : $feeAmount,
+                'saldo_diterima' => $saldoDiterima,
+                'fee_persen'     => $feePercent,
+            ];
+        });
+
+        return response()->json(['success' => true, 'data' => $salesData]);
+    }
+
+
     public function redeemPoints(Request $request)
     {
         $request->validate([
