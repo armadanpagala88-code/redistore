@@ -212,8 +212,8 @@ const getStatusColor = (status: string) => {
               <div class="text-caption text-medium-emphasis">{{ new Date(trx.created_at).toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'}) }}</div>
             </td>
             <td>
-              <div class="font-weight-bold">{{ trx.user ? trx.user.nama_lengkap : 'Tamu (Guest)' }}</div>
-              <div class="text-caption text-medium-emphasis">{{ trx.no_whatsapp }}</div>
+              <div class="font-weight-bold">{{ trx.user ? trx.user.nama_lengkap : (trx.nama_pembeli || 'Tamu (Guest)') }}</div>
+              <div class="text-caption text-medium-emphasis">{{ trx.user ? '@' + trx.user.username : trx.no_whatsapp }}</div>
             </td>
             <td>
               <div v-if="trx.details && trx.details.length > 0">

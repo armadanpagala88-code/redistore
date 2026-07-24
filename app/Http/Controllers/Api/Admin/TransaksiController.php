@@ -12,7 +12,7 @@ class TransaksiController extends Controller
     public function index()
     {
         // Mengambil semua transaksi urut terbaru
-        $transaksis = Transaksi::with('details')->orderBy('created_at', 'desc')->get();
+        $transaksis = Transaksi::with(['details', 'user'])->orderBy('created_at', 'desc')->get();
         return response()->json([
             'success' => true,
             'data' => $transaksis
