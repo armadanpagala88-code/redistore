@@ -101,11 +101,18 @@ const printLaporan = () => {
     </VCard>
 
     <!-- Print Header: Show ONLY when printing -->
-    <div class="d-none d-print-block text-center mb-6">
-      <h2 class="text-h4 font-weight-bold mb-2">REDISTORE</h2>
-      <h3 class="text-h5">Laporan Penjualan</h3>
-      <p>Periode: {{ filter.start_date }} s.d {{ filter.end_date }}</p>
-      <hr class="mt-4 mb-4">
+    <div class="print-header mb-6 pb-4">
+      <div class="d-flex align-center">
+        <img src="/uploads/logo.png" alt="Logo" style="height: 50px; margin-right: 16px; object-fit: contain;">
+        <div class="text-left">
+          <h2 class="text-h4 font-weight-black mb-1 text-black" style="line-height: 1.2;">REDISTORE</h2>
+          <h3 class="text-h6 text-black font-weight-medium" style="line-height: 1.2;">Laporan Penjualan</h3>
+        </div>
+      </div>
+      <div class="text-right text-black">
+        <p class="mb-0 text-caption font-weight-bold">PERIODE:</p>
+        <p class="font-weight-black mb-0 text-body-1">{{ filter.start_date }} s.d {{ filter.end_date }}</p>
+      </div>
     </div>
 
     <!-- Report Table -->
@@ -181,6 +188,10 @@ const printLaporan = () => {
 </template>
 
 <style scoped>
+  .print-header {
+    display: none;
+  }
+  
 @media print {
   @page {
     size: A4 landscape;
@@ -191,10 +202,12 @@ const printLaporan = () => {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
     background-color: white !important;
+    color: #000 !important;
   }
   
   .v-application {
     background-color: white !important;
+    color: #000 !important;
   }
 
   .d-print-none {
@@ -203,6 +216,13 @@ const printLaporan = () => {
 
   .d-print-block {
     display: block !important;
+  }
+  
+  .print-header {
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 3px solid #000;
   }
 
   .print-card {
@@ -214,18 +234,33 @@ const printLaporan = () => {
     border-collapse: collapse;
     width: 100%;
     table-layout: auto;
+    color: #000 !important;
   }
 
   .laporan-table th, .laporan-table td {
-    border: 1px solid #ddd;
-    padding: 6px !important;
+    border: 1px solid #000 !important;
+    padding: 8px !important;
     white-space: normal !important; /* Override text-no-wrap */
     word-break: break-word;
     font-size: 11px !important;
+    color: #000 !important;
   }
 
   .laporan-table th {
     background-color: #f2f2f2 !important;
+    font-weight: bold !important;
+    color: #000 !important;
+  }
+  
+  .laporan-table .text-primary,
+  .laporan-table .text-error,
+  .laporan-table .text-medium-emphasis {
+    color: #000 !important;
+  }
+  
+  .laporan-table tfoot td {
+    border-top: 2px solid #000 !important;
+    font-weight: bold !important;
   }
 
   .text-no-wrap {
