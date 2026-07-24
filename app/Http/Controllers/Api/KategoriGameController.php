@@ -28,4 +28,29 @@ class KategoriGameController extends Controller
             'data' => $kategori
         ]);
     }
+
+    public function destroy($id)
+    {
+        $kategori = KategoriGame::findOrFail($id);
+        
+        if ($kategori->gambar_logo) {
+            $path = public_path('images/' . $kategori->gambar_logo);
+            if (file_exists($path)) {
+                unlink($path);
+            }
+        }
+        
+        $kategori->delete();
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Kategori game berhasil dihapus'
+        ]);
+    }
+
+    public function runMigrations()
+    {
+        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+        return \Illuminate\Support\Facades\Artisan::output();
+    }
 }
