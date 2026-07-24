@@ -154,10 +154,6 @@ class CheckoutController extends Controller
                 'subtotal' => $produk->harga_jual
             ]);
         } else {
-            // Ubah status akun menjadi diproses/pending (optional, tapi baiknya dikunci dulu)
-            $akunGame->status = 'Pending';
-            $akunGame->save();
-
             DetailTransaksi::create([
                 'transaksi_id' => $trxId,
                 'produk_voucher_id' => null,

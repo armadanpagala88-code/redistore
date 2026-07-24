@@ -34,6 +34,22 @@ class TransaksiController extends Controller
             if ($transaksi->tipe_transaksi === 'BeliAkun' && $transaksi->akun_game_id) {
                 $akun = \App\Models\AkunGame::find($transaksi->akun_game_id);
                 if ($akun) {
+                    $akun->status = 'Terjual';
+                    $akun->save();
+                    
+                    // Tambahkan saldo ke penjual (dipotong fee admin)
+                    $penjual = \App\Models\User::find($akun->user_id);
+                    if ($penjual) {
+                        $setting = \App\Models\Setting::where('key', 'biaya_admin_persen')->first();
+                        $feePercent = $setting ? (float)$setting->value : 5.0;
+                        
+                        $feeAmount = ($feePercent / 100) * $transaksi->total_bayar;
+                        $saldoDiterima = $transaksi->total_bayar - $feeAmount;
+                        
+                        $penjual->saldo += $saldoDiterima;
+                        $penjual->save();
+                    }
+
                     $msg = "Horee! Pembayaran pesanan *$id* telah *BERHASIL* diverifikasi.\n\nBerikut adalah data login akun game Anda:\n\nEmail/Username: *" . $akun->email_akun . "*\nPassword: *" . $akun->password_akun . "*\nLogin Via: *" . $akun->login_via . "*\n\nCatatan Penjual: " . ($akun->catatan_akun ? $akun->catatan_akun : "-") . "\n\nTerima kasih telah berbelanja di Redistore! Harap segera amankan akun Anda.";
                     FonnteService::sendMessage($transaksi->no_whatsapp, $msg);
                 }
