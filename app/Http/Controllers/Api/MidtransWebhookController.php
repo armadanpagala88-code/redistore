@@ -78,6 +78,15 @@ class MidtransWebhookController extends Controller
                             
                             $penjual->saldo += $saldoDiterima;
                             $penjual->save();
+                            
+                            // Catat mutasi penambahan saldo hasil penjualan
+                            \App\Models\MutasiSaldo::create([
+                                'user_id' => $penjual->id,
+                                'jenis' => 'Masuk',
+                                'nominal' => $saldoDiterima,
+                                'saldo_akhir' => $penjual->saldo,
+                                'keterangan' => "Hasil Penjualan Akun Game ({$transaksi->id}) - Potongan Admin {$feePercent}%"
+                            ]);
                         }
                     }
                     

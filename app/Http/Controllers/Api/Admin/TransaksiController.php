@@ -48,6 +48,15 @@ class TransaksiController extends Controller
                         
                         $penjual->saldo += $saldoDiterima;
                         $penjual->save();
+                        
+                        // Catat mutasi penambahan saldo hasil penjualan
+                        \App\Models\MutasiSaldo::create([
+                            'user_id' => $penjual->id,
+                            'jenis' => 'Masuk',
+                            'nominal' => $saldoDiterima,
+                            'saldo_akhir' => $penjual->saldo,
+                            'keterangan' => "Hasil Penjualan Akun Game ({$transaksi->id}) - Potongan Admin {$feePercent}%"
+                        ]);
                     }
 
                     $msg = "Horee! Pembayaran pesanan *$id* telah *BERHASIL* diverifikasi.\n\nBerikut adalah data login akun game Anda:\n\nEmail/Username: *" . $akun->email_akun . "*\nPassword: *" . $akun->password_akun . "*\nLogin Via: *" . $akun->login_via . "*\n\nCatatan Penjual: " . ($akun->catatan_akun ? $akun->catatan_akun : "-") . "\n\nTerima kasih telah berbelanja di Redistore! Harap segera amankan akun Anda.";
