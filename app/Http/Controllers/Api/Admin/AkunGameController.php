@@ -156,4 +156,20 @@ class AkunGameController extends Controller
             'message' => 'Akun berhasil dihapus'
         ]);
     }
+
+    public function stats()
+    {
+        $total = AkunGame::count();
+        $pending = AkunGame::where('status', 'Pending')->count();
+        $tersedia = AkunGame::where('status', 'Tersedia')->count();
+        
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'total' => $total,
+                'pending' => $pending,
+                'tersedia' => $tersedia
+            ]
+        ]);
+    }
 }
