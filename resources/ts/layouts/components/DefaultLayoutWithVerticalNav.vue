@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { ref, watch, onMounted, computed } from 'vue'
-import axios from 'axios'
+import { ref, watch, onMounted, reactive } from 'vue'
 import navItems from '@/navigation/vertical'
+import axios from 'axios'
 import { useConfigStore } from '@core/stores/config'
 import { themeConfig } from '@themeConfig'
 
@@ -29,8 +29,8 @@ watch([
     verticalNavHeaderActionAnimationName.value = val[0] ? 'rotate-180' : 'rotate-back-180'
 }, { immediate: true })
 
-const pendingAkunCount = ref(0)
-const unpaidTransaksiCount = ref(0)
+// Reactive nav items to avoid infinite render loops with computed arrays
+const dynamicNavItems = reactive([...navItems])
 
 const fetchStats = async () => {
   try {
@@ -39,20 +39,22 @@ const fetchStats = async () => {
       axios.get('/api/admin/transaksi/stats')
     ])
     
-    if (akunRes.data.success && akunRes.data.data.pending > 0) {
-      pendingAkunCount.value = akunRes.data.data.pending
-    } else {
-      pendingAkunCount.value = 0
+    if (akunRes.data.success) {
+      const pending = akunRes.data.data.pending
+      const item = dynamicNavItems.find(i => i.title === 'Persetujuan Akun')
+      if (item) {
+        item.badgeContent = pending > 0 ? pending.toString() : undefined
+        item.badgeClass = 'bg-error text-white'
+      }
     }
     
-    // For manual transfer/unpaid tracking
-    // Note: the user asked for unpaid badge. Usually admin cares about "Pending" (need manual verification) 
-    // or "Unpaid" (waiting for user payment). 
-    // We will use pending/unpaid count. If we just show unpaid as requested:
     if (transRes.data.success) {
-      // Actually, admin might want to know about Pending (uploaded bukti) + Unpaid. 
-      // But user requested: "buat badget angka jumlah unpaid"
-      unpaidTransaksiCount.value = transRes.data.data.unpaid
+      const unpaid = transRes.data.data.unpaid
+      const item = dynamicNavItems.find(i => i.title === 'Data Transaksi')
+      if (item) {
+        item.badgeContent = unpaid > 0 ? unpaid.toString() : undefined
+        item.badgeClass = 'bg-warning text-white'
+      }
     }
   } catch (error) {
     console.error('Failed to fetch admin stats', error)
@@ -61,26 +63,6 @@ const fetchStats = async () => {
 
 onMounted(() => {
   fetchStats()
-})
-
-const dynamicNavItems = computed(() => {
-  return navItems.map(item => {
-    if (item.title === 'Persetujuan Akun') {
-      return {
-        ...item,
-        badgeContent: pendingAkunCount.value > 0 ? pendingAkunCount.value.toString() : undefined,
-        badgeClass: 'bg-error text-white'
-      }
-    }
-    if (item.title === 'Transaksi') {
-      return {
-        ...item,
-        badgeContent: unpaidTransaksiCount.value > 0 ? unpaidTransaksiCount.value.toString() : undefined,
-        badgeClass: 'bg-warning text-white'
-      }
-    }
-    return item
-  })
 })
 </script>
 
