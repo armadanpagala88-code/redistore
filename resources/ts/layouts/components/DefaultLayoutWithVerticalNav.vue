@@ -30,23 +30,37 @@ watch([
 }, { immediate: true })
 
 const pendingAkunCount = ref(0)
+const unpaidTransaksiCount = ref(0)
 
-const fetchPendingAkun = async () => {
+const fetchStats = async () => {
   try {
-    const res = await axios.get('/api/admin/akun-game/stats')
-    if (res.data.success && res.data.data.pending > 0) {
-      pendingAkunCount.value = res.data.data.pending
+    const [akunRes, transRes] = await Promise.all([
+      axios.get('/api/admin/akun-game/stats'),
+      axios.get('/api/admin/transaksi/stats')
+    ])
+    
+    if (akunRes.data.success && akunRes.data.data.pending > 0) {
+      pendingAkunCount.value = akunRes.data.data.pending
     } else {
       pendingAkunCount.value = 0
     }
+    
+    // For manual transfer/unpaid tracking
+    // Note: the user asked for unpaid badge. Usually admin cares about "Pending" (need manual verification) 
+    // or "Unpaid" (waiting for user payment). 
+    // We will use pending/unpaid count. If we just show unpaid as requested:
+    if (transRes.data.success) {
+      // Actually, admin might want to know about Pending (uploaded bukti) + Unpaid. 
+      // But user requested: "buat badget angka jumlah unpaid"
+      unpaidTransaksiCount.value = transRes.data.data.unpaid
+    }
   } catch (error) {
-    console.error('Failed to fetch pending akun stats', error)
+    console.error('Failed to fetch admin stats', error)
   }
 }
 
 onMounted(() => {
-  fetchPendingAkun()
-  // Optional: setInterval(fetchPendingAkun, 30000)
+  fetchStats()
 })
 
 const dynamicNavItems = computed(() => {
@@ -56,6 +70,13 @@ const dynamicNavItems = computed(() => {
         ...item,
         badgeContent: pendingAkunCount.value > 0 ? pendingAkunCount.value.toString() : undefined,
         badgeClass: 'bg-error text-white'
+      }
+    }
+    if (item.title === 'Transaksi') {
+      return {
+        ...item,
+        badgeContent: unpaidTransaksiCount.value > 0 ? unpaidTransaksiCount.value.toString() : undefined,
+        badgeClass: 'bg-warning text-white'
       }
     }
     return item

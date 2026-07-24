@@ -106,8 +106,9 @@ class WithdrawalController extends Controller
             // Catat mutasi
             MutasiSaldo::create([
                 'user_id' => $user->id,
-                'tipe' => 'Keluar',
+                'jenis' => 'Keluar',
                 'nominal' => $request->nominal,
+                'saldo_akhir' => $user->saldo,
                 'keterangan' => 'Pengajuan Penarikan Dana (Tarik Saldo)'
             ]);
 
