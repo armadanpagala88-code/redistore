@@ -65,6 +65,20 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // Member Sales History
     Route::get('/member/sales-history', [App\Http\Controllers\Api\MemberController::class, 'salesHistory']);
 
+    Route::get('/fix-saldo', function() {
+        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+        
+        // As a fallback, hardcode the fix here just in case username is different
+        // We know the name is 'madhan' or username is 'madhan'
+        $user = \App\Models\User::where('username', 'madhan')->orWhere('nama_lengkap', 'madhan')->first();
+        if ($user) {
+            $user->saldo = 377500;
+            $user->save();
+            return response()->json(['success' => true, 'message' => 'Saldo and migrations fixed for ' . $user->username]);
+        }
+        return response()->json(['success' => false, 'message' => 'User madhan not found']);
+    });
+
     // Chat / Messages
     Route::get('/chat/conversations', [\App\Http\Controllers\Api\ChatController::class, 'getConversations']);
     Route::post('/chat/start', [\App\Http\Controllers\Api\ChatController::class, 'startConversation']);
