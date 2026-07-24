@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('akun_games', function (Blueprint $table) {
-            $table->text('alasan_ditolak')->nullable()->after('status');
-        });
+        if (!Schema::hasColumn('akun_games', 'alasan_ditolak')) {
+            Schema::table('akun_games', function (Blueprint $table) {
+                $table->text('alasan_ditolak')->nullable()->after('status');
+            });
+        }
     }
 
     /**
