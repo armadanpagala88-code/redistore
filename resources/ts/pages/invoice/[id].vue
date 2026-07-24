@@ -157,7 +157,7 @@ onMounted(async () => {
               <div>
                 <div class="d-flex align-center gap-3 mb-2">
                   <VIcon icon="ri-store-2-fill" color="primary" size="36" />
-                  <span class="text-h4 font-weight-black text-primary text-uppercase tracking-wide">Redistore</span>
+                  <span class="text-h4 font-weight-black text-high-emphasis text-uppercase tracking-wide">Redistore</span>
                 </div>
                 <div class="text-body-1 text-medium-emphasis mt-2">Solusi Top Up & Jual Beli Akun Terpercaya</div>
               </div>
@@ -175,40 +175,40 @@ onMounted(async () => {
             <!-- Bill To & Payment Info -->
             <VRow class="mb-8">
               <VCol cols="12" sm="6">
-                <h6 class="text-subtitle-2 text-primary font-weight-bold mb-3 text-uppercase">Ditagihkan Kepada:</h6>
+                <h6 class="text-subtitle-2 text-medium-emphasis font-weight-bold mb-3 text-uppercase">Ditagihkan Kepada:</h6>
                 <div class="text-h6 font-weight-bold mb-1">{{ invoice.user ? invoice.user.nama_lengkap : 'Pelanggan' }}</div>
                 <div class="text-body-2 text-medium-emphasis mb-1 d-flex align-center gap-2">
                   <VIcon icon="ri-whatsapp-line" size="16"/> {{ invoice.no_whatsapp }}
                 </div>
               </VCol>
               <VCol cols="12" sm="6" class="text-sm-right">
-                <h6 class="text-subtitle-2 text-primary font-weight-bold mb-3 text-uppercase">Detail Pembayaran:</h6>
-                <div class="text-h3 font-weight-black text-primary mb-2">Rp {{ Number(invoice.total_bayar).toLocaleString('id-ID') }}</div>
+                <h6 class="text-subtitle-2 text-medium-emphasis font-weight-bold mb-3 text-uppercase">Detail Pembayaran:</h6>
+                <div class="text-h3 font-weight-black text-high-emphasis mb-2">Rp {{ Number(invoice.total_bayar).toLocaleString('id-ID') }}</div>
                 <div class="text-body-2 text-medium-emphasis">Tanggal: <span class="font-weight-medium text-high-emphasis">{{ new Date(invoice.created_at).toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'}) }}</span></div>
               </VCol>
             </VRow>
 
             <!-- Data Login Section -->
             <template v-if="invoice.akun_game_login">
-              <VCard variant="flat" class="bg-success-lighten-5 border-success mb-8 rounded-lg" style="border: 1px solid rgb(var(--v-theme-success))">
+              <VCard variant="flat" class="bg-grey-lighten-4 border mb-8 rounded-lg">
                 <VCardText class="pa-5">
                   <div class="d-flex align-center gap-3 mb-4">
-                    <VAvatar color="success" variant="tonal" rounded size="40">
+                    <VAvatar color="grey-darken-3" variant="tonal" rounded size="40">
                       <VIcon icon="ri-shield-keyhole-line" size="24" />
                     </VAvatar>
-                    <h3 class="text-h6 font-weight-bold text-success mb-0">Informasi Data Login Akun</h3>
+                    <h3 class="text-h6 font-weight-bold text-high-emphasis mb-0">Informasi Data Login Akun</h3>
                   </div>
                   <VRow>
                     <VCol cols="12" sm="4">
-                      <div class="text-caption text-success font-weight-medium text-uppercase mb-1">Email / Username</div>
+                      <div class="text-caption text-medium-emphasis font-weight-medium text-uppercase mb-1">Email / Username</div>
                       <div class="text-body-1 font-weight-bold text-high-emphasis">{{ invoice.akun_game_login.email_akun }}</div>
                     </VCol>
                     <VCol cols="12" sm="4">
-                      <div class="text-caption text-success font-weight-medium text-uppercase mb-1">Password</div>
+                      <div class="text-caption text-medium-emphasis font-weight-medium text-uppercase mb-1">Password</div>
                       <div class="text-body-1 font-weight-bold text-high-emphasis">{{ invoice.akun_game_login.password_akun }}</div>
                     </VCol>
                     <VCol cols="12" sm="4">
-                      <div class="text-caption text-success font-weight-medium text-uppercase mb-1">Login Via</div>
+                      <div class="text-caption text-medium-emphasis font-weight-medium text-uppercase mb-1">Login Via</div>
                       <div class="text-body-1 font-weight-bold text-high-emphasis">{{ invoice.akun_game_login.login_via }}</div>
                     </VCol>
                   </VRow>
