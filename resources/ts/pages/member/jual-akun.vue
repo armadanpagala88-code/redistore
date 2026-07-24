@@ -308,27 +308,27 @@ const statusColor = (status: string) => {
             <td>
               <VChip size="small" color="primary" variant="tonal">{{ sale.pembeli }}</VChip>
             </td>
-            <td class="text-right font-weight-bold">{{ formatRupiah(sale.harga_jual) }}</td>
+            <td class="text-right font-weight-bold">{{ formatRupiah(Number(sale.harga_jual)) }}</td>
             <td class="text-right">
               <VTooltip location="top">
                 <template #activator="{ props }">
                   <span v-bind="props" class="text-error font-weight-medium cursor-help">
-                    -{{ formatRupiah(sale.potongan_admin) }}
+                    -{{ formatRupiah(Number(sale.potongan_admin)) }}
                     <VChip size="x-small" color="error" variant="tonal" class="ms-1">{{ sale.fee_persen }}%</VChip>
                   </span>
                 </template>
-                <span>Biaya platform {{ sale.fee_persen }}% dari harga jual Rp {{ sale.harga_jual.toLocaleString('id-ID') }}</span>
+                <span>Biaya platform {{ sale.fee_persen }}% dari harga jual Rp {{ Number(sale.harga_jual).toLocaleString('id-ID') }}</span>
               </VTooltip>
             </td>
-            <td class="text-right font-weight-bold text-success">{{ formatRupiah(sale.saldo_diterima) }}</td>
+            <td class="text-right font-weight-bold text-success">{{ formatRupiah(Number(sale.saldo_diterima)) }}</td>
           </tr>
         </tbody>
         <tfoot class="bg-grey-lighten-5">
           <tr>
             <td colspan="3" class="text-right text-caption font-weight-bold py-3 px-4">TOTAL</td>
-            <td class="text-right font-weight-bold py-3">{{ formatRupiah(salesHistory.reduce((s, r) => s + r.harga_jual, 0)) }}</td>
-            <td class="text-right text-error font-weight-bold py-3">-{{ formatRupiah(salesHistory.reduce((s, r) => s + r.potongan_admin, 0)) }}</td>
-            <td class="text-right text-success font-weight-bold py-3">{{ formatRupiah(salesHistory.reduce((s, r) => s + r.saldo_diterima, 0)) }}</td>
+            <td class="text-right font-weight-bold py-3">{{ formatRupiah(salesHistory.reduce((s, r) => s + Number(r.harga_jual), 0)) }}</td>
+            <td class="text-right text-error font-weight-bold py-3">-{{ formatRupiah(salesHistory.reduce((s, r) => s + Number(r.potongan_admin), 0)) }}</td>
+            <td class="text-right text-success font-weight-bold py-3">{{ formatRupiah(salesHistory.reduce((s, r) => s + Number(r.saldo_diterima), 0)) }}</td>
           </tr>
         </tfoot>
       </VTable>
