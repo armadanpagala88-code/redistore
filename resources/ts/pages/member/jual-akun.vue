@@ -36,6 +36,8 @@ const fetchKategori = async () => {
 }
 
 const adminFeePercent = ref<number>(5)
+const userSaldo = ref<number>(0)
+
 const fetchSettings = async () => {
   try {
     const res = await axios.get('/api/settings')
@@ -47,10 +49,22 @@ const fetchSettings = async () => {
   }
 }
 
+const fetchUser = async () => {
+  try {
+    const res = await axios.get('/api/me')
+    if (res.data && res.data.data) {
+      userSaldo.value = res.data.data.saldo || 0
+    }
+  } catch (error) {
+    console.error(error)
+  }
+}
+
 onMounted(() => {
   fetchItems()
   fetchKategori()
   fetchSettings()
+  fetchUser()
 })
 
 const isDialogVisible = ref(false)
@@ -204,6 +218,50 @@ const statusColor = (status: string) => {
 
 <template>
   <VContainer class="py-8">
+    <VRow class="mb-6">
+      <VCol cols="12" md="6">
+        <VCard elevation="10" class="border-t-success rounded-lg overflow-hidden h-100">
+          <VCardText class="pa-6">
+            <div class="d-flex align-center justify-space-between mb-4">
+              <div class="d-flex align-center gap-2">
+                <VAvatar color="success" variant="tonal" size="40">
+                  <VIcon icon="ri-wallet-3-line" size="24" />
+                </VAvatar>
+                <div class="text-h6 font-weight-bold">Saldo Pendapatan</div>
+              </div>
+              <VBtn color="success" variant="elevated" prepend-icon="ri-bank-card-line" size="small" to="/member/withdrawals">
+                Tarik Dana
+              </VBtn>
+            </div>
+            <div class="text-h3 font-weight-bold text-success mb-2">{{ formatRupiah(userSaldo) }}</div>
+            <p class="text-body-2 text-medium-emphasis mb-0">Total pendapatan dari penjualan akun game Anda yang siap ditarik.</p>
+          </VCardText>
+        </VCard>
+      </VCol>
+      
+      <VCol cols="12" md="6">
+        <VCard elevation="10" class="border-t-info rounded-lg overflow-hidden h-100">
+          <VCardText class="pa-6">
+            <div class="d-flex align-center gap-2 mb-4">
+              <VAvatar color="info" variant="tonal" size="40">
+                <VIcon icon="ri-information-line" size="24" />
+              </VAvatar>
+              <div class="text-h6 font-weight-bold">Informasi Penjualan</div>
+            </div>
+            <div class="d-flex justify-space-between align-center mb-2">
+              <span class="text-body-1">Biaya Admin Penjualan</span>
+              <VChip color="error" size="small" class="font-weight-bold">{{ adminFeePercent }}%</VChip>
+            </div>
+            <div class="d-flex justify-space-between align-center">
+              <span class="text-body-1">Estimasi Penerimaan Bersih</span>
+              <VChip color="success" size="small" class="font-weight-bold">{{ 100 - adminFeePercent }}%</VChip>
+            </div>
+            <VDivider class="my-3" />
+            <p class="text-caption text-medium-emphasis mb-0">Contoh: Jika Anda menjual akun seharga Rp 100.000, Anda akan menerima pendapatan sebesar Rp {{ (100000 - (100000 * adminFeePercent / 100)).toLocaleString('id-ID') }}. Sistem secara otomatis memotong biaya platform pada setiap transaksi yang berhasil.</p>
+          </VCardText>
+        </VCard>
+      </VCol>
+    </VRow>
     <div class="d-flex flex-column flex-md-row justify-space-between align-md-center mb-6 gap-4">
       <div>
         <h2 class="text-h4 font-weight-bold d-flex align-center gap-2">
