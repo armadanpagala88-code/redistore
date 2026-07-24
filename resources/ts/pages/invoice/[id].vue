@@ -62,6 +62,10 @@ const payWithMidtrans = () => {
   }
 }
 
+const printInvoice = () => {
+  window.print()
+}
+
 const uploadBukti = async (e: Event) => {
   const target = e.target as HTMLInputElement
   if (!target.files || target.files.length === 0) return
@@ -162,6 +166,9 @@ onMounted(async () => {
                 <div class="text-body-1 text-medium-emphasis mt-2">Solusi Top Up & Jual Beli Akun Terpercaya</div>
               </div>
               <div class="text-sm-right">
+                <div class="d-flex justify-sm-end gap-2 mb-3 d-print-none">
+                  <VBtn color="secondary" variant="tonal" size="small" prepend-icon="ri-printer-line" @click="printInvoice">Cetak PDF</VBtn>
+                </div>
                 <h1 class="text-h4 font-weight-bold text-high-emphasis mb-1">INVOICE</h1>
                 <VChip size="small" :color="invoice.status_transaksi === 'Success' ? 'success' : (invoice.status_transaksi === 'Unpaid' ? 'error' : 'warning')" class="font-weight-bold text-uppercase px-4 mb-2">
                   {{ invoice.status_transaksi }}
@@ -176,7 +183,7 @@ onMounted(async () => {
             <VRow class="mb-8">
               <VCol cols="12" sm="6">
                 <h6 class="text-subtitle-2 text-medium-emphasis font-weight-bold mb-3 text-uppercase">Ditagihkan Kepada:</h6>
-                <div class="text-h6 font-weight-bold mb-1">{{ invoice.user ? invoice.user.nama_lengkap : 'Pelanggan' }}</div>
+                <div class="text-h6 font-weight-bold mb-1">{{ invoice.user ? invoice.user.nama_lengkap : (invoice.email_pembeli || 'Pelanggan (Guest)') }}</div>
                 <div class="text-body-2 text-medium-emphasis mb-1 d-flex align-center gap-2">
                   <VIcon icon="ri-whatsapp-line" size="16"/> {{ invoice.no_whatsapp }}
                 </div>
@@ -273,7 +280,7 @@ onMounted(async () => {
         </VCard>
 
         <!-- Payment Actions -->
-        <VCard elevation="6" class="rounded-xl overflow-hidden mb-6 border-t-warning border-t-8" v-if="invoice.status_transaksi === 'Pending'">
+        <VCard elevation="6" class="rounded-xl overflow-hidden mb-6 border-t-warning border-t-8 d-print-none" v-if="invoice.status_transaksi === 'Pending'">
           <VCardText class="pa-6 text-center">
             <VAvatar color="warning" variant="tonal" size="64" class="mb-4">
               <VIcon icon="ri-time-line" size="32" />
@@ -285,7 +292,7 @@ onMounted(async () => {
           </VCardText>
         </VCard>
 
-        <VRow v-if="invoice.status_transaksi === 'Unpaid'">
+        <VRow v-if="invoice.status_transaksi === 'Unpaid'" class="d-print-none">
           <VCol cols="12" md="6" v-if="bankAccounts.length > 0">
             <VCard elevation="6" class="h-100 rounded-xl overflow-hidden border-t-primary border-t-8">
               <VCardText class="pa-6 d-flex flex-column h-100">
@@ -379,5 +386,29 @@ onMounted(async () => {
 }
 .tracking-wide {
   letter-spacing: 0.05em !important;
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .invoice-container, .invoice-container * {
+    visibility: visible;
+  }
+  .invoice-container {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  .d-print-none {
+    display: none !important;
+  }
+  .v-card {
+    box-shadow: none !important;
+    border: 1px solid #ddd !important;
+  }
 }
 </style>
