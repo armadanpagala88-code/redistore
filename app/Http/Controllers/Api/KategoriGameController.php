@@ -10,13 +10,10 @@ class KategoriGameController extends Controller
 {
     public function index()
     {
-        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
-        $output = \Illuminate\Support\Facades\Artisan::output();
-        
+        $kategori = KategoriGame::where('is_aktif', true)->get();
         return response()->json([
             'success' => true,
-            'message' => 'Migrations executed successfully',
-            'output' => $output
+            'data' => $kategori
         ]);
     }
 
