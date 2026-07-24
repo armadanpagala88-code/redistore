@@ -4,6 +4,13 @@ import axios from 'axios'
 
 const transaksis = ref<any[]>([])
 const loading = ref(false)
+const stats = ref({
+  total: 0,
+  success: 0,
+  pending: 0,
+  unpaid: 0,
+  failed: 0
+})
 const dialog = ref(false)
 const selectedTrx = ref<any>(null)
 const selectedStatus = ref('')
@@ -28,8 +35,20 @@ const fetchTransaksi = async () => {
   }
 }
 
+const fetchStats = async () => {
+  try {
+    const res = await axios.get('/api/admin/transaksi/stats')
+    if (res.data.success) {
+      stats.value = res.data.data
+    }
+  } catch (error) {
+    console.error('Failed to fetch stats', error)
+  }
+}
+
 onMounted(() => {
   fetchTransaksi()
+  fetchStats()
 })
 
 const formatRupiah = (angka: number) => {
@@ -61,6 +80,7 @@ const updateStatus = async () => {
       snackbar.value = true
       dialog.value = false
       fetchTransaksi()
+      fetchStats()
     }
   } catch (error: any) {
     console.error('Failed to update status', error)
@@ -92,11 +112,78 @@ const getStatusColor = (status: string) => {
         </h2>
         <p class="text-body-2 text-medium-emphasis mb-0 mt-1">Kelola semua transaksi dan ubah status pesanannya di sini.</p>
       </div>
-      <VBtn color="primary" variant="tonal" @click="fetchTransaksi" :loading="loading">
+      <VBtn color="primary" variant="tonal" @click="() => { fetchTransaksi(); fetchStats(); }" :loading="loading">
         <VIcon start icon="ri-refresh-line" />
         Refresh
       </VBtn>
     </div>
+
+    <!-- Stats Widgets -->
+    <VRow class="mb-6">
+      <!-- Widget 1: Total Transaksi -->
+      <VCol cols="12" sm="6" md="3">
+        <VCard elevation="4" class="rounded-xl border-none position-relative overflow-visible h-100 bg-white" style="border-left: 6px solid rgb(var(--v-theme-primary)) !important;">
+          <VCardText class="pa-5 d-flex justify-space-between align-center h-100">
+            <div>
+              <div class="text-caption text-uppercase font-weight-bold text-medium-emphasis mb-1" style="letter-spacing: 1px;">Total</div>
+              <div class="text-h3 font-weight-black text-high-emphasis mb-1">{{ stats.total }}</div>
+              <div class="text-caption text-medium-emphasis">Semua transaksi</div>
+            </div>
+            <VAvatar color="primary" size="64" rounded="lg" class="elevation-4" style="right: -10px;">
+              <VIcon icon="ri-shopping-cart-line" size="32" color="white" />
+            </VAvatar>
+          </VCardText>
+        </VCard>
+      </VCol>
+      
+      <!-- Widget 2: Success -->
+      <VCol cols="12" sm="6" md="3">
+        <VCard elevation="4" class="rounded-xl border-none position-relative overflow-visible h-100 bg-white" style="border-left: 6px solid rgb(var(--v-theme-success)) !important;">
+          <VCardText class="pa-5 d-flex justify-space-between align-center h-100">
+            <div>
+              <div class="text-caption text-uppercase font-weight-bold text-medium-emphasis mb-1" style="letter-spacing: 1px;">Lunas / Sukses</div>
+              <div class="text-h3 font-weight-black text-high-emphasis mb-1">{{ stats.success }}</div>
+              <div class="text-caption text-medium-emphasis">Berhasil diverifikasi</div>
+            </div>
+            <VAvatar color="success" size="64" rounded="lg" class="elevation-4" style="right: -10px;">
+              <VIcon icon="ri-checkbox-circle-line" size="32" color="white" />
+            </VAvatar>
+          </VCardText>
+        </VCard>
+      </VCol>
+
+      <!-- Widget 3: Pending -->
+      <VCol cols="12" sm="6" md="3">
+        <VCard elevation="4" class="rounded-xl border-none position-relative overflow-visible h-100 bg-white" style="border-left: 6px solid rgb(var(--v-theme-warning)) !important;">
+          <VCardText class="pa-5 d-flex justify-space-between align-center h-100">
+            <div>
+              <div class="text-caption text-uppercase font-weight-bold text-medium-emphasis mb-1" style="letter-spacing: 1px;">Tertunda</div>
+              <div class="text-h3 font-weight-black text-high-emphasis mb-1">{{ stats.pending }}</div>
+              <div class="text-caption text-medium-emphasis">Perlu diverifikasi</div>
+            </div>
+            <VAvatar color="warning" size="64" rounded="lg" class="elevation-4" style="right: -10px;">
+              <VIcon icon="ri-time-line" size="32" color="white" />
+            </VAvatar>
+          </VCardText>
+        </VCard>
+      </VCol>
+      
+      <!-- Widget 4: Unpaid -->
+      <VCol cols="12" sm="6" md="3">
+        <VCard elevation="4" class="rounded-xl border-none position-relative overflow-visible h-100 bg-white" style="border-left: 6px solid rgb(var(--v-theme-error)) !important;">
+          <VCardText class="pa-5 d-flex justify-space-between align-center h-100">
+            <div>
+              <div class="text-caption text-uppercase font-weight-bold text-medium-emphasis mb-1" style="letter-spacing: 1px;">Belum Dibayar</div>
+              <div class="text-h3 font-weight-black text-high-emphasis mb-1">{{ stats.unpaid }}</div>
+              <div class="text-caption text-medium-emphasis">Menunggu pembayaran</div>
+            </div>
+            <VAvatar color="error" size="64" rounded="lg" class="elevation-4" style="right: -10px;">
+              <VIcon icon="ri-wallet-3-line" size="32" color="white" />
+            </VAvatar>
+          </VCardText>
+        </VCard>
+      </VCol>
+    </VRow>
 
     <!-- Data Table -->
     <VCard elevation="10" class="rounded-lg overflow-hidden border-t-primary">

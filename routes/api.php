@@ -105,6 +105,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/admin/chats/{conversationId}', [\App\Http\Controllers\Api\Admin\ChatController::class, 'getMessages']);
 
         // Transaksi
+        Route::get('/admin/transaksi/stats', [App\Http\Controllers\Api\Admin\TransaksiController::class, 'stats']);
         Route::get('/admin/transaksi', [App\Http\Controllers\Api\Admin\TransaksiController::class, 'index']);
         Route::put('/admin/transaksi/{id}/status', [App\Http\Controllers\Api\Admin\TransaksiController::class, 'updateStatus']);
         

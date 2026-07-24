@@ -66,4 +66,24 @@ class TransaksiController extends Controller
         }
         return response()->file($path);
     }
+
+    public function stats()
+    {
+        $total = Transaksi::count();
+        $success = Transaksi::where('status_transaksi', 'Success')->count();
+        $pending = Transaksi::where('status_transaksi', 'Pending')->count();
+        $unpaid = Transaksi::where('status_transaksi', 'Unpaid')->count();
+        $failed = Transaksi::whereIn('status_transaksi', ['Failed', 'Cancel', 'Refund'])->count();
+        
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'total' => $total,
+                'success' => $success,
+                'pending' => $pending,
+                'unpaid' => $unpaid,
+                'failed' => $failed
+            ]
+        ]);
+    }
 }
