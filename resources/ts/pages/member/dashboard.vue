@@ -35,8 +35,21 @@ const fetchDashboard = async () => {
   }
 }
 
+const adminFeePercent = ref(5)
+const fetchSettings = async () => {
+  try {
+    const res = await axios.get('/api/settings')
+    if (res.data && res.data.data && res.data.data.biaya_admin_persen) {
+      adminFeePercent.value = parseFloat(res.data.data.biaya_admin_persen)
+    }
+  } catch (error) {
+    console.error(error)
+  }
+}
+
 onMounted(() => {
   fetchDashboard()
+  fetchSettings()
 })
 
 const formatRupiah = (angka: number) => {
@@ -188,11 +201,14 @@ const handlePhotoUpload = async (event: any) => {
               <VBtn size="small" color="warning" variant="elevated" @click="isRedeemDialogVisible = true">Tukar</VBtn>
             </VCard>
 
-            <VBtn block color="primary" variant="elevated" class="mb-3" to="/member/jual-akun" prepend-icon="ri-store-2-line">
+            <VBtn block color="primary" variant="elevated" class="mb-1" to="/member/jual-akun" prepend-icon="ri-store-2-line">
               Mulai Jual Akun Game
             </VBtn>
+            <div class="text-caption text-center text-medium-emphasis mb-3 opacity-80">
+              *Biaya admin penjualan: {{ adminFeePercent }}%
+            </div>
             
-            <VBtn block color="secondary" variant="tonal" class="mb-3" to="/member/tickets" prepend-icon="ri-customer-service-2-line">
+            <VBtn block color="secondary" variant="tonal" class="mb-3" to="/member/ticket" prepend-icon="ri-customer-service-2-line">
               Pusat Bantuan (Tiket)
             </VBtn>
           </VCard>

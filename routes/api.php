@@ -82,6 +82,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
         // Admin Withdrawals
         Route::get('/admin/withdrawals', [\App\Http\Controllers\Api\Admin\WithdrawalController::class, 'index']);
+        Route::get('/admin/withdrawals/stats', [\App\Http\Controllers\Api\Admin\WithdrawalController::class, 'stats']);
         Route::put('/admin/withdrawals/{id}/status', [\App\Http\Controllers\Api\Admin\WithdrawalController::class, 'updateStatus']);
 
         // Dasbor & Laporan

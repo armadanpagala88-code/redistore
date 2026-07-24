@@ -57,8 +57,9 @@ class WithdrawalController extends Controller
                 // Catat mutasi pengembalian
                 MutasiSaldo::create([
                     'user_id' => $user->id,
-                    'tipe' => 'Masuk',
+                    'jenis' => 'Masuk',
                     'nominal' => $withdrawal->nominal,
+                    'saldo_akhir' => $user->saldo,
                     'keterangan' => 'Pengembalian Dana (Tarik Saldo Ditolak)'
                 ]);
             }
@@ -81,5 +82,17 @@ class WithdrawalController extends Controller
                 'message' => 'Terjadi kesalahan sistem: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    public function stats()
+    {
+        $pending = Withdrawal::where('status', 'Pending')->count();
+        
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'pending' => $pending
+            ]
+        ]);
     }
 }

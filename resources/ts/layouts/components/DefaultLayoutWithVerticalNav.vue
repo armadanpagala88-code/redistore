@@ -34,9 +34,10 @@ const dynamicNavItems = reactive([...navItems])
 
 const fetchStats = async () => {
   try {
-    const [akunRes, transRes] = await Promise.all([
+    const [akunRes, transRes, wdRes] = await Promise.all([
       axios.get('/api/admin/akun-game/stats'),
-      axios.get('/api/admin/transaksi/stats')
+      axios.get('/api/admin/transaksi/stats'),
+      axios.get('/api/admin/withdrawals/stats')
     ])
     
     if (akunRes.data.success) {
@@ -54,6 +55,15 @@ const fetchStats = async () => {
       if (item) {
         item.badgeContent = unpaid > 0 ? unpaid.toString() : undefined
         item.badgeClass = 'bg-warning text-white'
+      }
+    }
+    
+    if (wdRes.data.success) {
+      const pendingWd = wdRes.data.data.pending
+      const item = dynamicNavItems.find(i => i.title === 'Penarikan Dana')
+      if (item) {
+        item.badgeContent = pendingWd > 0 ? pendingWd.toString() : undefined
+        item.badgeClass = 'bg-info text-white'
       }
     }
   } catch (error) {
