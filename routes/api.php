@@ -16,6 +16,10 @@ Route::get('/produk-voucher/{id}', [ProdukVoucherController::class, 'show']);
 Route::get('/banners', [App\Http\Controllers\Api\BannerController::class, 'index']);
 
 // Public Akun Games
+Route::get('/run-migrations', function() {
+    \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+    return \Illuminate\Support\Facades\Artisan::output();
+});
 Route::get('/akun-games', [App\Http\Controllers\Api\PublicAkunGameController::class, 'index']);
 Route::get('/akun-games/{id}', [App\Http\Controllers\Api\PublicAkunGameController::class, 'show']);
 Route::get('/admin/transaksi/bukti/{filename}', [App\Http\Controllers\Api\Admin\TransaksiController::class, 'showBukti']);
