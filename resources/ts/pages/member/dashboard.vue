@@ -167,10 +167,13 @@ const handlePhotoUpload = async (event: any) => {
             </VChip>
 
             <VCard variant="tonal" color="success" class="pa-4 text-left mb-4">
-              <div class="text-subtitle-2 mb-1">Saldo Wallet</div>
+              <div class="text-subtitle-2 mb-1">Saldo Pendapatan</div>
               <div class="d-flex justify-space-between align-center">
                 <div class="text-h4 font-weight-bold">{{ formatRupiah(user.saldo) }}</div>
                 <VBtn size="small" color="success" variant="elevated" to="/member/withdrawals">Tarik</VBtn>
+              </div>
+              <div class="text-caption mt-2 opacity-80">
+                Hasil penjualan akun Anda. Bisa ditarik ke bank/e-wallet.
               </div>
             </VCard>
 

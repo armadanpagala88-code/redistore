@@ -35,9 +35,22 @@ const fetchKategori = async () => {
   }
 }
 
+const adminFeePercent = ref<number>(5)
+const fetchSettings = async () => {
+  try {
+    const res = await axios.get('/api/settings')
+    if (res.data && res.data.data && res.data.data.biaya_admin_persen) {
+      adminFeePercent.value = parseFloat(res.data.data.biaya_admin_persen)
+    }
+  } catch (error) {
+    console.error(error)
+  }
+}
+
 onMounted(() => {
   fetchItems()
   fetchKategori()
+  fetchSettings()
 })
 
 const isDialogVisible = ref(false)
@@ -317,7 +330,7 @@ const statusColor = (status: string) => {
             />
             
             <VRow>
-              <VCol cols="6">
+              <VCol cols="12" md="6">
                 <VTextField 
                   v-model.number="form.harga" 
                   type="number" 
@@ -325,10 +338,26 @@ const statusColor = (status: string) => {
                   required 
                   variant="outlined" 
                   density="comfortable" 
-                  class="mb-4" 
+                  class="mb-2" 
                 />
+                
+                <VCard variant="tonal" color="info" class="pa-3 mb-4 text-caption" v-if="form.harga > 0">
+                  <div class="d-flex justify-space-between mb-1">
+                    <span>Harga Jual:</span>
+                    <span class="font-weight-medium">{{ formatRupiah(form.harga) }}</span>
+                  </div>
+                  <div class="d-flex justify-space-between mb-1 text-error">
+                    <span>Potongan Admin ({{ adminFeePercent }}%):</span>
+                    <span>-{{ formatRupiah(form.harga * adminFeePercent / 100) }}</span>
+                  </div>
+                  <VDivider class="my-1" />
+                  <div class="d-flex justify-space-between text-success font-weight-bold">
+                    <span>Pendapatan Anda:</span>
+                    <span>{{ formatRupiah(form.harga - (form.harga * adminFeePercent / 100)) }}</span>
+                  </div>
+                </VCard>
               </VCol>
-              <VCol cols="6">
+              <VCol cols="12" md="6">
                 <VTextField 
                   v-model="form.login_via" 
                   label="Login Via (Moonton, FB, dll)" 
