@@ -20,6 +20,7 @@ const form = ref({
   user_id_game: '',
   produk_voucher_id: null,
   no_whatsapp: '',
+  nama_pembeli: '',
   email_pembeli: '',
   kode_voucher: ''
 })
@@ -293,6 +294,16 @@ const checkout = async () => {
                   class="mb-4 custom-input"
                   required
                   prepend-inner-icon="ri-whatsapp-line"
+                />
+
+                <VTextField
+                  v-model="form.nama_pembeli"
+                  label="Nama Lengkap (Opsional)"
+                  placeholder="Masukkan nama Anda"
+                  variant="outlined"
+                  color="primary"
+                  class="mb-4 custom-input"
+                  prepend-inner-icon="ri-user-line"
                 />
 
                 <VTextField

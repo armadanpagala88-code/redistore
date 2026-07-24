@@ -183,7 +183,7 @@ onMounted(async () => {
             <VRow class="mb-8">
               <VCol cols="12" sm="6">
                 <h6 class="text-subtitle-2 text-medium-emphasis font-weight-bold mb-3 text-uppercase">Ditagihkan Kepada:</h6>
-                <div class="text-h6 font-weight-bold mb-1">{{ invoice.user ? invoice.user.nama_lengkap : (invoice.email_pembeli || 'Pelanggan (Guest)') }}</div>
+                <div class="text-h6 font-weight-bold mb-1">{{ invoice.user ? invoice.user.nama_lengkap : (invoice.nama_pembeli || invoice.email_pembeli || 'Pelanggan (Guest)') }}</div>
                 <div class="text-body-2 text-medium-emphasis mb-1 d-flex align-center gap-2">
                   <VIcon icon="ri-whatsapp-line" size="16"/> {{ invoice.no_whatsapp }}
                 </div>

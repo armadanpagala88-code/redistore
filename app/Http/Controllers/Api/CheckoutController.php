@@ -70,6 +70,7 @@ class CheckoutController extends Controller
         $request->validate([
             'tipe_transaksi' => 'required|in:TopUp,BeliAkun',
             'no_whatsapp' => 'required|string',
+            'nama_pembeli' => 'nullable|string',
             'email_pembeli' => 'nullable|email',
             'kode_voucher' => 'nullable|string',
             // Jika TopUp
@@ -134,6 +135,7 @@ class CheckoutController extends Controller
             'akun_game_id' => $request->akun_game_id,
             'zone_id' => $request->zone_id,
             'no_whatsapp' => $request->no_whatsapp,
+            'nama_pembeli' => $request->nama_pembeli,
             'email_pembeli' => $request->email_pembeli,
             'total_bayar' => $totalBayar,
             'diskon_voucher_id' => $diskonVoucherId,
