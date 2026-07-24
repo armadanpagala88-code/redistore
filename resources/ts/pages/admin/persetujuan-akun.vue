@@ -122,11 +122,29 @@ const submitReject = async () => {
     if (error.response && error.response.data && error.response.data.message) {
       alert(error.response.data.message)
     } else {
-      alert('Gagal mengubah status')
+      alert('Gagal menolak postingan akun')
     }
   } finally {
     isSubmittingReject.value = false
   }
+}
+
+const getMainImage = (gambarUtama: any) => {
+  if (!gambarUtama) return '/img/placeholder.png'
+  if (typeof gambarUtama === 'string') {
+    try {
+      const parsed = JSON.parse(gambarUtama)
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return `/img/akun/${parsed[0]}`
+      }
+    } catch (e) {
+      // not a json string
+      return `/img/akun/${gambarUtama}`
+    }
+  } else if (Array.isArray(gambarUtama) && gambarUtama.length > 0) {
+    return `/img/akun/${gambarUtama[0]}`
+  }
+  return `/img/akun/${gambarUtama}`
 }
 
 const deleteItem = async (id: string) => {
@@ -256,42 +274,48 @@ const submitEdit = async () => {
 
     <!-- Stats Widgets -->
     <VRow class="mb-6">
+      <!-- Widget 1: Total Akun -->
       <VCol cols="12" md="4">
-        <VCard elevation="4" class="rounded-lg bg-primary text-white border-none">
-          <VCardText class="d-flex align-center justify-space-between pa-5">
+        <VCard elevation="4" class="rounded-xl border-none position-relative overflow-visible h-100 bg-white" style="border-left: 6px solid rgb(var(--v-theme-primary)) !important;">
+          <VCardText class="pa-5 d-flex justify-space-between align-center h-100">
             <div>
-              <h4 class="text-h6 font-weight-medium mb-1 text-white opacity-90">Total Akun</h4>
-              <div class="text-h4 font-weight-bold">{{ stats.total }}</div>
+              <div class="text-caption text-uppercase font-weight-bold text-medium-emphasis mb-1" style="letter-spacing: 1px;">Total Akun</div>
+              <div class="text-h3 font-weight-black text-high-emphasis mb-1">{{ stats.total }}</div>
+              <div class="text-caption text-medium-emphasis">Keseluruhan postingan</div>
             </div>
-            <VAvatar color="rgba(255,255,255,0.2)" size="56" rounded>
+            <VAvatar color="primary" size="64" rounded="lg" class="elevation-4" style="right: -10px;">
               <VIcon icon="ri-file-list-3-line" size="32" color="white" />
             </VAvatar>
           </VCardText>
         </VCard>
       </VCol>
       
+      <!-- Widget 2: Belum Disetujui -->
       <VCol cols="12" md="4">
-        <VCard elevation="4" class="rounded-lg bg-warning text-white border-none">
-          <VCardText class="d-flex align-center justify-space-between pa-5">
+        <VCard elevation="4" class="rounded-xl border-none position-relative overflow-visible h-100 bg-white" style="border-left: 6px solid rgb(var(--v-theme-warning)) !important;">
+          <VCardText class="pa-5 d-flex justify-space-between align-center h-100">
             <div>
-              <h4 class="text-h6 font-weight-medium mb-1 text-white opacity-90">Belum Disetujui</h4>
-              <div class="text-h4 font-weight-bold">{{ stats.pending }}</div>
+              <div class="text-caption text-uppercase font-weight-bold text-medium-emphasis mb-1" style="letter-spacing: 1px;">Belum Disetujui</div>
+              <div class="text-h3 font-weight-black text-high-emphasis mb-1">{{ stats.pending }}</div>
+              <div class="text-caption text-medium-emphasis">Menunggu verifikasi</div>
             </div>
-            <VAvatar color="rgba(255,255,255,0.2)" size="56" rounded>
+            <VAvatar color="warning" size="64" rounded="lg" class="elevation-4" style="right: -10px;">
               <VIcon icon="ri-time-line" size="32" color="white" />
             </VAvatar>
           </VCardText>
         </VCard>
       </VCol>
 
+      <!-- Widget 3: Disetujui -->
       <VCol cols="12" md="4">
-        <VCard elevation="4" class="rounded-lg bg-success text-white border-none">
-          <VCardText class="d-flex align-center justify-space-between pa-5">
+        <VCard elevation="4" class="rounded-xl border-none position-relative overflow-visible h-100 bg-white" style="border-left: 6px solid rgb(var(--v-theme-success)) !important;">
+          <VCardText class="pa-5 d-flex justify-space-between align-center h-100">
             <div>
-              <h4 class="text-h6 font-weight-medium mb-1 text-white opacity-90">Disetujui (Tersedia)</h4>
-              <div class="text-h4 font-weight-bold">{{ stats.tersedia }}</div>
+              <div class="text-caption text-uppercase font-weight-bold text-medium-emphasis mb-1" style="letter-spacing: 1px;">Tersedia</div>
+              <div class="text-h3 font-weight-black text-high-emphasis mb-1">{{ stats.tersedia }}</div>
+              <div class="text-caption text-medium-emphasis">Berhasil diverifikasi</div>
             </div>
-            <VAvatar color="rgba(255,255,255,0.2)" size="56" rounded>
+            <VAvatar color="success" size="64" rounded="lg" class="elevation-4" style="right: -10px;">
               <VIcon icon="ri-checkbox-circle-line" size="32" color="white" />
             </VAvatar>
           </VCardText>
@@ -322,7 +346,7 @@ const submitEdit = async () => {
             <td class="py-3">
               <div class="d-flex align-center gap-3">
                 <VAvatar rounded="lg" size="48" color="surface-variant" variant="tonal" class="elevation-1">
-                  <VImg :src="`/img/akun/${item.gambar_utama}`" cover />
+                  <VImg :src="getMainImage(item.gambar_utama)" cover />
                 </VAvatar>
                 <div>
                   <div class="font-weight-bold text-high-emphasis">{{ item.judul_akun }}</div>
