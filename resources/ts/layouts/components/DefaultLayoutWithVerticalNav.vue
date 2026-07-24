@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import { ref, watch, onMounted, computed } from 'vue'
+import axios from 'axios'
 import navItems from '@/navigation/vertical'
 import { useConfigStore } from '@core/stores/config'
 import { themeConfig } from '@themeConfig'
@@ -26,10 +28,43 @@ watch([
   else
     verticalNavHeaderActionAnimationName.value = val[0] ? 'rotate-180' : 'rotate-back-180'
 }, { immediate: true })
+
+const pendingAkunCount = ref(0)
+
+const fetchPendingAkun = async () => {
+  try {
+    const res = await axios.get('/api/admin/akun-game/stats')
+    if (res.data.success && res.data.data.pending > 0) {
+      pendingAkunCount.value = res.data.data.pending
+    } else {
+      pendingAkunCount.value = 0
+    }
+  } catch (error) {
+    console.error('Failed to fetch pending akun stats', error)
+  }
+}
+
+onMounted(() => {
+  fetchPendingAkun()
+  // Optional: setInterval(fetchPendingAkun, 30000)
+})
+
+const dynamicNavItems = computed(() => {
+  return navItems.map(item => {
+    if (item.title === 'Persetujuan Akun') {
+      return {
+        ...item,
+        badgeContent: pendingAkunCount.value > 0 ? pendingAkunCount.value.toString() : undefined,
+        badgeClass: 'bg-error text-white'
+      }
+    }
+    return item
+  })
+})
 </script>
 
 <template>
-  <VerticalNavLayout :nav-items="navItems">
+  <VerticalNavLayout :nav-items="dynamicNavItems">
     <!-- 👉 navbar -->
     <template #navbar="{ toggleVerticalOverlayNavActive }">
       <div class="d-flex h-100 align-center">

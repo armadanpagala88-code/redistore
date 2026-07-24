@@ -9,6 +9,12 @@ const loading = ref(true)
 const page = ref(1)
 const totalPages = ref(1)
 
+const stats = ref({
+  total: 0,
+  pending: 0,
+  tersedia: 0
+})
+
 const snackbar = ref({
   show: false,
   message: '',
@@ -49,8 +55,20 @@ const fetchItems = async () => {
   }
 }
 
+const fetchStats = async () => {
+  try {
+    const res = await axios.get('/api/admin/akun-game/stats')
+    if (res.data.success) {
+      stats.value = res.data.data
+    }
+  } catch (error) {
+    console.error('Error fetching stats:', error)
+  }
+}
+
 onMounted(() => {
   fetchItems()
+  fetchStats()
 })
 
 const onSearch = () => {
@@ -74,6 +92,7 @@ const updateStatus = async (id: string, status: string) => {
     const res = await axios.put(`/api/admin/akun-game/${id}/status`, { status })
     alert(res.data.message)
     fetchItems()
+    fetchStats()
   } catch (error: any) {
     if (error.response && error.response.data && error.response.data.message) {
       alert(error.response.data.message)
@@ -98,6 +117,7 @@ const submitReject = async () => {
     alert(res.data.message)
     isRejectDialogVisible.value = false
     fetchItems()
+    fetchStats()
   } catch (error: any) {
     if (error.response && error.response.data && error.response.data.message) {
       alert(error.response.data.message)
@@ -233,6 +253,51 @@ const submitEdit = async () => {
         />
       </div>
     </div>
+
+    <!-- Stats Widgets -->
+    <VRow class="mb-6">
+      <VCol cols="12" md="4">
+        <VCard elevation="4" class="rounded-lg bg-primary text-white border-none">
+          <VCardText class="d-flex align-center justify-space-between pa-5">
+            <div>
+              <h4 class="text-h6 font-weight-medium mb-1 text-white opacity-90">Total Akun</h4>
+              <div class="text-h4 font-weight-bold">{{ stats.total }}</div>
+            </div>
+            <VAvatar color="rgba(255,255,255,0.2)" size="56" rounded>
+              <VIcon icon="ri-file-list-3-line" size="32" color="white" />
+            </VAvatar>
+          </VCardText>
+        </VCard>
+      </VCol>
+      
+      <VCol cols="12" md="4">
+        <VCard elevation="4" class="rounded-lg bg-warning text-white border-none">
+          <VCardText class="d-flex align-center justify-space-between pa-5">
+            <div>
+              <h4 class="text-h6 font-weight-medium mb-1 text-white opacity-90">Belum Disetujui</h4>
+              <div class="text-h4 font-weight-bold">{{ stats.pending }}</div>
+            </div>
+            <VAvatar color="rgba(255,255,255,0.2)" size="56" rounded>
+              <VIcon icon="ri-time-line" size="32" color="white" />
+            </VAvatar>
+          </VCardText>
+        </VCard>
+      </VCol>
+
+      <VCol cols="12" md="4">
+        <VCard elevation="4" class="rounded-lg bg-success text-white border-none">
+          <VCardText class="d-flex align-center justify-space-between pa-5">
+            <div>
+              <h4 class="text-h6 font-weight-medium mb-1 text-white opacity-90">Disetujui (Tersedia)</h4>
+              <div class="text-h4 font-weight-bold">{{ stats.tersedia }}</div>
+            </div>
+            <VAvatar color="rgba(255,255,255,0.2)" size="56" rounded>
+              <VIcon icon="ri-checkbox-circle-line" size="32" color="white" />
+            </VAvatar>
+          </VCardText>
+        </VCard>
+      </VCol>
+    </VRow>
 
     <!-- Data Table Card -->
     <VCard elevation="10" class="border-t-primary rounded-lg overflow-hidden">
