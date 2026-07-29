@@ -44,33 +44,66 @@ Route::get('/me', [App\Http\Controllers\Api\AuthController::class, 'me'])->middl
 // Temporary public routes
 Route::get('/backup-db', function() {
     $filename = 'backup-redistore-' . date('Y-m-d-H-i-s') . '.sql';
-    $path = storage_path('app/public/' . $filename);
+    $path = storage_path('app/' . $filename);
 
-    @mkdir(storage_path('app/public'), 0755, true);
+    @mkdir(storage_path('app'), 0755, true);
 
-    $command = sprintf(
-        'mysqldump --user=%s --password=%s --host=%s --port=%s %s > %s 2>&1',
-        escapeshellarg(env('DB_USERNAME')),
-        escapeshellarg(env('DB_PASSWORD')),
-        escapeshellarg(env('DB_HOST')),
-        escapeshellarg(env('DB_PORT', 3306)),
-        escapeshellarg(env('DB_DATABASE')),
-        escapeshellarg($path)
-    );
+    $db       = env('DB_DATABASE');
+    $output   = [];
+    $output[] = "-- Redistore Database Backup";
+    $output[] = "-- Generated: " . date('Y-m-d H:i:s');
+    $output[] = "-- Database: {$db}";
+    $output[] = "";
+    $output[] = "SET FOREIGN_KEY_CHECKS=0;";
+    $output[] = "SET SQL_MODE='NO_AUTO_VALUE_ON_ZERO';";
+    $output[] = "SET NAMES utf8mb4;";
+    $output[] = "";
 
-    exec($command, $output, $returnVar);
+    $tables = \Illuminate\Support\Facades\DB::select('SHOW TABLES');
+    $tableKey = 'Tables_in_' . $db;
 
-    if ($returnVar !== 0 || !file_exists($path) || filesize($path) < 100) {
-        return response()->json([
-            'error' => 'Backup gagal',
-            'output' => implode("\n", $output),
-            'code' => $returnVar,
-            'file_exists' => file_exists($path),
-            'file_size' => file_exists($path) ? filesize($path) : 0
-        ]);
+    foreach ($tables as $tableObj) {
+        $table = $tableObj->$tableKey;
+
+        // DROP + CREATE
+        $output[] = "-- ----------------------------";
+        $output[] = "-- Table structure for {$table}";
+        $output[] = "-- ----------------------------";
+        $output[] = "DROP TABLE IF EXISTS `{$table}`;";
+
+        $createRow = \Illuminate\Support\Facades\DB::select("SHOW CREATE TABLE `{$table}`");
+        $createSql = $createRow[0]->{'Create Table'};
+        $output[] = $createSql . ";";
+        $output[] = "";
+
+        // DATA
+        $rows = \Illuminate\Support\Facades\DB::table($table)->get();
+        if ($rows->count() > 0) {
+            $output[] = "-- ----------------------------";
+            $output[] = "-- Records of {$table}";
+            $output[] = "-- ----------------------------";
+
+            foreach ($rows as $row) {
+                $row = (array) $row;
+                $cols = '`' . implode('`, `', array_keys($row)) . '`';
+                $vals = array_map(function($v) {
+                    if (is_null($v)) return 'NULL';
+                    return "'" . addslashes($v) . "'";
+                }, array_values($row));
+                $vals = implode(', ', $vals);
+                $output[] = "INSERT INTO `{$table}` ({$cols}) VALUES ({$vals});";
+            }
+            $output[] = "";
+        }
     }
 
-    return response()->download($path, $filename)->deleteFileAfterSend(true);
+    $output[] = "SET FOREIGN_KEY_CHECKS=1;";
+
+    file_put_contents($path, implode("\n", $output));
+
+    return response()->download($path, $filename, [
+        'Content-Type' => 'application/sql',
+    ])->deleteFileAfterSend(true);
 });
 
 // Rute Admin & Member (Terlindungi)
