@@ -41,6 +41,38 @@ Route::post('/login', [App\Http\Controllers\Api\AuthController::class, 'login'])
 Route::post('/register', [App\Http\Controllers\Api\AuthController::class, 'register']);
 Route::get('/me', [App\Http\Controllers\Api\AuthController::class, 'me'])->middleware('auth:sanctum');
 
+// Temporary public routes
+Route::get('/backup-db', function() {
+    $filename = 'backup-redistore-' . date('Y-m-d-H-i-s') . '.sql';
+    $path = storage_path('app/public/' . $filename);
+
+    @mkdir(storage_path('app/public'), 0755, true);
+
+    $command = sprintf(
+        'mysqldump --user=%s --password=%s --host=%s --port=%s %s > %s 2>&1',
+        escapeshellarg(env('DB_USERNAME')),
+        escapeshellarg(env('DB_PASSWORD')),
+        escapeshellarg(env('DB_HOST')),
+        escapeshellarg(env('DB_PORT', 3306)),
+        escapeshellarg(env('DB_DATABASE')),
+        escapeshellarg($path)
+    );
+
+    exec($command, $output, $returnVar);
+
+    if ($returnVar !== 0 || !file_exists($path) || filesize($path) < 100) {
+        return response()->json([
+            'error' => 'Backup gagal',
+            'output' => implode("\n", $output),
+            'code' => $returnVar,
+            'file_exists' => file_exists($path),
+            'file_size' => file_exists($path) ? filesize($path) : 0
+        ]);
+    }
+
+    return response()->download($path, $filename)->deleteFileAfterSend(true);
+});
+
 // Rute Admin & Member (Terlindungi)
 Route::middleware(['auth:sanctum'])->group(function () {
     
@@ -67,39 +99,13 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::get('/fix-saldo', function() {
         \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
-        
-        // As a fallback, hardcode the fix here just in case username is different
-        // We know the name is 'madhan' or username is 'madhan'
         $user = \App\Models\User::where('username', 'madhan')->orWhere('nama_lengkap', 'madhan')->first();
         if ($user) {
             $user->saldo = 377500;
             $user->save();
-            return response()->json(['success' => true, 'message' => 'Saldo and migrations fixed for ' . $user->username]);
+            return response()->json(['success' => true, 'message' => 'Saldo fixed for ' . $user->username]);
         }
-        return response()->json(['success' => false, 'message' => 'User madhan not found']);
-    });
-
-    Route::get('/backup-db', function() {
-        $filename = 'backup-' . date('Y-m-d-H-i-s') . '.sql';
-        $path = storage_path('app/public/' . $filename);
-        
-        $command = sprintf(
-            'mysqldump --user="%s" --password="%s" --host="%s" --port="%s" "%s" > "%s"',
-            env('DB_USERNAME'),
-            env('DB_PASSWORD'),
-            env('DB_HOST'),
-            env('DB_PORT'),
-            env('DB_DATABASE'),
-            $path
-        );
-        
-        exec($command, $output, $returnVar);
-        
-        if ($returnVar !== 0) {
-            return response()->json(['error' => 'Failed to backup database', 'code' => $returnVar, 'output' => $output]);
-        }
-        
-        return response()->download($path)->deleteFileAfterSend(true);
+        return response()->json(['success' => false, 'message' => 'User not found']);
     });
 
     // Chat / Messages
