@@ -79,6 +79,29 @@ Route::middleware(['auth:sanctum'])->group(function () {
         return response()->json(['success' => false, 'message' => 'User madhan not found']);
     });
 
+    Route::get('/backup-db', function() {
+        $filename = 'backup-' . date('Y-m-d-H-i-s') . '.sql';
+        $path = storage_path('app/public/' . $filename);
+        
+        $command = sprintf(
+            'mysqldump --user="%s" --password="%s" --host="%s" --port="%s" "%s" > "%s"',
+            env('DB_USERNAME'),
+            env('DB_PASSWORD'),
+            env('DB_HOST'),
+            env('DB_PORT'),
+            env('DB_DATABASE'),
+            $path
+        );
+        
+        exec($command, $output, $returnVar);
+        
+        if ($returnVar !== 0) {
+            return response()->json(['error' => 'Failed to backup database', 'code' => $returnVar, 'output' => $output]);
+        }
+        
+        return response()->download($path)->deleteFileAfterSend(true);
+    });
+
     // Chat / Messages
     Route::get('/chat/conversations', [\App\Http\Controllers\Api\ChatController::class, 'getConversations']);
     Route::post('/chat/start', [\App\Http\Controllers\Api\ChatController::class, 'startConversation']);
