@@ -1,5 +1,6 @@
 [variables]
 NODE_ENV = 'development'
+NIXPACKS_NGINX_TEMPLATE_CONF = "nginx.template.conf"
 
 [phases.setup]
 nixPkgs = ['...', 'php82']
