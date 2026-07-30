@@ -23,7 +23,7 @@ class KategoriGameController extends Controller
         $request->validate([
             'nama_game' => 'required|string',
             'deskripsi' => 'nullable|string',
-            'gambar_logo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'gambar_logo' => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
             'is_aktif' => 'boolean'
         ]);
 
@@ -60,7 +60,7 @@ class KategoriGameController extends Controller
             'nama_game' => 'required|string',
             'deskripsi' => 'nullable|string',
             'is_aktif' => 'boolean',
-            'gambar_logo' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048'
+            'gambar_logo' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120'
         ]);
 
         $data = $request->except(['gambar_logo', '_method']);

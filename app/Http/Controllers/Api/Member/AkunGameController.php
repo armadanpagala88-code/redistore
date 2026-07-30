@@ -34,7 +34,7 @@ class AkunGameController extends Controller
             'password_akun' => 'required|string',
             'catatan_akun' => 'nullable|string',
             'gambar_utama' => 'required',
-            'gambar_utama.*' => 'image|max:2048'
+            'gambar_utama.*' => 'image|max:5120'
         ]);
 
         $data = $request->except('gambar_utama');
@@ -99,7 +99,7 @@ class AkunGameController extends Controller
             'password_akun' => 'required|string',
             'catatan_akun' => 'nullable|string',
             'gambar_utama' => 'nullable',
-            'gambar_utama.*' => 'image|max:2048'
+            'gambar_utama.*' => 'image|max:5120'
         ]);
 
         $data = $request->except(['gambar_utama', '_method']);

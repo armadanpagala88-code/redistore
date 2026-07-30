@@ -88,7 +88,7 @@ class AkunGameController extends Controller
             'harga' => 'required|numeric|min:1000',
             'login_via' => 'required|string',
             'gambar_utama' => 'nullable',
-            'gambar_utama.*' => 'image|max:2048'
+            'gambar_utama.*' => 'image|max:5120'
         ]);
 
         $data = $request->only(['judul_akun', 'harga', 'login_via']);

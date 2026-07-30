@@ -228,7 +228,7 @@ class CheckoutController extends Controller
     public function uploadBukti(Request $request, $id)
     {
         $request->validate([
-            'bukti_pembayaran' => 'required|image|mimes:jpeg,png,jpg|max:2048'
+            'bukti_pembayaran' => 'required|image|mimes:jpeg,png,jpg|max:5120'
         ]);
 
         $transaksi = Transaksi::findOrFail($id);

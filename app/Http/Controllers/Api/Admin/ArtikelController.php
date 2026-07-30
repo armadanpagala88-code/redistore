@@ -24,7 +24,7 @@ class ArtikelController extends Controller
             'judul' => 'required|string|max:255',
             'konten' => 'required|string',
             'is_published' => 'boolean',
-            'gambar' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
+            'gambar' => 'nullable|image|mimes:jpeg,png,jpg|max:5120'
         ]);
 
         $slug = Str::slug($request->judul);
@@ -71,7 +71,7 @@ class ArtikelController extends Controller
             'judul' => 'required|string|max:255',
             'konten' => 'required|string',
             'is_published' => 'boolean',
-            'gambar' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
+            'gambar' => 'nullable|image|mimes:jpeg,png,jpg|max:5120'
         ]);
 
         $artikel = Artikel::findOrFail($id);
