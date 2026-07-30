@@ -62,7 +62,7 @@ class KategoriGameController extends Controller
             'is_aktif' => 'boolean'
         ]);
 
-        $data = $request->except('gambar_logo');
+        $data = $request->except(['gambar_logo', '_method']);
         $data['slug'] = Str::slug($request->nama_game);
 
         if ($request->hasFile('gambar_logo')) {

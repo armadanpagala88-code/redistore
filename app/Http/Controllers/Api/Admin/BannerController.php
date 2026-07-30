@@ -99,8 +99,8 @@ class BannerController extends Controller
     {
         $banner = Banner::findOrFail($id);
         
-        if ($banner->gambar_banner && File::exists(public_path('images/' . $banner->gambar_banner))) {
-            File::delete(public_path('images/' . $banner->gambar_banner));
+        if ($banner->gambar_banner && File::exists(storage_path('app/public/' . $banner->gambar_banner))) {
+            File::delete(storage_path('app/public/' . $banner->gambar_banner));
         }
         
         $banner->delete();
