@@ -49,7 +49,7 @@ const totalPages = computed(() =>
 // ── Methods ───────────────────────────────────────────────────────────────────
 const getImageUrl = (path: string) => {
   if (!path) return 'https://placehold.co/400x400/f1f5f9/94a3b8.png?text=Game'
-  return path.startsWith('http') ? path : `/img/${path}`
+  return path.startsWith('http') ? path : `/img/kategori/${path}`
 }
 
 const getAkunImage = (path: string) => {

@@ -13,4 +13,9 @@ class KategoriGame extends Model
     {
         return $this->hasMany(ProdukVoucher::class, 'kategori_game_id');
     }
+
+    public function akunGames()
+    {
+        return $this->hasMany(AkunGame::class, 'kategori_game_id');
+    }
 }
