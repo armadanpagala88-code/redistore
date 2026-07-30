@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use App\Services\FonnteService;
 
 class AuthController extends Controller
 {
@@ -75,6 +76,10 @@ class AuthController extends Controller
         ]);
 
         $token = $user->createToken('auth_token')->plainTextToken;
+
+        // Kirim Notifikasi WhatsApp Selamat Datang
+        $msg = "Halo *{$user->nama_lengkap}*!\n\nSelamat! Pendaftaran Anda di *Redistore* telah berhasil.\n\nUsername Anda: *{$user->username}*\n\nTerima kasih telah bergabung. Selamat berbelanja dan menikmati layanan kami!";
+        FonnteService::sendMessage($user->no_telepon, $msg);
 
         return response()->json([
             'success' => true,

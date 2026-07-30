@@ -88,9 +88,10 @@ class MidtransWebhookController extends Controller
                                 'keterangan' => "Hasil Penjualan Akun Game ({$transaksi->id}) - Potongan Admin {$feePercent}%"
                             ]);
                         }
+                        $msg = "Horee! Pembayaran pesanan *$orderId* telah *BERHASIL* diverifikasi.\n\nBerikut adalah data login akun game Anda:\n\nEmail/Username: *" . $akunGame->email_akun . "*\nPassword: *" . $akunGame->password_akun . "*\nLogin Via: *" . $akunGame->login_via . "*\n\nCatatan Penjual: " . ($akunGame->catatan_akun ? $akunGame->catatan_akun : "-") . "\n\nTerima kasih telah berbelanja di Redistore! Harap segera amankan akun Anda.";
+                    } else {
+                        $msg = "Pembayaran untuk pembelian Akun Game *$orderId* telah BERHASIL kami terima.\n\nAkun game akan segera diserahkan, silakan cek detail akun pada menu riwayat pesanan Anda!";
                     }
-                    
-                    $msg = "Pembayaran untuk pembelian Akun Game *$orderId* telah BERHASIL kami terima.\n\nAkun game akan segera diserahkan, silakan cek detail akun pada menu riwayat pesanan Anda!";
                 }
 
                 // Tambahkan Poin Loyalitas jika pembeli adalah Member
