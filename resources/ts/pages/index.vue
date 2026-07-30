@@ -211,23 +211,29 @@ const filteredAkunGames = computed(() => {
           Marketplace Akun Game
         </h2>
         
-        <!-- Category Filter -->
-        <VChipGroup
-          v-model="selectedCategory"
-          mandatory
-          class="custom-chip-group"
-        >
-          <VChip
-            v-for="cat in uniqueCategories"
-            :key="cat"
-            :value="cat"
-            variant="elevated"
-            :class="['font-weight-medium px-4 mx-1', selectedCategory === cat ? 'text-white' : 'text-high-emphasis']"
-            :color="selectedCategory === cat ? 'primary' : 'surface'"
+        <div class="d-flex flex-column flex-sm-row align-sm-center gap-4">
+          <!-- Category Filter -->
+          <VChipGroup
+            v-model="selectedCategory"
+            mandatory
+            class="custom-chip-group"
           >
-            {{ cat }}
-          </VChip>
-        </VChipGroup>
+            <VChip
+              v-for="cat in uniqueCategories"
+              :key="cat"
+              :value="cat"
+              variant="elevated"
+              :class="['font-weight-medium px-4 mx-1', selectedCategory === cat ? 'text-white' : 'text-high-emphasis']"
+              :color="selectedCategory === cat ? 'primary' : 'surface'"
+            >
+              {{ cat }}
+            </VChip>
+          </VChipGroup>
+
+          <VBtn to="/marketplace" color="primary" variant="tonal" append-icon="ri-arrow-right-line" class="font-weight-bold rounded-pill d-none d-sm-flex">
+            Lihat Semua
+          </VBtn>
+        </div>
       </div>
 
       <!-- Game Grid ala UniPin -->
@@ -281,6 +287,13 @@ const filteredAkunGames = computed(() => {
           </div>
         </VCol>
       </VRow>
+
+      <!-- Tombol Lihat Semua (Bawah) -->
+      <div class="text-center mt-8 mb-4">
+        <VBtn to="/marketplace" color="primary" variant="flat" append-icon="ri-arrow-right-line" class="font-weight-bold rounded-pill px-8" size="large">
+          Jelajahi Semua Produk
+        </VBtn>
+      </div>
     </template>
   </div>
 </template>

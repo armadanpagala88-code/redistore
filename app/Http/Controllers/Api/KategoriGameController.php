@@ -10,7 +10,11 @@ class KategoriGameController extends Controller
 {
     public function index()
     {
-        $kategori = KategoriGame::where('is_aktif', true)->get();
+        $kategori = KategoriGame::where('is_aktif', true)
+            ->withCount(['akunGames' => function ($q) {
+                $q->where('status', 'Tersedia');
+            }])
+            ->get();
         return response()->json([
             'success' => true,
             'data' => $kategori

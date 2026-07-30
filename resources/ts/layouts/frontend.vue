@@ -81,7 +81,7 @@ watch([isFallbackStateActive, refLoadingIndicator], () => {
           <VBtn variant="text" to="/" prepend-icon="ri-home-4-line" class="text-white font-weight-medium nav-btn">
             Home
           </VBtn>
-          <VBtn variant="text" to="/#marketplace" prepend-icon="ri-store-2-line" class="text-white font-weight-medium nav-btn">
+          <VBtn variant="text" to="/marketplace" prepend-icon="ri-store-2-line" class="text-white font-weight-medium nav-btn">
             Marketplace
           </VBtn>
           <VBtn variant="text" to="/blog" prepend-icon="ri-article-line" class="text-white font-weight-medium nav-btn">
@@ -125,7 +125,7 @@ watch([isFallbackStateActive, refLoadingIndicator], () => {
       
       <VList class="pa-2">
         <VListItem to="/" prepend-icon="ri-home-4-line" title="Home" rounded="lg" class="mb-1" @click="isMobileDrawerOpen = false" />
-        <VListItem to="/#marketplace" prepend-icon="ri-store-2-line" title="Marketplace" rounded="lg" class="mb-1" @click="isMobileDrawerOpen = false" />
+        <VListItem to="/marketplace" prepend-icon="ri-store-2-line" title="Marketplace" rounded="lg" class="mb-1" @click="isMobileDrawerOpen = false" />
         <VListItem to="/blog" prepend-icon="ri-article-line" title="Kabar Game" rounded="lg" class="mb-1" @click="isMobileDrawerOpen = false" />
         
         <template v-if="userData">
