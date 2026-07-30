@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
+import TiptapEditor from '@/@core/components/TiptapEditor.vue'
 
 const router = useRouter()
 const items = ref<any[]>([])
@@ -66,8 +67,6 @@ const saveItem = async () => {
     }
 
     if (isEdit.value) {
-      // Laravel trick to handle PUT with FormData
-      formData.append('_method', 'PUT')
       await axios.post(`/api/admin/artikel/${form.value.id}`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       })
@@ -204,14 +203,10 @@ const formatDate = (dateString: string) => {
               class="mb-4" 
             />
 
-            <VTextarea 
-              v-model="form.konten" 
-              label="Konten (Mendukung HTML dasar)" 
-              required 
-              rows="10"
-              variant="outlined"
-              class="mb-4" 
-            />
+            <div class="mb-4">
+              <div class="text-caption mb-1 ml-1 text-medium-emphasis">Konten (Mendukung HTML & Gambar)</div>
+              <TiptapEditor v-model="form.konten" class="border rounded" />
+            </div>
 
             <VSwitch v-model="form.is_published" label="Publish (Tampilkan di Publik)" color="primary" class="mb-6 font-weight-medium" inset />
             

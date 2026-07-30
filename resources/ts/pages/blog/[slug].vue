@@ -63,7 +63,7 @@ const formatDate = (dateString: string) => {
           <!-- Gambar -->
           <VImg
             v-if="artikel.gambar"
-            :src="artikel.gambar"
+            :src="'/img/' + artikel.gambar"
             cover
             class="rounded-lg mb-8"
             max-height="400"

@@ -72,8 +72,6 @@ const saveItem = async () => {
 
   try {
     if (isEdit.value) {
-      // Gunakan spoofing karena formData untuk image di PHP seringkali bermasalah pada verb PUT langsung
-      formData.append('_method', 'PUT')
       await axios.post(`/api/admin/kategori/${form.value.id}`, formData)
     } else {
       await axios.post('/api/admin/kategori', formData)

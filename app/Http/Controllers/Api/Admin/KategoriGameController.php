@@ -59,7 +59,8 @@ class KategoriGameController extends Controller
         $request->validate([
             'nama_game' => 'required|string',
             'deskripsi' => 'nullable|string',
-            'is_aktif' => 'boolean'
+            'is_aktif' => 'boolean',
+            'gambar_logo' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048'
         ]);
 
         $data = $request->except(['gambar_logo', '_method']);

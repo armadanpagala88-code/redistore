@@ -191,6 +191,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::put('/admin/transaksi/{id}/status', [App\Http\Controllers\Api\Admin\TransaksiController::class, 'updateStatus']);
         
         // Kategori Game
+        Route::post('/admin/kategori/{id}', [App\Http\Controllers\Api\Admin\KategoriGameController::class, 'update']);
         Route::apiResource('/admin/kategori', App\Http\Controllers\Api\Admin\KategoriGameController::class);
         
         // Produk Voucher
@@ -201,6 +202,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::apiResource('/admin/banner', App\Http\Controllers\Api\Admin\BannerController::class);
         
         // Artikel
+        Route::post('admin/upload-image', [\App\Http\Controllers\Api\Admin\ImageUploadController::class, 'upload']);
+        Route::post('admin/artikel/{id}', [\App\Http\Controllers\Api\Admin\ArtikelController::class, 'update']);
         Route::apiResource('admin/artikel', \App\Http\Controllers\Api\Admin\ArtikelController::class);
         Route::apiResource('admin/users', \App\Http\Controllers\Api\Admin\UserController::class);
         Route::apiResource('admin/kupon', \App\Http\Controllers\Api\Admin\DiskonVoucherController::class);

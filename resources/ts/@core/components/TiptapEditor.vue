@@ -3,7 +3,9 @@ import { Placeholder } from '@tiptap/extension-placeholder'
 import { TextAlign } from '@tiptap/extension-text-align'
 import { Underline } from '@tiptap/extension-underline'
 import { StarterKit } from '@tiptap/starter-kit'
+import { Image } from '@tiptap/extension-image'
 import { EditorContent, useEditor } from '@tiptap/vue-3'
+import axios from 'axios'
 
 const props = defineProps<{
   modelValue: string
@@ -14,13 +16,18 @@ const emit = defineEmits<{
 }>()
 
 const editorRef = ref()
+const fileInput = ref<HTMLInputElement | null>(null)
 
 const editor = useEditor({
   content: props.modelValue,
   extensions: [
     StarterKit,
+    Image.configure({
+      inline: true,
+      allowBase64: true,
+    }),
     TextAlign.configure({
-      types: ['heading', 'paragraph'],
+      types: ['heading', 'paragraph', 'image'],
     }),
     Placeholder.configure({
       placeholder: 'Write something here...',
@@ -34,6 +41,36 @@ const editor = useEditor({
     emit('update:modelValue', editor.value.getHTML())
   },
 })
+
+const triggerImageUpload = () => {
+  fileInput.value?.click()
+}
+
+const handleImageUpload = async (event: Event) => {
+  const target = event.target as HTMLInputElement
+  const file = target.files?.[0]
+  if (!file) return
+
+  const formData = new FormData()
+  formData.append('image', file)
+
+  try {
+    const res = await axios.post('/api/admin/upload-image', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    })
+    
+    if (res.data.success && res.data.url) {
+      editor.value?.chain().focus().setImage({ src: res.data.url }).run()
+    }
+  } catch (error) {
+    console.error('Failed to upload image', error)
+    alert('Gagal mengunggah gambar')
+  } finally {
+    if (fileInput.value) {
+      fileInput.value.value = ''
+    }
+  }
+}
 
 watch(() => props.modelValue, () => {
   const isSame = editor.value?.getHTML() === props.modelValue
@@ -123,6 +160,16 @@ watch(() => props.modelValue, () => {
         :class="{ 'is-active': editor.isActive({ textAlign: 'justify' }) }"
         @click="editor.chain().focus().setTextAlign('justify').run()"
       />
+      <VDivider vertical class="mx-2" />
+      <VBtn
+        icon="ri-image-add-line"
+        class="rounded"
+        size="small"
+        variant="text"
+        color="default"
+        @click="triggerImageUpload"
+      />
+      <input type="file" ref="fileInput" accept="image/*" style="display: none" @change="handleImageUpload" />
     </div>
     <VDivider class="mt-4 mb-2" />
     <EditorContent
