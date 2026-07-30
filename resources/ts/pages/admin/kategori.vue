@@ -80,8 +80,12 @@ const saveItem = async () => {
     }
     isDialogVisible.value = false
     fetchItems()
-  } catch (e) {
-    alert('Gagal menyimpan data')
+  } catch (e: any) {
+    if (e.response && e.response.data) {
+      alert('Gagal menyimpan data: ' + JSON.stringify(e.response.data))
+    } else {
+      alert('Gagal menyimpan data: ' + e.message)
+    }
   }
 }
 
