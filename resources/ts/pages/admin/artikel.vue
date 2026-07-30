@@ -140,7 +140,7 @@ const formatDate = (dateString: string) => {
           <tr v-for="item in items" :key="item.id" class="transition-swing">
             <td class="py-3">
               <VAvatar size="60" rounded="lg" color="surface-variant" variant="tonal" class="elevation-1">
-                <VImg v-if="item.gambar" :src="item.gambar" cover />
+                <VImg v-if="item.gambar" :src="item.gambar ? '/img/' + item.gambar : ''" cover />
                 <VIcon v-else icon="ri-image-line" color="grey-darken-1" size="24" />
               </VAvatar>
             </td>

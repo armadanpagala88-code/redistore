@@ -37,8 +37,8 @@ class ArtikelController extends Controller
         if ($request->hasFile('gambar')) {
             $file = $request->file('gambar');
             $filename = time() . '_' . $file->getClientOriginalName();
-            $file->move(public_path('uploads/artikel'), $filename);
-            $gambarPath = '/uploads/artikel/' . $filename;
+            $file->move(storage_path('app/public/artikel'), $filename);
+            $gambarPath = 'artikel/' . $filename;
         }
 
         $artikel = Artikel::create([
@@ -88,14 +88,14 @@ class ArtikelController extends Controller
         if ($request->hasFile('gambar')) {
             $file = $request->file('gambar');
             $filename = time() . '_' . $file->getClientOriginalName();
-            $file->move(public_path('uploads/artikel'), $filename);
+            $file->move(storage_path('app/public/artikel'), $filename);
             
             // Delete old file if exists
-            if ($artikel->gambar && file_exists(public_path($artikel->gambar))) {
-                @unlink(public_path($artikel->gambar));
+            if ($artikel->gambar && file_exists(storage_path('app/public/' . $artikel->gambar))) {
+                @unlink(storage_path('app/public/' . $artikel->gambar));
             }
             
-            $artikel->gambar = '/uploads/artikel/' . $filename;
+            $artikel->gambar = 'artikel/' . $filename;
         }
 
         $artikel->judul = $request->judul;
@@ -117,8 +117,8 @@ class ArtikelController extends Controller
         $artikel = Artikel::findOrFail($id);
         
         // Hapus file gambar
-        if ($artikel->gambar && file_exists(public_path($artikel->gambar))) {
-            @unlink(public_path($artikel->gambar));
+        if ($artikel->gambar && file_exists(storage_path('app/public/' . $artikel->gambar))) {
+            @unlink(storage_path('app/public/' . $artikel->gambar));
         }
 
         $artikel->delete();

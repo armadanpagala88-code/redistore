@@ -136,7 +136,7 @@ const deleteItem = async (id: string) => {
             <td class="py-3">
               <div class="d-flex align-center gap-3">
                 <VAvatar rounded="lg" size="48" color="surface-variant" variant="tonal" class="elevation-1">
-                  <VImg :src="item.gambar_logo ? `/images/${item.gambar_logo}` : 'https://placehold.co/100x100'" cover />
+                  <VImg :src="item.gambar_logo ? `/img/kategori/${item.gambar_logo}` : 'https://placehold.co/100x100'" cover />
                 </VAvatar>
                 <div class="font-weight-bold text-high-emphasis">{{ item.nama_game }}</div>
               </div>

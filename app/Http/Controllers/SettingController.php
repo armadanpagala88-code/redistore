@@ -44,11 +44,13 @@ class SettingController extends Controller
                 $file = $request->file('logo');
                 
                 // Ensure directory exists in uploads (which is a persistent volume)
-                if (!file_exists(public_path('uploads'))) {
-                    @mkdir(public_path('uploads'), 0755, true);
+                if (!file_exists(storage_path('app/public/settings'))) {
+                    @mkdir(storage_path('app/public/settings'), 0755, true);
                 }
 
-                $file->move(public_path('uploads'), 'logo.png');
+                $file->move(storage_path('app/public/settings'), 'logo.png');
+                $data['logo'] = 'settings/logo.png'; // Will be saved in loop below if we don't unset it, wait, loop skips 'logo'. We must handle it.
+                Setting::updateOrCreate(['key' => 'logo'], ['value' => 'settings/logo.png']);
             } catch (\Exception $e) {
                 \Log::error('Gagal upload logo: ' . $e->getMessage());
                 // Lanjut menyimpan pengaturan lain meskipun logo gagal

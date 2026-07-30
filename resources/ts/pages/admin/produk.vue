@@ -199,7 +199,7 @@ const doSyncDigiflazz = async () => {
             <td class="font-weight-bold py-3">
               <div class="d-flex align-center gap-2">
                 <VAvatar size="32" variant="tonal" color="primary" rounded>
-                  <VImg :src="item.kategori?.gambar_logo ? `/images/${item.kategori.gambar_logo}` : 'https://placehold.co/100x100'" cover />
+                  <VImg :src="item.kategori?.gambar_logo ? `/img/kategori/${item.kategori.gambar_logo}` : 'https://placehold.co/100x100'" cover />
                 </VAvatar>
                 {{ item.kategori?.nama_game }}
               </div>

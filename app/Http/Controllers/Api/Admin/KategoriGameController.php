@@ -33,7 +33,7 @@ class KategoriGameController extends Controller
         if ($request->hasFile('gambar_logo')) {
             $file = $request->file('gambar_logo');
             $filename = time() . '_' . $file->getClientOriginalName();
-            $file->move(public_path('images'), $filename);
+            $file->move(storage_path('app/public/kategori'), $filename);
             $data['gambar_logo'] = $filename;
         }
 
@@ -68,10 +68,10 @@ class KategoriGameController extends Controller
         if ($request->hasFile('gambar_logo')) {
             $file = $request->file('gambar_logo');
             $filename = time() . '_' . $file->getClientOriginalName();
-            $file->move(public_path('images'), $filename);
+            $file->move(storage_path('app/public/kategori'), $filename);
 
-            if ($kategori->gambar_logo && file_exists(public_path('images/' . $kategori->gambar_logo))) {
-                unlink(public_path('images/' . $kategori->gambar_logo));
+            if ($kategori->gambar_logo && file_exists(storage_path('app/public/kategori/' . $kategori->gambar_logo))) {
+                @unlink(storage_path('app/public/kategori/' . $kategori->gambar_logo));
             }
 
             $data['gambar_logo'] = $filename;
@@ -91,8 +91,8 @@ class KategoriGameController extends Controller
         try {
             $kategori = KategoriGame::findOrFail($id);
 
-            if ($kategori->gambar_logo && file_exists(public_path('images/' . $kategori->gambar_logo))) {
-                unlink(public_path('images/' . $kategori->gambar_logo));
+            if ($kategori->gambar_logo && file_exists(storage_path('app/public/kategori/' . $kategori->gambar_logo))) {
+                @unlink(storage_path('app/public/kategori/' . $kategori->gambar_logo));
             }
 
             $kategori->delete();

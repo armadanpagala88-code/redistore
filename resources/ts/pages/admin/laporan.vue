@@ -103,7 +103,7 @@ const printLaporan = () => {
     <!-- Print Header: Show ONLY when printing -->
     <div class="print-header mb-6 pb-4">
       <div class="d-flex align-center">
-        <img src="/uploads/logo.png" alt="Logo" style="height: 50px; margin-right: 16px; object-fit: contain;">
+        <img src="/img/settings/logo.png" alt="Logo" style="height: 50px; margin-right: 16px; object-fit: contain;">
         <div class="text-left">
           <h2 class="text-h4 font-weight-black mb-1 text-black" style="line-height: 1.2;">REDISTORE</h2>
           <h3 class="text-h6 text-black font-weight-medium" style="line-height: 1.2;">Laporan Penjualan</h3>
