@@ -377,8 +377,8 @@ const submitEdit = async () => {
                   Tolak
                 </VBtn>
                 
-                <VBtn v-if="item.status !== 'Terjual'" icon="ri-pencil-line" variant="tonal" size="small" color="primary" @click="openEditDialog(item)" />
-                <VBtn v-if="item.status !== 'Terjual' && item.status !== 'Pending'" icon="ri-delete-bin-line" variant="tonal" size="small" color="error" @click="deleteItem(item.id)" />
+                <VBtn icon="ri-pencil-line" variant="tonal" size="small" color="primary" @click="openEditDialog(item)" />
+                <VBtn v-if="item.status !== 'Pending'" icon="ri-delete-bin-line" variant="tonal" size="small" color="error" @click="deleteItem(item.id)" />
               </div>
             </td>
           </tr>
